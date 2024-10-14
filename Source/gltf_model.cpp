@@ -312,6 +312,7 @@ void gltf_model::fetch_meshes(ID3D11Device* device, const tinygltf::Model& Model
 				}
 			}
 		}
+		//‚Ä‚·‚Æ
 	}
 }
 
