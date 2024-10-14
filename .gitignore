@@ -1,0 +1,14 @@
+3dgp.vcxproj.user
+Blend mode formulas.docx
+Mtl Specification.txt
+Obj Specification.txt
+.vs/
+cereal-master/
+DirectXTK-master/
+FBX2glTF/
+reflection_capture_tool/
+Resources/
+x64/
+Source/tinygltf-release/
+Source/imgui/
+3dgp.exe
