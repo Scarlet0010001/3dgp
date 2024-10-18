@@ -64,8 +64,8 @@ gltf_model::gltf_model(ID3D11Device* device, const std::string& filename) : file
 			{ "TEXCOORD", 0, vertex_buffer_views.at("TEXCOORD_0").format, 3, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "JOINTS", 0, vertex_buffer_views.at("JOINTS_0").format, 4, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "WEIGHTS", 0, vertex_buffer_views.at("WEIGHTS_0").format, 5, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			//{ "JOINTS", 1/*EIGHT_BONES*/, vertex_buffer_views.at("JOINTS_1").format, 6, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, // EIGHT_BONES
-			//{ "WEIGHTS", 1/*EIGHT_BONES*/,vertex_buffer_views.at("WEIGHTS_1").format, 7, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // EIGHT_BONES
+			{ "JOINTS", 1/*EIGHT_BONES*/, vertex_buffer_views.at("JOINTS_1").format, 6, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, // EIGHT_BONES
+			{ "WEIGHTS", 1/*EIGHT_BONES*/,vertex_buffer_views.at("WEIGHTS_1").format, 7, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // EIGHT_BONES
 		};
 		create_vs_from_cso(device, "Shader\\gltf_model_vs.cso", vertex_shader.ReleaseAndGetAddressOf(),
 			input_layout.ReleaseAndGetAddressOf(), input_element_desc, _countof(input_element_desc));
@@ -185,6 +185,11 @@ gltf_model::buffer_view gltf_model::make_buffer_view(const tinygltf::Accessor& a
 			buffer_view.format = DXGI_FORMAT_R32_UINT;
 			buffer_view.stride_in_bytes = sizeof(UINT);
 			break;
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+			buffer_view.format = DXGI_FORMAT_R8G8B8A8_UINT;
+			buffer_view.stride_in_bytes = sizeof(USHORT);
+			break;
+
 		default:
 			_ASSERT_EXPR(FALSE, L"This accessor component type is not supported.");
 			break;
@@ -274,7 +279,7 @@ void gltf_model::fetch_meshes(ID3D11Device* device, const tinygltf::Model& Model
 			hr = device->CreateBuffer(&buffer_desc, &subresource_data,
 			primitive.index_buffer_view.buffer.ReleaseAndGetAddressOf());
 			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
+			int a = 0;
 			// Create vertex buffers
 			for (std::map<std::string, int>::const_reference gltf_attribute : gltf_primitive.attributes)
 			{
@@ -295,6 +300,7 @@ void gltf_model::fetch_meshes(ID3D11Device* device, const tinygltf::Model& Model
 				_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 				
 				 primitive.vertex_buffer_views.emplace(std::make_pair(gltf_attribute.first, vertex_buffer_view));
+				 a++;
 			}
 			
 			// Add dummy attributes if any are missing.
@@ -734,8 +740,8 @@ void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::X
 			primitive.vertex_buffer_views.at("TEXCOORD_0").buffer.Get(),
 			primitive.vertex_buffer_views.at("JOINTS_0").buffer.Get(),
 			primitive.vertex_buffer_views.at("WEIGHTS_0").buffer.Get(),
-			//primitive.vertex_buffer_views.at("JOINTS_1").buffer.Get(),
-			//primitive.vertex_buffer_views.at("WEIGHTS_1").buffer.Get(),
+			primitive.vertex_buffer_views.at("JOINTS_1").buffer.Get(),
+			primitive.vertex_buffer_views.at("WEIGHTS_1").buffer.Get(),
 			};
 			UINT strides[]{
 				static_cast<UINT>(primitive.vertex_buffer_views.at("POSITION").stride_in_bytes),
@@ -744,8 +750,8 @@ void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::X
 				static_cast<UINT>(primitive.vertex_buffer_views.at("TEXCOORD_0").stride_in_bytes),
 				static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_0").stride_in_bytes),
 				static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_0").stride_in_bytes),
-				//static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_1").stride_in_bytes),
-				//static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_1").stride_in_bytes),
+				static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_1").stride_in_bytes),
+				static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_1").stride_in_bytes),
 			};
 			UINT offsets[_countof(vertex_buffers)]{ 0 };
 			immediate_context->IASetVertexBuffers(0, _countof(vertex_buffers), vertex_buffers, strides, offsets);

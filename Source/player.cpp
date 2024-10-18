@@ -20,8 +20,8 @@ Player::Player()
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
 		//"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf");
-		"Resources/test asset/stone_golem/stone_golem.gltf");
-		//"Resources/test asset/Ancient_Golem_UE/Ancient_Golem.gltf");
+		//"Resources/test asset/stone_golem/stone_golem.gltf");
+		"Resources/Player/white_crow.gltf");
 	//skill_manager = std::make_unique<SkillManager>();
 	//キャラが持つ剣
 	//sword = std::make_unique<Sword>();
@@ -50,7 +50,7 @@ void Player::Initialize()
 	jump_count = jump_limit;
 
 	position = { 0.0f,2.0f,0.0f };
-	scale.x = scale.y = scale.z = 10.0f;
+	scale.x = scale.y = scale.z = 1.0f;
 
 	charaParam.moveSpeed = 5.0f;
 
