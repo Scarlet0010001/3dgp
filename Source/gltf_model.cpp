@@ -283,11 +283,19 @@ void gltf_model::fetch_meshes(ID3D11Device* device, const tinygltf::Model& Model
 			// Create vertex buffers
 			for (std::map<std::string, int>::const_reference gltf_attribute : gltf_primitive.attributes)
 			{
-				const tinygltf::Accessor & gltf_accessor{ Model.accessors.at(gltf_attribute.second) };
+				const tinygltf::Accessor &
+					gltf_accessor{ Model.accessors.at(gltf_attribute.second) };
 				const tinygltf::BufferView & gltf_buffer_view{ Model.bufferViews.at(gltf_accessor.bufferView) };
-				
+
 				buffer_view vertex_buffer_view{ make_buffer_view(gltf_accessor) };
 				
+				//if (primitive.vertex_buffer_views.find("WEIGHTS_1")->first == gltf_attribute.first)
+				if ("WEIGHTS_1" == gltf_attribute.first && a == 9)
+				{
+					//if(gltf_primitive.attributes.find("WEIGHTS_1")->first)
+					//continue;
+				}
+
 				D3D11_BUFFER_DESC buffer_desc{};
 				buffer_desc.ByteWidth = static_cast<UINT>(vertex_buffer_view.size_in_bytes);
 				buffer_desc.Usage = D3D11_USAGE_DEFAULT;
