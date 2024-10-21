@@ -5,9 +5,10 @@
 void Player::TransitionIdleState()
 {
 	p_update = &Player::UpdateIdleState;
-	//model->animate(PlayerAnimation::PLAYER_IDLE, true);
+	//model->animate(PlayerAnimation::PLAYER_IDLE, anime_time,model->nodes, true);
 	state = State::IDLE;
-
+	playerAnimation = PlayerAnimation::PLAYER_IDLE;
+	anime_time = 0.0f;
 }
 
 void Player::TransitionMoveState()
@@ -44,6 +45,7 @@ void Player::TransitionShotState()
 
 void Player::UpdateIdleState(float elapsedTime)
 {
+	//model->animate(PlayerAnimation::PLAYER_IDLE, anime_time, model->nodes, true);
 	if (InputMove(elapsedTime))
 	{
 		TransitionMoveState();

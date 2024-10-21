@@ -19,9 +19,11 @@ Player::Player()
 	Graphics& graphics = Graphics::Instance();
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
-		//"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf");
-		//"Resources/test asset/stone_golem/stone_golem.gltf");
-		"Resources/Player/white_crow.gltf");
+		//"Resources/Player/fbxGLTF/white_crow.gltf");
+		//"Resources/Player/glb/white_crow.glb");
+		"Resources/Player/glb/white_crow_test.glb");
+		//"Resources/Player/white_crow.gltf");
+
 	//skill_manager = std::make_unique<SkillManager>();
 	//キャラが持つ剣
 	//sword = std::make_unique<Sword>();
@@ -88,6 +90,7 @@ void Player::Update(float elapsedTime)
 	//無敵時間の更新
 	UpdateInvicibleTimer(elapsedTime);
 
+	anime_time += elapsedTime;
 	collider.start = position;
 	collider.end = { position.x,position.y + charaParam.height, position.z };
 	collider.radius = 1.0f;
@@ -106,8 +109,8 @@ void Player::Render_f(float elapsedTime)
 	static std::vector<gltf_model::node> animated_nodes{ model->nodes };
 	static float time{ 0 };
 	//ブレンドアニメーションはゲープロか福井先生のやつ
-	model->animate(0, time += elapsedTime, animated_nodes);
-	model->render(graphics.Get_DC().Get(), transform, animated_nodes, -1);
+	model->animate(playerAnimation, time += elapsedTime, animated_nodes, true);
+	model->render(graphics.Get_DC().Get(), transform, animated_nodes);
 
 	//デバッグGUI描画
 	DebugGUI();
@@ -436,25 +439,25 @@ void Player::DebugGUI()
 
 			//	}
 			//}
-			//if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
-			//{
-			//	const char* anime_item[] = { "IDLE","MOVE","JUMP","FALL","LANDING" };
-			//	static int item_current = 0;
-			//	static bool loop = false;
-			//	ImGui::Combo("anime", &item_current, anime_item, IM_ARRAYSIZE(anime_item)); ImGui::Checkbox("is_loop", &loop);
-			//	if (ImGui::Button("play", { 80,20 }))
-			//	{
-			//		//model->animate(item_current, loop, 0.1f);
-			//	}
-			//	string s;
-			//	ImGui::DragInt("index", &model->anime_param.current_index);
-			//	ImGui::DragInt("frame_index", &model->anime_param.frame_index);
-			//	ImGui::Checkbox("end_flag", &model->anime_param.end_flag);
-			//	ImGui::DragFloat("current_time", &model->anime_param.current_time);
-			//	ImGui::DragFloat("playback_speed", &model->anime_param.playback_speed, 0.1f);
-			//	ImGui::DragFloat("blend_time", &model->anime_param.blend_time);
-			//	ImGui::DragFloat("sampling", &model->anime_param.animation.sampling_rate);
-			//}
+			if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				const char* anime_item[] = { "IDLE","MOVE","JUMP","FALL","LANDING" };
+				static int item_current = 0;
+				static bool loop = false;
+				ImGui::Combo("anime", &item_current, anime_item, IM_ARRAYSIZE(anime_item)); ImGui::Checkbox("is_loop", &loop);
+				if (ImGui::Button("play", { 80,20 }))
+				{
+					//model->animate(item_current, loop, 0.1f);
+				}
+				//string s;
+				//ImGui::DragInt("index", &model->anime_param.current_index);
+				//ImGui::DragInt("frame_index", &model->anime_param.frame_index);
+				//ImGui::Checkbox("end_flag", &model->anime_param.end_flag);
+				//ImGui::DragFloat("current_time", &model->anime_param.current_time);
+				//ImGui::DragFloat("playback_speed", &model->anime_param.playback_speed, 0.1f);
+				//ImGui::DragFloat("blend_time", &model->anime_param.blend_time);
+				//ImGui::DragFloat("sampling", &model->anime_param.animation.sampling_rate);
+			}
 
 		}
 		ImGui::End();

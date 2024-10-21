@@ -203,6 +203,8 @@ private:
 
 	std::unique_ptr <gltf_model> model;
 
+	float anime_time = 0.0f;
+
 	//現何回ジャンプしてるか
 	int jump_count = 0;
 	//ジャンプ可能回数

@@ -40,7 +40,7 @@ gltf_model::gltf_model(ID3D11Device* device, const std::string& filename) : file
 		scene.name = Model.scenes.at(0).name;
 		scene.nodes = Model.scenes.at(0).nodes;
 	}
-
+	Model.meshes.at(0).weights;
 	fetch_nodes(Model);
 
 	fetch_meshes(device, Model);
@@ -56,19 +56,36 @@ gltf_model::gltf_model(ID3D11Device* device, const std::string& filename) : file
 		meshes.at(0).primitives.at(0).vertex_buffer_views };
 
 	{
-		D3D11_INPUT_ELEMENT_DESC input_element_desc[]
+		if (vertex_buffer_views.size() > 6)
 		{
-			{ "POSITION", 0, vertex_buffer_views.at("POSITION").format, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{ "NORMAL", 0, vertex_buffer_views.at("NORMAL").format, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TANGENT", 0, vertex_buffer_views.at("TANGENT").format, 2, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, vertex_buffer_views.at("TEXCOORD_0").format, 3, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "JOINTS", 0, vertex_buffer_views.at("JOINTS_0").format, 4, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "WEIGHTS", 0, vertex_buffer_views.at("WEIGHTS_0").format, 5, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "JOINTS", 1/*EIGHT_BONES*/, vertex_buffer_views.at("JOINTS_1").format, 6, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, // EIGHT_BONES
-			{ "WEIGHTS", 1/*EIGHT_BONES*/,vertex_buffer_views.at("WEIGHTS_1").format, 7, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // EIGHT_BONES
-		};
-		create_vs_from_cso(device, "Shader\\gltf_model_vs.cso", vertex_shader.ReleaseAndGetAddressOf(),
-			input_layout.ReleaseAndGetAddressOf(), input_element_desc, _countof(input_element_desc));
+			D3D11_INPUT_ELEMENT_DESC input_element_desc[]
+			{
+				{ "POSITION", 0, vertex_buffer_views.at("POSITION").format, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{ "NORMAL", 0, vertex_buffer_views.at("NORMAL").format, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TANGENT", 0, vertex_buffer_views.at("TANGENT").format, 2, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD", 0, vertex_buffer_views.at("TEXCOORD_0").format, 3, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "JOINTS", 0, vertex_buffer_views.at("JOINTS_0").format, 4, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "WEIGHTS", 0, vertex_buffer_views.at("WEIGHTS_0").format, 5, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "JOINTS", 1/*EIGHT_BONES*/, vertex_buffer_views.at("JOINTS_1").format, 6, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, // EIGHT_BONES
+				{ "WEIGHTS", 1/*EIGHT_BONES*/,vertex_buffer_views.at("WEIGHTS_1").format, 7, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // EIGHT_BONES
+			};
+			create_vs_from_cso(device, "Shader\\gltf_model_vs.cso", vertex_shader.ReleaseAndGetAddressOf(),
+				input_layout.ReleaseAndGetAddressOf(), input_element_desc, _countof(input_element_desc));
+		}
+		else
+		{
+			D3D11_INPUT_ELEMENT_DESC input_element_desc[]
+			{
+				{ "POSITION", 0, vertex_buffer_views.at("POSITION").format, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{ "NORMAL", 0, vertex_buffer_views.at("NORMAL").format, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TANGENT", 0, vertex_buffer_views.at("TANGENT").format, 2, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD", 0, vertex_buffer_views.at("TEXCOORD_0").format, 3, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "JOINTS", 0, vertex_buffer_views.at("JOINTS_0").format, 4, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "WEIGHTS", 0, vertex_buffer_views.at("WEIGHTS_0").format, 5, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			};
+			create_vs_from_cso(device, "Shader\\gltf_model_vs.cso", vertex_shader.ReleaseAndGetAddressOf(),
+				input_layout.ReleaseAndGetAddressOf(), input_element_desc, _countof(input_element_desc));
+		}
 	}
 
 	create_ps_from_cso(device, "Shader\\gltf_model_ps.cso", pixel_shader.ReleaseAndGetAddressOf());
@@ -289,13 +306,6 @@ void gltf_model::fetch_meshes(ID3D11Device* device, const tinygltf::Model& Model
 
 				buffer_view vertex_buffer_view{ make_buffer_view(gltf_accessor) };
 				
-				//if (primitive.vertex_buffer_views.find("WEIGHTS_1")->first == gltf_attribute.first)
-				if ("WEIGHTS_1" == gltf_attribute.first && a == 9)
-				{
-					//if(gltf_primitive.attributes.find("WEIGHTS_1")->first)
-					//continue;
-				}
-
 				D3D11_BUFFER_DESC buffer_desc{};
 				buffer_desc.ByteWidth = static_cast<UINT>(vertex_buffer_view.size_in_bytes);
 				buffer_desc.Usage = D3D11_USAGE_DEFAULT;
@@ -494,7 +504,7 @@ void gltf_model::fetch_animations(const tinygltf::Model& Model)
 			const BufferView & gltf_buffer_view{ Model.bufferViews.at(gltf_accessor.bufferView) };
 			pair<unordered_map<int, vector<float>>::iterator, bool>&timelines{
 			animation.timelines.emplace(gltf_sampler.input, gltf_accessor.count) };
-			if (timelines.second)
+ 			if (timelines.second)
 			{
 				memcpy(timelines.first->second.data(), Model.buffers.at(gltf_buffer_view.buffer).data.data() +
 				gltf_buffer_view.byteOffset + gltf_accessor.byteOffset, gltf_accessor.count * sizeof(FLOAT));
@@ -544,7 +554,10 @@ void gltf_model::fetch_animations(const tinygltf::Model& Model)
 	}
 }
 
-void gltf_model::animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback)
+void gltf_model::animate(size_t animation_index, 
+	float time, 
+	std::vector<node>& animated_nodes,
+	bool loopback)
 {
 	using namespace std;
 	using namespace DirectX;
@@ -741,30 +754,56 @@ void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::X
 		const mesh & mesh{ meshes.at(node.mesh) };
 		for (std::vector<mesh::primitive>::const_reference primitive : mesh.primitives)
 		{
-			ID3D11Buffer * vertex_buffers[]{
-			primitive.vertex_buffer_views.at("POSITION").buffer.Get(),
-			primitive.vertex_buffer_views.at("NORMAL").buffer.Get(),
-			primitive.vertex_buffer_views.at("TANGENT").buffer.Get(),
-			primitive.vertex_buffer_views.at("TEXCOORD_0").buffer.Get(),
-			primitive.vertex_buffer_views.at("JOINTS_0").buffer.Get(),
-			primitive.vertex_buffer_views.at("WEIGHTS_0").buffer.Get(),
-			primitive.vertex_buffer_views.at("JOINTS_1").buffer.Get(),
-			primitive.vertex_buffer_views.at("WEIGHTS_1").buffer.Get(),
-			};
-			UINT strides[]{
-				static_cast<UINT>(primitive.vertex_buffer_views.at("POSITION").stride_in_bytes),
-				static_cast<UINT>(primitive.vertex_buffer_views.at("NORMAL").stride_in_bytes),
-				static_cast<UINT>(primitive.vertex_buffer_views.at("TANGENT").stride_in_bytes),
-				static_cast<UINT>(primitive.vertex_buffer_views.at("TEXCOORD_0").stride_in_bytes),
-				static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_0").stride_in_bytes),
-				static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_0").stride_in_bytes),
-				static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_1").stride_in_bytes),
-				static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_1").stride_in_bytes),
-			};
+			if (primitive.vertex_buffer_views.size() > 6)
+			{
+				ID3D11Buffer* vertex_buffers[]{
+				primitive.vertex_buffer_views.at("POSITION").buffer.Get(),
+				primitive.vertex_buffer_views.at("NORMAL").buffer.Get(),
+				primitive.vertex_buffer_views.at("TANGENT").buffer.Get(),
+				primitive.vertex_buffer_views.at("TEXCOORD_0").buffer.Get(),
+				primitive.vertex_buffer_views.at("JOINTS_0").buffer.Get(),
+				primitive.vertex_buffer_views.at("WEIGHTS_0").buffer.Get(),
+				primitive.vertex_buffer_views.at("JOINTS_1").buffer.Get(),
+				primitive.vertex_buffer_views.at("WEIGHTS_1").buffer.Get(),
+				};
+				UINT strides[]{
+					static_cast<UINT>(primitive.vertex_buffer_views.at("POSITION").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("NORMAL").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("TANGENT").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("TEXCOORD_0").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_0").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_0").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_1").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_1").stride_in_bytes),
+				};
 			UINT offsets[_countof(vertex_buffers)]{ 0 };
 			immediate_context->IASetVertexBuffers(0, _countof(vertex_buffers), vertex_buffers, strides, offsets);
 			immediate_context->IASetIndexBuffer(primitive.index_buffer_view.buffer.Get(),
-			primitive.index_buffer_view.format, 0);
+				primitive.index_buffer_view.format, 0);
+			}
+			else
+			{
+				ID3D11Buffer* vertex_buffers[]{
+				primitive.vertex_buffer_views.at("POSITION").buffer.Get(),
+				primitive.vertex_buffer_views.at("NORMAL").buffer.Get(),
+				primitive.vertex_buffer_views.at("TANGENT").buffer.Get(),
+				primitive.vertex_buffer_views.at("TEXCOORD_0").buffer.Get(),
+				primitive.vertex_buffer_views.at("JOINTS_0").buffer.Get(),
+				primitive.vertex_buffer_views.at("WEIGHTS_0").buffer.Get(),
+				};
+				UINT strides[]{
+					static_cast<UINT>(primitive.vertex_buffer_views.at("POSITION").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("NORMAL").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("TANGENT").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("TEXCOORD_0").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("JOINTS_0").stride_in_bytes),
+					static_cast<UINT>(primitive.vertex_buffer_views.at("WEIGHTS_0").stride_in_bytes),
+				};
+				UINT offsets[_countof(vertex_buffers)]{ 0 };
+				immediate_context->IASetVertexBuffers(0, _countof(vertex_buffers), vertex_buffers, strides, offsets);
+				immediate_context->IASetIndexBuffer(primitive.index_buffer_view.buffer.Get(),
+					primitive.index_buffer_view.format, 0);
+			}
 	
 			const material& material{ materials.at(primitive.material) };
 			const int texture_indices[]
@@ -800,7 +839,7 @@ void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::X
 				immediate_context->UpdateSubresource(primitive_joint_cbuffer.Get(), 0, 0, &primitive_joint_data, 0, 0);
 				immediate_context->VSSetConstantBuffers(2, 1, primitive_joint_cbuffer.GetAddressOf());
 			}
-
+			
 			primitive_constants primitive_data{};
 			primitive_data.material = primitive.material;
 			primitive_data.has_tangent = primitive.vertex_buffer_views.at("TANGENT").buffer != NULL;
