@@ -79,6 +79,8 @@ public:
     void UpdateWithTracking(float elapsedTime);
     //ロックオン対象にカメラを向ける
     void UpdateWithLockOn(float elapsedTime);
+    //飛行中プレイヤーの正面を写すように向ける
+    void UpdateWithWing(float elapsedTime);
     //コントローラーのスティックで操作
     void ControlByGamePadStick(float elapsedTime);
     //void move_viewing_angle(bool is_move, float elapsed_time){};
@@ -161,6 +163,7 @@ private:
     DirectX::XMFLOAT3 eye; //視点
     DirectX::XMFLOAT3 trakkingTarget;//注視点
     DirectX::XMFLOAT3 lockOnTarget;//注視点
+    DirectX::XMFLOAT3 wingTarget;//注視点
     DirectX::XMFLOAT3 angle;
     DirectX::XMFLOAT4 orientation = { 0,0,0,1 };
     DirectX::XMFLOAT4 standardOrientation = { 0,0,0,1 };

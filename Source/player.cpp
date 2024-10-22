@@ -19,10 +19,8 @@ Player::Player()
 	Graphics& graphics = Graphics::Instance();
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
-		//"Resources/Player/fbxGLTF/white_crow.gltf");
 		//"Resources/Player/glb/white_crow.glb");
 		"Resources/Player/glb/white_crow_test.glb");
-		//"Resources/Player/white_crow.gltf");
 
 	//skill_manager = std::make_unique<SkillManager>();
 	//キャラが持つ剣
@@ -52,7 +50,7 @@ void Player::Initialize()
 	jump_count = jump_limit;
 
 	position = { 0.0f,2.0f,0.0f };
-	scale.x = scale.y = scale.z = 1.0f;
+	scale.x = scale.y = scale.z = 3.0f;
 
 	charaParam.moveSpeed = 5.0f;
 
@@ -79,9 +77,9 @@ void Player::Update(float elapsedTime)
 		camera->SetLockOn();
 	}
 
-	if (isFallDawn)
+	if (isWing)
 	{
-		velocity.y = 0.0f;
+		InputWing();
 	}
 
 	//プレイヤーの正面情報を更新
@@ -89,7 +87,6 @@ void Player::Update(float elapsedTime)
 
 	//無敵時間の更新
 	UpdateInvicibleTimer(elapsedTime);
-
 	anime_time += elapsedTime;
 	collider.start = position;
 	collider.end = { position.x,position.y + charaParam.height, position.z };
@@ -140,6 +137,23 @@ void Player::JudgeSkillCollision(Capsule object_colider, AddDamageFunc damaged_f
 {
 }
 
+void Player::Move(float vx, float vz, float speed)
+{
+	//移動方向ベクトルを設定
+	moveVec_x = vx;
+	moveVec_z = vz;
+
+	if (state == State::WING)
+	{
+		charaParam.maxMoveSpeed = param.wingSpeed;
+	}
+	else
+	{
+		//最大速度設定
+		charaParam.maxMoveSpeed = speed;
+	}
+}
+
 bool Player::InputMove(float elapsedTime)
 {
 	//進行ベクトル取得
@@ -160,6 +174,18 @@ bool Player::InputMove(float elapsedTime, float restrictionMove, float restricti
 	//移動処理
 	Move(move_vec.x, move_vec.z, charaParam.moveSpeed / restrictionMove);
 	Turn(elapsedTime, move_vec, charaParam.turnSpeed / restrictionTurn, orientation);
+
+	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
+}
+
+bool Player::InputMove(float elapsedTime, float move_speed)
+{
+	//進行ベクトル取得
+	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
+
+	//移動処理
+	Move(move_vec.x, move_vec.z, move_speed);
+	Turn(elapsedTime, move_vec, charaParam.turnSpeed, orientation);
 
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
@@ -226,6 +252,14 @@ void Player::InputAvoidance()
 		TransitionAvoidanceState();
 	}
 
+}
+
+void Player::InputWing()
+{
+	if (gamePad->GetButtonDown() & GamePad::BTN_X)
+	{
+		TransitionWingState();
+	}
 }
 
 void Player::OnLanding()
@@ -342,7 +376,7 @@ void Player::DebugGUI()
 				state_name = magic_enum::enum_name<State>(state);
 				ImGui::Text(state_name.c_str());
 				ImGui::DragFloat3("velocity:", &velocity.x);
-				ImGui::Checkbox("isFallDawn:", &isFallDawn);
+				ImGui::Checkbox("isWing:", &isWing);
 			}
 			if (ImGui::CollapsingHeader("Param", ImGuiTreeNodeFlags_DefaultOpen))
 			{

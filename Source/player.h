@@ -45,6 +45,8 @@ public:
 	//スキルと敵の当たり判定
 	void JudgeSkillCollision(Capsule object_colider, AddDamageFunc damaged_func);
 
+	void Move(float vx, float vz, float speed)override;
+
 private:
 	//-------------構造体、列挙型--------------//
 	//アニメーション
@@ -76,6 +78,7 @@ private:
 	{
 		IDLE,
 		MOVE,
+		WING,
 		ROLL,
 		JUMP,
 		SHOT,
@@ -98,6 +101,8 @@ private:
 		float avoidanceSpeed = 50;
 		//debug用タイマー
 		int avoidanceTimer = 0;
+		//飛行速度
+		float wingSpeed = 40;
 		//浮遊度
 		float floatingValue = 10.0f;
 		//剣エフェクトの速度
@@ -117,6 +122,7 @@ private:
 				cereal::make_nvp("charaParam", charaInitParam),
 				cereal::make_nvp("jumpSpeed", jumpSpeed),
 				cereal::make_nvp("avoidanceSpeed", avoidanceSpeed),
+				cereal::make_nvp("wingSpeed", wingSpeed),
 				cereal::make_nvp("floatingValue", floatingValue),
 				cereal::make_nvp("swordSwingSpeed", swordSwingSpeed),
 				cereal::make_nvp("attack_combo_1", combo_1),
@@ -145,6 +151,8 @@ private:
 	//------------遷移--------------//
 	void TransitionIdleState();//待機
 	void TransitionMoveState();//走り
+	void TransitionWingState();//飛行
+	void TransitionWing_to_IdleState();//飛行から待機へ
 	void TransitionAvoidanceState();//回避
 	void TransitionJumpState();//ジャンプ
 	void TransitionShotState();//射撃
@@ -153,6 +161,7 @@ private:
 	//--------各ステートのアップデート--------//r_はルートモーション付き
 	void UpdateIdleState(float elapsedTime);//待機
 	void UpdateMoveState(float elapsedTime);//走り
+	void UpdateWingState(float elapsedTime);//飛行
 	void UpdateAvoidanceState(float elapsedTime);//回避
 	void UpdateJumpState(float elapsedTime);//ジャンプ
 	void UpdateShotState(float elapsedTime);//射撃
@@ -166,11 +175,17 @@ private:
 
 	//制限付きの移動（攻撃中などの移動入力）
 	bool InputMove(float elapsedTime, float restrictionMove, float restrictionTurn);
+	
+	bool InputMove(float elapsedTime, float move_speed);
+	
 	const DirectX::XMFLOAT3 GetMoveVec(Camera* camera) const;
 	//ジャンプ入力処理
 	void InputJump();
 	//回避入力
 	void InputAvoidance();
+
+	//飛行入力
+	void InputWing();
 
 	//着地したか
 	void OnLanding()override;
@@ -222,7 +237,7 @@ private:
 
 
 	//------------------デバッグ-------------------------
-	bool isFallDawn = false;
+	bool isWing = false;
 public:
 	//ダメージを受けたときに呼ばれる *関数を呼ぶのはダメージを与えたオブジェクト
 	AddDamageFunc damagedFunction;

@@ -92,7 +92,7 @@ public:
 	virtual bool ApplyDamage(int damage, float invincibleTime, WINCE_TYPE type);
 
 protected:
-	void Move(float vx, float vz, float speed);
+	virtual void Move(float vx, float vz, float speed);
 	void Turn(float elapsed_time, float vx, float vz, float speed);//オイラー
 	void Turn(float elapsed_time, DirectX::XMFLOAT3 move_vec, float speed, DirectX::XMFLOAT4& orien);//クォータニオン
 	//ジャンプ処理

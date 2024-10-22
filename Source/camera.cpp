@@ -299,6 +299,36 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 
 }
 
+void Camera::UpdateWithWing(float elapsedTime)
+{
+	//Y軸の回転値を-3.14~3.14に収まるようにする
+	if (angle.y < -DirectX::XM_PI) { angle.y += DirectX::XM_2PI; }
+	if (angle.y > DirectX::XM_PI) { angle.y -= DirectX::XM_2PI; }
+
+	// カメラ回転値を回転行列に変換
+	// XMVECTORクラスへ変換
+	DirectX::XMFLOAT3 forward = Math::get_posture_forward(orientation);
+
+	// レイキャスト(ターゲットと壁)
+	DirectX::XMFLOAT3 ray_target = trakkingTarget + DirectX::XMFLOAT3{ 0,-0.5,0 };//めり込まないよう少し下に下げる
+	DirectX::XMFLOAT3 start = ray_target;
+	DirectX::XMFLOAT3 end = ray_target - forward * DirectX::XMFLOAT3(range, range, range);
+	HitResult hit;
+	//StageManager::Instance().RayCast(start, end, hit);
+
+	//hit.distance = (std::max)(hit.distance, 0.5f);
+	//hit.distance = (std::min)(hit.distance, range);
+
+	hit.distance = 15.0f;
+
+	//注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
+	DirectX::XMFLOAT3 pos;
+	pos.x = trakkingTarget.x - forward.x * hit.distance;
+	pos.y = trakkingTarget.y - forward.y * hit.distance;
+	pos.z = trakkingTarget.z - forward.z * hit.distance;
+	eye = Math::Lerp(eye, pos, attendRate * elapsedTime);
+}
+
 void Camera::ControlByGamePadStick(float elapsedTime)
 {
 	GamePad& game_pad = Device::Instance().GetGamePad();

@@ -19,6 +19,18 @@ void Player::TransitionMoveState()
 
 }
 
+void Player::TransitionWingState()
+{
+	p_update = &Player::UpdateWingState;
+
+	state = State::WING;
+}
+
+void Player::TransitionWing_to_IdleState()
+{
+
+}
+
 void Player::TransitionAvoidanceState()
 {
 	p_update = &Player::UpdateAvoidanceState;
@@ -86,6 +98,30 @@ void Player::UpdateMoveState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
+void Player::UpdateWingState(float elapsedTime)
+{
+	//向いている方向に速度を足す
+	velocity.x = (forward * (param.wingSpeed)).x;
+	velocity.z = (forward * (param.wingSpeed)).z;
+
+	if (!InputMove(elapsedTime, 1.0f, 6.0f) && isGround)
+	{
+		//TransitionWing_to_IdleState();
+	}
+
+	//回避入力
+	InputAvoidance();
+
+	//攻撃入力
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	{
+	}
+
+	//速力処理更新
+	UpdateVelocity(elapsedTime, position);
+
+}
+
 void Player::UpdateAvoidanceState(float elapsedTime)
 {
 	//徐々に速度を落としていく
@@ -104,8 +140,8 @@ void Player::UpdateAvoidanceState(float elapsedTime)
 	else
 	{
 		//向いている方向に速度を足す
-		velocity.x += (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).x;
-		velocity.z += (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).z;
+		velocity.x = (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).x;
+		velocity.z = (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).z;
 
 	}
 
