@@ -70,6 +70,8 @@ public:
 	const DirectX::XMFLOAT3& GetVelocity() const { return velocity; }
 	//velocityセット
 	void SetVelocity(const DirectX::XMFLOAT3& v) { this->velocity = v; }
+	//orientation取得
+	const DirectX::XMFLOAT4& GetOrientation() const { return orientation; }
 	// 半径
 	float GetRadius() const { return charaParam.radius; }
 	// HP
@@ -127,6 +129,7 @@ protected:
 
 	float invincibleTimer = 0.0f;
 	float moveVec_x = 0.0f;
+	float moveVec_y = 0.0f;
 	float moveVec_z = 0.0f;
 
 	//体力
@@ -141,7 +144,7 @@ protected:
 	//-----------プライベート関数--------------//
 private:
 	//垂直速力更新処理
-	void UpdateVerticalVelocity(float elapsed_frame);
+	virtual void UpdateVerticalVelocity(float elapsed_frame);
 	//垂直移動更新処理
 	void UpdateVerticalMove(float elapsed_time, DirectX::XMFLOAT3& position);
 	//水平速力更新処理

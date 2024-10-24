@@ -6,7 +6,7 @@
 #include "debug_renderer.h"
 
 Camera::Camera()
-	: range(20.0f)
+	: range(10.0f)
 	, eye(5, 5, 5)
 	, angle(DirectX::XMConvertToRadians(0.0f), DirectX::XMConvertToRadians(-180.0f), 0)
 	, trakkingTarget(0.0f, 0, 0)
@@ -58,7 +58,7 @@ Camera::Camera()
 		eye.y = trakkingTarget.y - front.y * range;
 		eye.z = trakkingTarget.z - front.z * range;
 	}
-
+	state = STATE::Tracking;
 }
 
 void Camera::Update(float elapsedTime)
@@ -71,7 +71,7 @@ void Camera::Update(float elapsedTime)
 	if (lockOn)
 	{
 		//ロックオン時のカメラの挙動
-		UpdateWithLockOn(elapsedTime);
+		p_update = &Camera::UpdateWithLockOn;
 	}
 	else
 	{
@@ -82,7 +82,15 @@ void Camera::Update(float elapsedTime)
 		{
 			//ControlByGamePadStick(elapsedTime);
 			Mouse& mouse = Device::Instance().GetMouse();
-
+			if (state == STATE::Tracking)
+			{
+				p_update = &Camera::UpdateWithTracking;
+			}
+			else
+			{
+				p_update = &Camera::UpdateWithWing;
+			}
+			
 			if (mouse.GetButton() & mouse.BTN_LEFT_CLICK)
 			{
 				float ax = mouse.GetCursorPosition().x - mouse.GetOldCursorPosition().x;
@@ -176,7 +184,7 @@ void Camera::Update(float elapsedTime)
 		XMVECTOR focus_vec = XMLoadFloat3(&trakkingTarget);
 		//view行列
 		XMMATRIX view_mat = XMMatrixLookAtLH(eye_vec, focus_vec, up_vec);
-		XMStoreFloat4x4(&view, view_mat);
+		DirectX::XMStoreFloat4x4(&view, view_mat);
 
 		// プロジェクション行列を作成
 		float width = static_cast<float>(SCREEN_WIDTH);
@@ -203,7 +211,7 @@ void Camera::Update(float elapsedTime)
 		}
 #endif // USE_IMGUI
 		XMMATRIX projection_mat = XMMatrixPerspectiveFovLH(XMConvertToRadians(capeVision), aspect_ratio, nearFar.x, nearFar.y); // P
-		XMStoreFloat4x4(&projection, projection_mat);
+		DirectX::XMStoreFloat4x4(&projection, projection_mat);
 	}
 }
 
@@ -231,7 +239,7 @@ void Camera::UpdateWithTracking(float elapsedTime)
 	//hit.distance = (std::max)(hit.distance, 0.5f);
 	//hit.distance = (std::min)(hit.distance, range);
 
-	hit.distance = 20.0f;
+	hit.distance = range;
 
 	//注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
 	DirectX::XMFLOAT3 pos;
@@ -307,19 +315,18 @@ void Camera::UpdateWithWing(float elapsedTime)
 
 	// カメラ回転値を回転行列に変換
 	// XMVECTORクラスへ変換
-	DirectX::XMFLOAT3 forward = Math::get_posture_forward(orientation);
+	DirectX::XMFLOAT3 forward = Math::get_posture_forward(playerOrientation);
 
 	// レイキャスト(ターゲットと壁)
 	DirectX::XMFLOAT3 ray_target = trakkingTarget + DirectX::XMFLOAT3{ 0,-0.5,0 };//めり込まないよう少し下に下げる
 	DirectX::XMFLOAT3 start = ray_target;
 	DirectX::XMFLOAT3 end = ray_target - forward * DirectX::XMFLOAT3(range, range, range);
 	HitResult hit;
-	//StageManager::Instance().RayCast(start, end, hit);
 
 	//hit.distance = (std::max)(hit.distance, 0.5f);
 	//hit.distance = (std::min)(hit.distance, range);
-
-	hit.distance = 15.0f;
+	range = 5.0f;
+	hit.distance = range;
 
 	//注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
 	DirectX::XMFLOAT3 pos;
@@ -496,9 +503,9 @@ void Camera::CalcViewProjection(float elapsedTime)
 	DirectX::XMMATRIX V = XMLoadFloat4x4(&view);
 	DirectX::XMMATRIX P = XMLoadFloat4x4(&projection);
 	// 定数バッファにフェッチする
-	XMStoreFloat4x4(&sceneConstant->data.view, V);
-	XMStoreFloat4x4(&sceneConstant->data.projection, P);
-	XMStoreFloat4x4(&sceneConstant->data.view_projection, V * P);
+	DirectX::XMStoreFloat4x4(&sceneConstant->data.view, V);
+	DirectX::XMStoreFloat4x4(&sceneConstant->data.projection, P);
+	DirectX::XMStoreFloat4x4(&sceneConstant->data.view_projection, V * P);
 
 	sceneConstant->data.light_color = lightColor;
 	sceneConstant->data.light_direction = lightDirection;

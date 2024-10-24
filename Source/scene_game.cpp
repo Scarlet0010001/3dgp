@@ -61,6 +61,7 @@ void SceneGame::Update(float elapsedTime)
     camera->Update(elapsedTime);
     camera->CalcViewProjection(elapsedTime);
     camera->SetTrakkingTarget(player.get()->GetGazingPoint());
+    camera->SetPlayerOrientation(player->GetOrientation());
     //camera->set_lock_on_target(boss.get()->get_position());
 
         //ƒJƒƒ‰‚ÌŒo‰ßŠÔ

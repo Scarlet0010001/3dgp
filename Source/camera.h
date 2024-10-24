@@ -31,6 +31,13 @@ private:
         float delta_time;
     };
 public:
+    enum STATE
+    {
+        Tracking = 0,
+        LockOn,
+        Wing,
+    }state;
+
     //------カメラシェイク-------//
     struct CameraShakeParam
     {
@@ -129,6 +136,12 @@ public:
     //クォータニオン取得
     const DirectX::XMFLOAT4& GetOrientation()const { return orientation; }
 
+    //playerクォータニオン取得
+    const DirectX::XMFLOAT4& GetPlayerOrientation()const { return playerOrientation; }
+    //playerクォータニオン設定
+    void SetPlayerOrientation(DirectX::XMFLOAT4 orientation) { playerOrientation = orientation; }
+
+
     //ターゲットが移動しているかどうか
     void SetIsMove(bool m) { this->isMove = m; }
     //視野角取得
@@ -167,13 +180,16 @@ private:
     DirectX::XMFLOAT3 angle;
     DirectX::XMFLOAT4 orientation = { 0,0,0,1 };
     DirectX::XMFLOAT4 standardOrientation = { 0,0,0,1 };
+    DirectX::XMFLOAT4 playerOrientation = { 0,0,0,1 };
+
+    
 
     float lockOnRate = 6.0f;
     float sensitivityRate = 0.7f;
     bool isMove;
     float attendRate; // 減衰比率
     float capeVision = 60.0f;//視野角
-    float rollSpeed = 90;//回転速度
+    float rollSpeed = 60;//回転速度
 
     //垂直遅延
     float verticalRotationDegree = 0;

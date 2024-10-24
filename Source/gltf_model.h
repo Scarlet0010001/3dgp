@@ -54,6 +54,8 @@ public:
 			return size_in_bytes / stride_in_bytes;
 		}
 	};
+	bool eight_bones = false;
+
 	struct mesh
 	{
 		std::string name;

@@ -34,7 +34,7 @@ public:
 	//プレイヤーの腰当たりの位置
 	DirectX::XMFLOAT3 GetWaistPosition() { return DirectX::XMFLOAT3(position.x, position.y + charaParam.height / 2, position.z); }
 	//カメラがプレイヤーを見るときに注視するポイント
-	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 3), position.z); }
+	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 1.5f), position.z); }
 
 	//プレイヤーのコリジョンと敵の当たり判定
 	void CalcCollision_vs_Enemy(Capsule capsule_collider, float colider_height);
@@ -44,8 +44,6 @@ public:
 
 	//スキルと敵の当たり判定
 	void JudgeSkillCollision(Capsule object_colider, AddDamageFunc damaged_func);
-
-	void Move(float vx, float vz, float speed)override;
 
 private:
 	//-------------構造体、列挙型--------------//
@@ -170,8 +168,13 @@ private:
 	//更新関数の関数ポインタの定義
 	typedef void (Player::* ActUpdate)(float elapsedTime);
 
+	void Move(float vx, float vz, float speed)override;
+	void Move(float vx, float vy, float vz, float speed);
+
 	//プレイヤーの移動入力処理
 	bool InputMove(float elapsedTime);
+	//プレイヤーの飛行入力処理
+	bool InputMoveWing(float elapsedTime);
 
 	//制限付きの移動（攻撃中などの移動入力）
 	bool InputMove(float elapsedTime, float restrictionMove, float restrictionTurn);
@@ -204,6 +207,10 @@ private:
 
 	//浮遊する
 	bool Flying();
+
+	//垂直速力更新処理
+	 void UpdateVerticalVelocity(float elapsed_frame)override;
+
 
 	//--------------------変数--------------------------
 	//関数ポインタの宣言

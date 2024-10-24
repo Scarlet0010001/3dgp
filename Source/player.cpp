@@ -50,7 +50,7 @@ void Player::Initialize()
 	jump_count = jump_limit;
 
 	position = { 0.0f,2.0f,0.0f };
-	scale.x = scale.y = scale.z = 3.0f;
+	scale.x = scale.y = scale.z = 2.0f;
 
 	charaParam.moveSpeed = 5.0f;
 
@@ -76,11 +76,7 @@ void Player::Update(float elapsedTime)
 	{
 		camera->SetLockOn();
 	}
-
-	if (isWing)
-	{
-		InputWing();
-	}
+	if (state == State::WING) orientation = camera->GetOrientation();
 
 	//プレイヤーの正面情報を更新
 	forward = Math::get_posture_forward(orientation);
@@ -154,6 +150,24 @@ void Player::Move(float vx, float vz, float speed)
 	}
 }
 
+void Player::Move(float vx, float vy, float vz, float speed)
+{
+	//移動方向ベクトルを設定
+	moveVec_x = vx;
+	moveVec_y = vy;
+	moveVec_z = vz;
+
+	if (state == State::WING)
+	{
+		charaParam.maxMoveSpeed = param.wingSpeed;
+	}
+	else
+	{
+		//最大速度設定
+		charaParam.maxMoveSpeed = speed;
+	}
+}
+
 bool Player::InputMove(float elapsedTime)
 {
 	//進行ベクトル取得
@@ -185,6 +199,18 @@ bool Player::InputMove(float elapsedTime, float move_speed)
 
 	//移動処理
 	Move(move_vec.x, move_vec.z, move_speed);
+	Turn(elapsedTime, move_vec, charaParam.turnSpeed, orientation);
+
+	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
+}
+
+bool Player::InputMoveWing(float elapsedTime)
+{
+	//進行ベクトル取得
+	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
+
+	//移動処理
+	Move(move_vec.x,move_vec.y, move_vec.z, charaParam.moveSpeed);
 	Turn(elapsedTime, move_vec, charaParam.turnSpeed, orientation);
 
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
@@ -224,7 +250,10 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera) const
 	DirectX::XMFLOAT3 vec{};
 	vec.x = (camera_forward_x * ay) + (camera_right_x * ax);
 	vec.z = (camera_forward_z * ay) + (camera_right_z * ax);
-
+	if (state == State::WING)
+	{
+		vec.y = orientation.y;
+	}
 	return vec;
 }
 
@@ -256,7 +285,7 @@ void Player::InputAvoidance()
 
 void Player::InputWing()
 {
-	if (gamePad->GetButtonDown() & GamePad::BTN_X)
+	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)
 	{
 		TransitionWingState();
 	}
@@ -347,6 +376,16 @@ bool Player::Flying()
     return false;
 }
 
+void Player::UpdateVerticalVelocity(float elapsed_frame)
+{
+	if(state != State::WING)
+		velocity.y += gravity * elapsed_frame;
+	else
+	{
+		velocity.y += moveVec_y * charaParam.acceleration;
+	}
+}
+
 void Player::DebugGUI()
 {
 #ifdef USE_IMGUI
@@ -389,6 +428,7 @@ void Player::DebugGUI()
 				ImGui::DragFloat("invinsible_timer", &invincibleTimer);
 				ImGui::DragFloat("TurnSpeed", &charaParam.turnSpeed, 0.1f);
 				ImGui::DragFloat("MoveSpeed", &charaParam.moveSpeed, 0.1f);
+				ImGui::DragFloat("wingSpeed", &param.wingSpeed, 0.1f);
 				ImGui::DragFloat("avoidance_speed", &param.avoidanceSpeed);
 				ImGui::DragFloat("friction", &charaParam.friction);
 				ImGui::DragFloat("acceleration", &charaParam.acceleration);
@@ -399,6 +439,7 @@ void Player::DebugGUI()
 				float control_y = gamePad->GetAxis_LY();
 				ImGui::DragFloat("control_x", &control_x);
 				ImGui::DragFloat("control_y", &control_y);
+
 			}
 			//if (ImGui::CollapsingHeader("AttackCameraShake", ImGuiTreeNodeFlags_DefaultOpen))
 			//{

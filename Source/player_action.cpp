@@ -66,7 +66,8 @@ void Player::UpdateIdleState(float elapsedTime)
 	InputJump();
 	//‰ñ”ð“ü—Í
 	InputAvoidance();
-
+	//”òs“ü—Í
+	InputWing();
 	//UŒ‚“ü—Í
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
@@ -88,7 +89,8 @@ void Player::UpdateMoveState(float elapsedTime)
 	InputJump();
 	//‰ñ”ð“ü—Í
 	InputAvoidance();
-
+	//”òs“ü—Í
+	InputWing();
 	//UŒ‚“ü—Í
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
@@ -104,7 +106,7 @@ void Player::UpdateWingState(float elapsedTime)
 	velocity.x = (forward * (param.wingSpeed)).x;
 	velocity.z = (forward * (param.wingSpeed)).z;
 
-	if (!InputMove(elapsedTime, 1.0f, 6.0f) && isGround)
+	if (!InputMoveWing(elapsedTime) && isGround)
 	{
 		//TransitionWing_to_IdleState();
 	}
@@ -175,7 +177,8 @@ void Player::UpdateJumpState(float elapsedTime)
 	{
 		TransitionIdleState();
 	}
-
+	//”òs“ü—Í
+	InputWing();
 	//UŒ‚“ü—Í
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{

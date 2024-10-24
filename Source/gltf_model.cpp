@@ -56,7 +56,15 @@ gltf_model::gltf_model(ID3D11Device* device, const std::string& filename) : file
 		meshes.at(0).primitives.at(0).vertex_buffer_views };
 
 	{
-		if (vertex_buffer_views.size() > 6)
+		for (auto& v : vertex_buffer_views)
+		{
+			if (v.first == "JOINT_1" || v.first == "WEIGHTS_1" || v.first == "COLOR_0")
+			{
+				eight_bones = true;
+				break;
+			}
+		}
+		if (!eight_bones)
 		{
 			D3D11_INPUT_ELEMENT_DESC input_element_desc[]
 			{
@@ -754,7 +762,7 @@ void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::X
 		const mesh & mesh{ meshes.at(node.mesh) };
 		for (std::vector<mesh::primitive>::const_reference primitive : mesh.primitives)
 		{
-			if (primitive.vertex_buffer_views.size() > 6)
+			if (!eight_bones)
 			{
 				ID3D11Buffer* vertex_buffers[]{
 				primitive.vertex_buffer_views.at("POSITION").buffer.Get(),
