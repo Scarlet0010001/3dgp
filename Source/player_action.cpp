@@ -104,6 +104,7 @@ void Player::UpdateWingState(float elapsedTime)
 {
 	//Œü‚¢‚Ä‚¢‚é•ûŒü‚É‘¬“x‚ð‘«‚·
 	velocity.x = (forward * (param.wingSpeed)).x;
+	velocity.y = (forward * (param.wingSpeed)).y;
 	velocity.z = (forward * (param.wingSpeed)).z;
 
 	if (!InputMoveWing(elapsedTime) && isGround)

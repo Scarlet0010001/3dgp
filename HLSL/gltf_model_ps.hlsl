@@ -75,7 +75,7 @@ float4 main(VS_OUT pin) : SV_TARGET
         basecolor_factor *= sampled;
     }
 
-    return basecolor_factor;
+    //return basecolor_factor;
 
     float3 emmisive_factor = m.emissive_factor;
     const int emissive_texture = m.emissive_texture.index;
@@ -138,7 +138,7 @@ float4 main(VS_OUT pin) : SV_TARGET
 
     // ライトごとのシェーディング処理のループ
     float3 L = normalize(-light_direction.xyz);
-    float3 Li = float3(1.0, 1.0, 1.0); // 光の輝き
+    float3 Li = float3(1.0, 1.0, 1.0) * 3.0; // 光の輝き
     const float NoL = max(0.0, dot(N, L));
     const float NoV = max(0.0, dot(N, V));
     if (NoL > 0.0 || NoV > 0.0)
@@ -153,6 +153,7 @@ float4 main(VS_OUT pin) : SV_TARGET
         specular += Li * NoL * brdf_specular_ggx(
             f0, f90, alpha_roughness, HoV, NoL, NoV, NoH);
     }
+
     diffuse += idl_radiance_lambertian(N, V, roughness_factor, c_diff, f0);
     specular += ibl_radiance_ggx(N, V, roughness_factor, f0);
 

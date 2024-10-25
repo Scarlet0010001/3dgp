@@ -229,31 +229,52 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera) const
 	if (fabs(ay) < 0.3f)  ay = 0.0f;
 	//カメラ右方向ベクトルをXZ単位ベクトルに変換
 	float camera_forward_x = camera->GetForward().x;
+	float camera_forward_y = camera->GetForward().y;
 	float camera_forward_z = camera->GetForward().z;
-	float camera_forward_lengh = sqrtf(camera_forward_x * camera_forward_x + camera_forward_z * camera_forward_z);
+	float camera_forward_lengh = sqrtf(camera_forward_x * camera_forward_x + camera_forward_y * camera_forward_y + camera_forward_z * camera_forward_z);
 	if (camera_forward_lengh > 0.0f)
 	{
 		camera_forward_x /= camera_forward_lengh;
+		camera_forward_y /= camera_forward_lengh;
 		camera_forward_z /= camera_forward_lengh;
 	}
 
 	float camera_right_x = camera->GetRight().x;
+	float camera_right_y = camera->GetRight().y;
 	float camera_right_z = camera->GetRight().z;
-	float camera_right_lengh = sqrtf(camera_right_x * camera_right_x + camera_right_z * camera_right_z);
+	float camera_right_lengh = sqrtf(camera_right_x * camera_right_x + camera_right_y * camera_right_y + camera_right_z * camera_right_z);
 
 	if (camera_right_lengh > 0.0f)
 	{
 		camera_right_x /= camera_right_lengh;
+		camera_right_y /= camera_right_lengh;
 		camera_right_z /= camera_right_lengh;
 	}
 
 	DirectX::XMFLOAT3 vec{};
 	vec.x = (camera_forward_x * ay) + (camera_right_x * ax);
+	vec.y = (camera_forward_y * ay) + (camera_right_y * ax);
 	vec.z = (camera_forward_z * ay) + (camera_right_z * ax);
+
+
 	if (state == State::WING)
 	{
-		vec.y = orientation.y;
+		//vec.y = orientation.y;
+		//DirectX::XMVECTOR quat = DirectX::XMLoadFloat4(&orientation); // XMFLOAT4 を XMVECTOR に変換
+		//
+		//// 初期ベクトル (例えば Z 軸の前方向)
+		//DirectX::XMVECTOR forward = DirectX::XMVectorSet(0, 1, 0, 0); // Y 軸方向
+		//
+		//// orientation クォータニオンで forward ベクトルを回転させる
+		//DirectX::XMVECTOR rotatedForward = DirectX::XMVector3Rotate(forward, quat);
+		//
+		//// XMFLOAT3 に変換して使用
+		//DirectX::XMFLOAT3 direction;
+		//DirectX::XMStoreFloat3(&direction, rotatedForward);
+		//vec.y = direction.y;
+		//vec.y = 0;
 	}
+
 	return vec;
 }
 

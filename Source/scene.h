@@ -8,7 +8,7 @@ public:
 	virtual ~Scene() {}
 
 	//‰Šú‰»
-	virtual void Initialize() = 0;
+	virtual void Initialize() = 0;//IBL‚Ìİ’è‚·‚é‚à‚Ì‚ğ’T‚·
 
 	//I—¹‰»
 	virtual void Finalize() = 0;
