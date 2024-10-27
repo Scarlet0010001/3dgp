@@ -16,7 +16,7 @@ class gltf_model
 {
 	std::string filename;
 public:
-	gltf_model(ID3D11Device* device, const std::string& filename);
+	gltf_model(ID3D11Device* device, const std::string& filename, bool eight_bones = false);
 	virtual ~gltf_model() = default;
 	struct scene
 	{

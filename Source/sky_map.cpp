@@ -1,14 +1,20 @@
 #include "sky_map.h"
 #include "texture.h"
 #include "shader.h"
+#include "graphics.h"
 
 #include "misc.h"
 
 SkyMap::SkyMap(ID3D11Device* device, const wchar_t* filename, bool generate_mips)
 {
 	D3D11_TEXTURE2D_DESC texture2d_desc;
-	load_texture_from_file(device, filename, shader_resource_view.GetAddressOf(), &texture2d_desc);
-
+	load_texture_from_file(device, filename, shader_resource_view[0].GetAddressOf(), &texture2d_desc);
+	load_texture_from_file(device, L"Resources/SkyMap/captured at (0, 0, 0)/diffuse_iem.dds",
+		shader_resource_view[1].GetAddressOf(), &texture2d_desc);
+	load_texture_from_file(device, L"Resources/SkyMap/captured at (0, 0, 0)/specular_pmrem.dds",
+		shader_resource_view[2].GetAddressOf(), &texture2d_desc);
+	//load_texture_from_file(device, L"Resources/SkyMap/captured at (0, 0, 0)/lut_ggx.dds",
+	//	shader_resource_view[3].GetAddressOf(), &texture2d_desc);
 	if (texture2d_desc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE)
 	{
 		is_texturecube = true;
@@ -34,11 +40,14 @@ void SkyMap::blit(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT
 	immediate_context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
 	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	immediate_context->IASetInputLayout(NULL);
-
+	
 	immediate_context->VSSetShader(skymap_vs.Get(), 0, 0);
 	immediate_context->PSSetShader(is_texturecube ? skybox_ps.Get() : skymap_ps.Get(), 0, 0);
 
-	immediate_context->PSSetShaderResources(0, 1, shader_resource_view.GetAddressOf());
+	immediate_context->PSSetShaderResources(0, 1, shader_resource_view[0].GetAddressOf());
+	immediate_context->PSSetShaderResources(1, 1, shader_resource_view[1].GetAddressOf());
+	immediate_context->PSSetShaderResources(2, 1, shader_resource_view[2].GetAddressOf());
+	//immediate_context->PSSetShaderResources(3, 1, shader_resource_view[3].GetAddressOf());
 
 	constants data;
 	DirectX::XMStoreFloat4x4(&data.inverse_view_projection, DirectX::XMMatrixInverse(NULL, DirectX::XMLoadFloat4x4(&view_projection)));

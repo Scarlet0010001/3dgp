@@ -15,7 +15,7 @@ public:
 
 	void blit(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4& view_projection);
 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view[8];
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> skymap_vs;

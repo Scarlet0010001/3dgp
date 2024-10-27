@@ -20,7 +20,7 @@ Player::Player()
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
 		//"Resources/Player/glb/white_crow.glb");
-		"Resources/Player/glb/white_crow_test.glb");
+		"Resources/Player/glb/white_crow_test.glb", true);
 
 	//skill_manager = std::make_unique<SkillManager>();
 	//キャラが持つ剣

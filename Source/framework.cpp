@@ -62,17 +62,16 @@ bool framework::initialize()
 		//gltf_models[0] = std::make_unique<gltf_model>(Graphics::Instance().GetDevice().Get(),
 		//	"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf");
 
-		//IBLテクスチャをロード
-		//D3D11_TEXTURE2D_DESC texture2d_desc;
-		//load_texture_from_file(device.Get(), L"reflection_capture_tool/captured at (0, 0, 0)/skybox.dds",
-		//	shader_resource_views[0].GetAddressOf(), &texture2d_desc);
-		//load_texture_from_file(device.Get(), L"reflection_capture_tool/captured at (0, 0, 0)/diffuse_iem.dds",
-		//	shader_resource_views[1].GetAddressOf(), &texture2d_desc);
-		//load_texture_from_file(device.Get(), L"reflection_capture_tool/captured at (0, 0, 0)/specular_pmrem.dds",
-		//	shader_resource_views[2].GetAddressOf(), &texture2d_desc);
-		//load_texture_from_file(device.Get(), L"reflection_capture_tool/captured at (0, 0, 0)/lut_ggx.dds",
-		//	shader_resource_views[3].GetAddressOf(), &texture2d_desc);
+
 	}
+	//IBLテクスチャをロード
+	D3D11_TEXTURE2D_DESC texture2d_desc;
+	load_texture_from_file(Graphics::Instance().GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/diffuse_iem.dds",
+		shader_resource_views[0].GetAddressOf(), &texture2d_desc);
+	load_texture_from_file(Graphics::Instance().GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/specular_pmrem.dds",
+		shader_resource_views[1].GetAddressOf(), &texture2d_desc);
+	load_texture_from_file(Graphics::Instance().GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/lut_ggx.dds",
+		shader_resource_views[2].GetAddressOf(), &texture2d_desc);
 
 	return true;
 }
@@ -160,10 +159,9 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	graphics.Get_DC()->PSSetShaderResources(0, _countof(null_shader_resource_views), null_shader_resource_views);
 
 	// IBLテクスチャをバインド
-	//immediate_context->PSSetShaderResources(32, 1, shader_resource_views[0].GetAddressOf());
-	//immediate_context->PSSetShaderResources(33, 1, shader_resource_views[1].GetAddressOf());
-	//immediate_context->PSSetShaderResources(34, 1, shader_resource_views[2].GetAddressOf());
-	//immediate_context->PSSetShaderResources(35, 1, shader_resource_views[3].GetAddressOf());
+	graphics.Get_DC()->PSSetShaderResources(32, 1, shader_resource_views[0].GetAddressOf());
+	graphics.Get_DC()->PSSetShaderResources(33, 1, shader_resource_views[1].GetAddressOf());
+	graphics.Get_DC()->PSSetShaderResources(34, 1, shader_resource_views[2].GetAddressOf());
 
 
 	FLOAT color[]{ 0.2f, 0.2f, 0.2f, 1.0f };

@@ -98,7 +98,7 @@ private:
 	//Microsoft::WRL::ComPtr<IDXGISwapChain> swap_chain;
 	//Microsoft::WRL::ComPtr<ID3D11RenderTargetView> render_target_view;
 	//Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depth_stencil_view;
-	//Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[8];
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[8];
 	//
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
 	//

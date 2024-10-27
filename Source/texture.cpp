@@ -58,10 +58,13 @@ HRESULT load_texture_from_file(Microsoft::WRL::ComPtr<ID3D11Device> device,
     }
 
     // SKY_MAP
-    ComPtr<ID3D11Texture2D> texture2d;
-    hr = resource.Get()->QueryInterface<ID3D11Texture2D>(texture2d.GetAddressOf());
-    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-    texture2d->GetDesc(texture2d_desc);
+    if (filename == L"Resources/SkyMap/captured at (0, 0, 0)/skybox.dds")
+    {
+        ComPtr<ID3D11Texture2D> texture2d;
+        hr = resource.Get()->QueryInterface<ID3D11Texture2D>(texture2d.GetAddressOf());
+        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+        texture2d->GetDesc(texture2d_desc);
+    }
     
     return hr;
 }

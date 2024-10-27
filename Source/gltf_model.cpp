@@ -14,7 +14,7 @@ bool null_load_image_data(tinygltf::Image*, const int, std::string*, std::string
 {
 	return true;
 }
-gltf_model::gltf_model(ID3D11Device* device, const std::string& filename) : filename(filename)
+gltf_model::gltf_model(ID3D11Device* device, const std::string& filename, bool eight_bones) : filename(filename), eight_bones(eight_bones)
 {
 	tinygltf::TinyGLTF tiny_gltf;
 	tiny_gltf.SetImageLoader(null_load_image_data, nullptr);
@@ -56,15 +56,16 @@ gltf_model::gltf_model(ID3D11Device* device, const std::string& filename) : file
 		meshes.at(0).primitives.at(0).vertex_buffer_views };
 
 	{
-		for (auto& v : vertex_buffer_views)
-		{
-			if (v.first == "JOINT_1" || v.first == "WEIGHTS_1" || v.first == "COLOR_0")
-			{
-				eight_bones = true;
-				break;
-			}
-		}
-		if (!eight_bones)
+		//for (auto& v : vertex_buffer_views)
+		//{
+		//	if (v.first == "JOINT_1" || v.first == "WEIGHTS_1"
+		//		|| v.first == "COLOR_0" || v.first == "TEXCOORD_1")
+		//	{
+		//		eight_bones = true;
+		//		break;
+		//	}
+		//}
+		if (eight_bones)
 		{
 			D3D11_INPUT_ELEMENT_DESC input_element_desc[]
 			{
@@ -762,7 +763,7 @@ void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::X
 		const mesh & mesh{ meshes.at(node.mesh) };
 		for (std::vector<mesh::primitive>::const_reference primitive : mesh.primitives)
 		{
-			if (!eight_bones)
+			if (eight_bones)
 			{
 				ID3D11Buffer* vertex_buffers[]{
 				primitive.vertex_buffer_views.at("POSITION").buffer.Get(),
