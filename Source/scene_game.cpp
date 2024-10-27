@@ -43,6 +43,7 @@ void SceneGame::Initialize()
     // SKY_MAP
     skymap = std::make_unique<SkyMap>(graphics.GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/skybox.dds");
 
+    radialBlur = std::make_unique<RadialBlur>(graphics.GetDevice().Get());
 }
 
 void SceneGame::Finalize()
@@ -142,6 +143,7 @@ void SceneGame::Render(float elapsedTime)
     graphics.GetDebugRenderer()->RenderAlFigures(graphics.Get_DC().Get());
 
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::CULL_NONE);
+    radialBlur->blit();
     framebuffers[0]->deactivate(graphics.Get_DC().Get());
     ID3D11ShaderResourceView* shader_resource_views[2]
     { framebuffers[0]->get_color_map().Get(), framebuffers[0]->depth_map().Get() };
@@ -149,6 +151,7 @@ void SceneGame::Render(float elapsedTime)
 
 #if USE_IMGUI
     camera->DebugGui();
+    radialBlur->DebugGUI();
     imguiMenuBar("Game", "game_menu", displayImgui);
     if (displayImgui)
     {

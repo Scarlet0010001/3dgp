@@ -236,6 +236,7 @@
     <ClCompile Include="Source\mouse.cpp" />
     <ClCompile Include="Source\player.cpp" />
     <ClCompile Include="Source\player_action.cpp" />
+    <ClCompile Include="Source\radial_blur.cpp" />
     <ClCompile Include="Source\resource_manager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -309,6 +310,7 @@
     <ClInclude Include="Source\par_shapes.h" />
     <ClInclude Include="Source\player.h" />
     <ClInclude Include="Source\primitive.h" />
+    <ClInclude Include="Source\radial_blur.h" />
     <ClInclude Include="Source\resource_manager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -422,6 +424,7 @@
     <FxCompile Include="HLSL\post_effect_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="HLSL\radial_blur_ps.hlsl" />
     <FxCompile Include="HLSL\resolve_depth_stencil_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>

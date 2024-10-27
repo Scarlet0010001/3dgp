@@ -100,6 +100,12 @@
     <Filter Include="Shaders\sprite">
       <UniqueIdentifier>{ec012e71-296e-427b-8d63-c9c49b124af6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Radial_Blur">
+      <UniqueIdentifier>{ce50e5a8-49b1-4366-99bb-97cb529e880a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Radial_Blur">
+      <UniqueIdentifier>{bbfd806e-ff2b-41c1-b8bb-102b21337bb6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\resource_manager.cpp">
@@ -245,6 +251,9 @@
     </ClCompile>
     <ClCompile Include="Source\gltf_model.cpp">
       <Filter>Sources\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\radial_blur.cpp">
+      <Filter>Sources\Radial_Blur</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -431,6 +440,9 @@
     <ClInclude Include="Source\gltf_model.h">
       <Filter>Sources\Model</Filter>
     </ClInclude>
+    <ClInclude Include="Source\radial_blur.h">
+      <Filter>Sources\Radial_Blur</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\accumulate_husk_particles_ps.hlsl">
@@ -576,6 +588,9 @@
     </FxCompile>
     <FxCompile Include="HLSL\sprite_vs.hlsl">
       <Filter>Shaders\sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\radial_blur_ps.hlsl">
+      <Filter>Shaders\Radial_Blur</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

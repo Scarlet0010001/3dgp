@@ -7,6 +7,8 @@
 #include "deferred_renderer.h"
 
 #include "sky_map.h"
+#include "radial_blur.h"
+
 
 class SceneGame :
     public Scene
@@ -66,6 +68,8 @@ private:
     */
     //スカイマップ
     std::unique_ptr<SkyMap> skymap;
+
+    std::unique_ptr<RadialBlur> radialBlur;
 
     std::unique_ptr<framebuffer> framebuffers[8];
 
