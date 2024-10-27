@@ -1,57 +1,63 @@
-#include "sprite.hlsli"
+// UNIT.32
+#include "fullscreen_quad.hlsli"
 
-//#include "scene_constant_buffer.hlsli"
-cbuffer SCENE_CONSTANT_BUFFER : register(b1)
+cbuffer radial_blur_constants : register(b2)
 {
-    float4 options; //	xy : マウスの座標値, z : タイマー, w : フラグ
-    float4 z_buffer_parameteres; // 非線形深度から線形深度へ変換するためのパラメーター
-    float4 camera_position;
-    float4 camera_direction;
-    float4 camera_clip_distance;
-    float4 viewport_size; //  xy : ビューポートサイズ, zw : 逆ビューポートサイズ
-    row_major float4x4 view_transform;
-    row_major float4x4 projection_transform;
-    row_major float4x4 view_projection_transform;
-    row_major float4x4 inverse_view_transform;
-    row_major float4x4 inverse_projection_transform;
-    row_major float4x4 inverse_view_projection_transform;
-
-    row_major float4x4 previous_view_projection_transform;
+	float2 blur_center; // center point where the blur is applied
+	float blur_strength; // blurring strength
+	float blur_radius; // blurred radiu
+	float blur_decay; // percentage of the maximum radius at which the intensity of the blur begins to decay
 };
 
-cbuffer RADIAL_BLUR_CONSTANT_BUFFER : register(b2)
-{
-    float blur_radius;
-    int blur_sampling_count;
-    float2 blur_center;
-
-    float blur_mask_radius;
-    float3 blur_dummy;
-
-};
-
-Texture2D scene_map : register(t0);
-SamplerState linear_sampler_state : register(s0);
+#define POINT 0
+#define LINEAR 1
+#define ANISOTROPIC 2
+#define LINEAR_BORDER_BLACK 3
+#define LINEAR_BORDER_WHITE 4
+#define LINEAR_CLAMP 5
+SamplerState sampler_states[6] : register(s0);
+Texture2D texture_maps[4] : register(t0);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
-    float2 scene_map_size;
-    scene_map.GetDimensions(scene_map_size.x, scene_map_size.y);
+#if 0
+	uint mip_level = 0, width, height, number_of_levels;
+	texture_maps[0].GetDimensions(mip_level, width, height, number_of_levels);
+#endif
 
-    float4 color = scene_map.Sample(linear_sampler_state, pin.texcoord);
-    float4 result_color = color;
+	const int samples = 16;
 
-    float2 blur_vector = (blur_center - pin.texcoord);
-    blur_vector *= (blur_radius / scene_map_size.xy) / blur_sampling_count;
-    for (int index = 1; index < blur_sampling_count; ++index)
-    {
-        result_color += scene_map.Sample(linear_sampler_state, pin.texcoord + blur_vector * index);
-    }
+	float2 center_to_pixel = pin.texcoord - blur_center;
+	float distance = length(center_to_pixel);
 
-    //return result_color / blur_sampling_count;
+	float factor = blur_strength / float(samples) * distance;
+#if 1
+	factor *= smoothstep(blur_radius, blur_radius * blur_decay, distance);
+#endif
 
-    //  指定の範囲内は適応量を変える
-    float mask_radius = blur_mask_radius / min(scene_map_size.x, scene_map_size.y);
-    float mask_value = saturate(length(pin.texcoord - blur_center) / mask_radius);
-    return lerp(color, result_color / blur_sampling_count, mask_value);
+	float3 color = 0.0;
+	for (int i = 0; i < samples; i++)
+	{
+		float sample_offset = 1.0 - factor * i;
+		color += texture_maps[0].Sample(sampler_states[LINEAR_CLAMP], blur_center + (center_to_pixel * sample_offset)).rgb;
+	}
+	color /= float(samples);
+
+
+
+
+
+
+
+#if 0
+	// Tone mapping : HDR -> SDR
+	const float exposure = 1.2;
+	color = 1 - exp(-color * exposure);
+
+	// Gamma process
+	const float gamma = 2.2;
+	color = pow(color, 1.0 / gamma);
+#endif
+
+	return float4(color, 1);
 }

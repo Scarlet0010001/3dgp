@@ -1,6 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 #include "graphics.h"
+#include "sprite.h"
 #include "constant.h"
 
 class RadialBlur
@@ -8,12 +9,11 @@ class RadialBlur
 private:
 	struct radial_blur_constants
 	{
-		float				blur_radius = 50.0f;
-		int					blur_sampling_count = 10;
-		DirectX::XMFLOAT2	blur_center = { 0.5f, 0.5f };
-
-		float				blur_mask_radius = 0;	//	centerからの指定の範囲はブラーを適応しないようにする
-		DirectX::XMFLOAT3	blur_dummy;
+		DirectX::XMFLOAT2 blur_center = { 0.5, 0.5 }; // center point where the blur is applied
+		float blur_strength = 1.0f; // blurring strength
+		float blur_radius = 0.5f; // blurred radiu
+		float blur_decay = 0.2f; // ratio of distance to decay to radius
+		float pads[3];
 
 	};
 	//	ラジアルブラー
@@ -21,14 +21,16 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> radial_blur_constant_buffer;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> radial_blur_pixel_shader;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> radial_blur_sampler_state;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> radial_blur_shader_resource_view;
 
 	bool displayRadialBlurImgui = false;
 public:
 	RadialBlur(ID3D11Device* device);
 	~RadialBlur() {}
 
+
 	void DebugGUI();
 
-	void blit();
+	void blit(ID3D11DeviceContext* immediate_context, ID3D11PixelShader* ps);
 };
 

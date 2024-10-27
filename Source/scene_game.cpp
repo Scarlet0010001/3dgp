@@ -141,13 +141,15 @@ void SceneGame::Render(float elapsedTime)
     //-------------------DebugPrimitive----------------------//
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::WIREFRAME_CULL_BACK);
     graphics.GetDebugRenderer()->RenderAlFigures(graphics.Get_DC().Get());
-
+    
+    radialBlur->blit(graphics.Get_DC().Get(), bit_block_transfer->get_embedded_pixel_shader().Get());
+    
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::CULL_NONE);
-    radialBlur->blit();
     framebuffers[0]->deactivate(graphics.Get_DC().Get());
     ID3D11ShaderResourceView* shader_resource_views[2]
     { framebuffers[0]->get_color_map().Get(), framebuffers[0]->depth_map().Get() };
-    bit_block_transfer->blit(graphics.Get_DC().Get(),framebuffers[0]->get_color_map().GetAddressOf(), 0, 1);
+    bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1);
+    //bit_block_transfer->blit(graphics.Get_DC().Get(),framebuffers[0]->get_color_map().GetAddressOf(), 0, 1);
 
 #if USE_IMGUI
     camera->DebugGui();
