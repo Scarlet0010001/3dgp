@@ -14,7 +14,7 @@ void Player::TransitionIdleState()
 void Player::TransitionMoveState()
 {
 	p_update = &Player::UpdateMoveState;
-	//model->play_animation(PlayerAnimation::PLAYER_RUN, true);
+	//playerAnimation = PlayerAnimation::PLAYER_MOV;
 	state = State::MOVE;
 
 }

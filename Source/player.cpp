@@ -19,8 +19,7 @@ Player::Player()
 	Graphics& graphics = Graphics::Instance();
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
-		//"Resources/Player/glb/white_crow.glb");
-		"Resources/Player/glb/white_crow_test.glb", true);
+		"Resources/Player/glb/white_crow.glb", true);
 
 	//skill_manager = std::make_unique<SkillManager>();
 	//キャラが持つ剣
@@ -537,13 +536,25 @@ void Player::DebugGUI()
 			//}
 			if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				const char* anime_item[] = { "IDLE","MOVE","JUMP","FALL","LANDING" };
+				const char* anime_item[] = { 
+					"PLAYER_IDLE",
+					"PLAYER_MOVE_FORWARD",
+					"PLAYER_MOVE_LEFT",
+					"PLAYER_MOVE_RIGHT",
+					"PLAYER_MOVE_BACK",
+					"PLAYER_JUMP_INIT",
+					"PLAYER_JUMP_FALL",
+					"PLAYER_JUMP_END",
+					"PLAYER_TRANSITION_WING",
+					"PLAYER_WING",
+					"PLAYER_TRANSITION_IDLE",
+				};
 				static int item_current = 0;
 				static bool loop = false;
 				ImGui::Combo("anime", &item_current, anime_item, IM_ARRAYSIZE(anime_item)); ImGui::Checkbox("is_loop", &loop);
 				if (ImGui::Button("play", { 80,20 }))
 				{
-					//model->animate(item_current, loop, 0.1f);
+					playerAnimation = static_cast<PlayerAnimation>(item_current);
 				}
 				//string s;
 				//ImGui::DragInt("index", &model->anime_param.current_index);

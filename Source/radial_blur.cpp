@@ -34,7 +34,7 @@ RadialBlur::RadialBlur(ID3D11Device* device)
 	//	ラジアルブラーシェーダー
 	create_ps_from_cso(device, "Shader/radial_blur_ps.cso", radial_blur_pixel_shader.GetAddressOf());
 
-	//radial_blur_sprite = std::make_unique<Sprite>(Graphics::Instance().GetDevice().Get(), );
+	radial_quad = std::make_unique<fullscreen_quad>(Graphics::Instance().GetDevice().Get());
 
 	radial_blur_constant = std::make_unique<Constants<radial_blur_constants>>(Graphics::Instance().GetDevice().Get());
 }
@@ -62,37 +62,22 @@ void RadialBlur::DebugGUI()
 #endif
 }
 
-void RadialBlur::blit(ID3D11DeviceContext* immediate_context, ID3D11PixelShader* ps)
+void RadialBlur::blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView** shader_resource_view)
 {
 	Graphics& graphics = Graphics::Instance();
 	//	バックバッファ指定
-	immediate_context->OMSetRenderTargets(1, graphics.GetRenderTargetView().GetAddressOf(), graphics.GetDepthStencilView().Get());
+	//immediate_context->OMSetRenderTargets(1, graphics.GetRenderTargetView().GetAddressOf(), graphics.GetDepthStencilView().Get());
 
 	immediate_context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
 	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	immediate_context->IASetInputLayout(NULL);
 
 	immediate_context->PSSetShader(radial_blur_pixel_shader.Get(), 0, 0);
-	//immediate_context->PSSetShaderResources(0, 1, radial_blur_shader_resource_view.GetAddressOf());
 
 	//	ラジアルブラー用定数バッファ
 	{
-		static constexpr int RadialBlurCBVIndex = 0;
-		static constexpr int RadialBlurSamplerIndex = 0;
-		immediate_context->UpdateSubresource(radial_blur_constant_buffer.Get(), 0, 0, &radial_blur_constant, 0, 0);
+		static constexpr int RadialBlurCBVIndex = 2;
 		radial_blur_constant->Bind(graphics.Get_DC().Get(), RadialBlurCBVIndex, CB_FLAG::PS);
-
-		//graphics.Get_DC()->VSSetSamplers(RadialBlurSamplerIndex, 1, radial_blur_sampler_state.GetAddressOf());
-		//graphics.Get_DC()->HSSetSamplers(RadialBlurSamplerIndex, 1, radial_blur_sampler_state.GetAddressOf());
-		//graphics.Get_DC()->DSSetSamplers(RadialBlurSamplerIndex, 1, radial_blur_sampler_state.GetAddressOf());
-		//graphics.Get_DC()->GSSetSamplers(RadialBlurSamplerIndex, 1, radial_blur_sampler_state.GetAddressOf());
-		graphics.Get_DC()->PSSetSamplers(RadialBlurSamplerIndex, 1, radial_blur_sampler_state.GetAddressOf());
-		//graphics.Get_DC()->CSSetSamplers(RadialBlurSamplerIndex, 1, radial_blur_sampler_state.GetAddressOf());
 	}
-
-	//radial_blur_sprite->render(graphics.Get_DC().Get(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-	immediate_context->Draw(4, 0);
-
-	immediate_context->PSSetShader(NULL, 0, 0);
-
+	radial_quad->blit(immediate_context, shader_resource_view, 0, 2, radial_blur_pixel_shader.Get());
 }
