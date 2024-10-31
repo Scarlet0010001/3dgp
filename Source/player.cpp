@@ -20,6 +20,11 @@ Player::Player()
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
 		"Resources/Player/glb/white_crow.glb", true);
+	for (auto& node : animated_nodes)
+	{
+		node = model->nodes;
+	}
+	blended_animated_nodes = model->nodes;
 
 	//skill_manager = std::make_unique<SkillManager>();
 	//キャラが持つ剣
@@ -82,7 +87,7 @@ void Player::Update(float elapsedTime)
 
 	//無敵時間の更新
 	UpdateInvicibleTimer(elapsedTime);
-	anime_time += elapsedTime;
+
 	collider.start = position;
 	collider.end = { position.x,position.y + charaParam.height, position.z };
 	collider.radius = 1.0f;
@@ -98,11 +103,49 @@ void Player::Render_f(float elapsedTime)
 
 	//自機モデルのトランスフォーム更新
 	transform = Math::calc_world_matrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
-	static std::vector<gltf_model::node> animated_nodes{ model->nodes };
-	static float time{ 0 };
+	//static std::vector<gltf_model::node> animated_nodes{ model->nodes };
+	//static float time{ 0 };
 	//ブレンドアニメーションはゲープロか福井先生のやつ
-	model->animate(playerAnimation, time += elapsedTime, animated_nodes, true);
-	model->render(graphics.Get_DC().Get(), transform, animated_nodes);
+	if (transition_state > 0 && transition_time > 0.0f)
+	{
+		switch (transition_state)
+		{
+		case 1:
+			model->animate(playerAnimation_old, time, animated_nodes[playerAnimation_old]);
+			//playerAnimation = static_cast<PlayerAnimation>((playerAnimation + 1) % 2);
+			model->animate(playerAnimation, 0.0f, animated_nodes[playerAnimation]);
+			transition_state = 2;
+			time = 0.0f;
+			factor = 0.0f;
+
+		case 2:
+			factor = time / transition_time;
+			model->blend_animations(animated_nodes[playerAnimation_old], animated_nodes[playerAnimation], factor, blended_animated_nodes);
+			time += elapsedTime;
+			if (factor > 1.0f)
+			{
+				 //End of transition
+				transition_state = 0;
+				time = 0;
+			}
+			break;
+		}
+		model->render(graphics.Get_DC().Get(), transform, blended_animated_nodes);
+	}
+	else
+	{
+		time += elapsedTime;
+		if (model->animations.at(playerAnimation).duration < time)
+		{
+			time = 0;
+		}
+		model->animate(playerAnimation, time, animated_nodes[playerAnimation]);
+		model->render(graphics.Get_DC().Get(), transform, animated_nodes[playerAnimation]);
+		playerAnimation_old = playerAnimation;
+	}
+
+	//model->animate(playerAnimation, time += elapsedTime, animated_nodes, true);
+	//model->render(graphics.Get_DC().Get(), transform, animated_nodes);
 
 	//デバッグGUI描画
 	DebugGUI();
@@ -555,15 +598,10 @@ void Player::DebugGUI()
 				if (ImGui::Button("play", { 80,20 }))
 				{
 					playerAnimation = static_cast<PlayerAnimation>(item_current);
+					transition_state = 1;
 				}
-				//string s;
-				//ImGui::DragInt("index", &model->anime_param.current_index);
-				//ImGui::DragInt("frame_index", &model->anime_param.frame_index);
-				//ImGui::Checkbox("end_flag", &model->anime_param.end_flag);
-				//ImGui::DragFloat("current_time", &model->anime_param.current_time);
-				//ImGui::DragFloat("playback_speed", &model->anime_param.playback_speed, 0.1f);
-				//ImGui::DragFloat("blend_time", &model->anime_param.blend_time);
-				//ImGui::DragFloat("sampling", &model->anime_param.animation.sampling_rate);
+				ImGui::SliderFloat("transition_time", &transition_time, 0.0f, 5.0f);
+
 			}
 
 		}

@@ -561,6 +561,16 @@ void gltf_model::fetch_animations(const tinygltf::Model& Model)
 			}
 		}
 	}
+
+	// Find a longest animation duration in timeline of each channel.
+	for (decltype(animations)::reference animation : animations)
+	{
+		for (decltype(animation.timelines)::reference timelines : animation.timelines)
+		{
+			animation.duration = std::max<float>(animation.duration, timelines.second.back());
+		}
+	}
+
 }
 
 void gltf_model::animate(size_t animation_index, 
@@ -732,6 +742,28 @@ bool gltf_model::is_animate(size_t animation_index, float time, std::vector<node
 	}
 
 	return is;
+}
+
+void gltf_model::blend_animations(const std::vector<node>& from_nodes, const std::vector<node>& to_nodes, float factor, std::vector<node>& out_nodes)
+{
+	using namespace DirectX;
+	_ASSERT_EXPR(from_nodes.size() == to_nodes.size(), "The size of the two node arrays must be the same.");
+
+	size_t node_count{ from_nodes.size() };
+	_ASSERT_EXPR(node_count == out_nodes.size(), "The size of output nodes must be input nodes.");
+	for (size_t node_index = 0; node_index < node_count; ++node_index)
+	{
+		XMVECTOR S[2]{ XMLoadFloat3(&from_nodes.at(node_index).scale), XMLoadFloat3(&to_nodes.at(node_index).scale) };
+		XMStoreFloat3(&out_nodes.at(node_index).scale, XMVectorLerp(S[0], S[1], factor));
+
+		XMVECTOR R[2]{ XMLoadFloat4(&from_nodes.at(node_index).rotation), XMLoadFloat4(&to_nodes.at(node_index).rotation) };
+		XMStoreFloat4(&out_nodes.at(node_index).rotation, XMQuaternionSlerp(R[0], R[1], factor));
+
+		XMVECTOR T[2]{ XMLoadFloat3(&from_nodes.at(node_index).translation), XMLoadFloat3(&to_nodes.at(node_index).translation) };
+		XMStoreFloat3(&out_nodes.at(node_index).translation, XMVectorLerp(T[0], T[1], factor));
+	}
+	cumulate_transforms(out_nodes);
+
 }
 
 gltf_model::node* gltf_model::find_nodes(const std::string name)

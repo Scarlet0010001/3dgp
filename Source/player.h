@@ -75,8 +75,18 @@ private:
 		PLAYER_ATK_COMBO2,//コンボ2-2
 		PLAYER_ATK_COMBO3,//コンボ2-3
 		PLAYER_ATK_DODGE_BACK,//後方に回避しながら魔法
+		PLAYER_ANIME_COUNT,
 	};
 	PlayerAnimation playerAnimation = PLAYER_IDLE;
+	PlayerAnimation playerAnimation_old = PLAYER_IDLE;
+
+	//ブレンドアニメーション
+	std::vector<gltf_model::node> animated_nodes[PLAYER_ANIME_COUNT];
+	std::vector<gltf_model::node> blended_animated_nodes;
+	float time{ 0 };
+	float factor{ 0 };
+	int transition_state{ 0 };
+	float transition_time{ 1.0f };
 
 
 	//ステート
@@ -219,7 +229,7 @@ private:
 	//垂直速力更新処理
 	 void UpdateVerticalVelocity(float elapsed_frame)override;
 
-
+private:
 	//--------------------変数--------------------------
 	//関数ポインタの宣言
 	ActUpdate p_update = &Player::UpdateIdleState;
@@ -241,6 +251,7 @@ private:
 	const int jump_limit = 1;
 
 	bool displayPlayerImgui = false;
+
 
 
 	//------------------攻撃関連--------------------------

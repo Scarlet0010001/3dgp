@@ -144,7 +144,8 @@ public:
 	struct animation
 	{
 		std::string name;
-		
+		float duration{ 0.0f };
+
 		struct channel
 		{
 			int sampler{ -1 };
@@ -209,6 +210,10 @@ public: //関数
 	void fetch_animations(const tinygltf::Model& gltf_model);
 	void animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback = false);
 	bool is_animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback = false);
+	
+	//ブレンドアニメーション
+	void blend_animations(const std::vector<node>& from_nodes, const std::vector<node>& to_nodes, float factor, std::vector<node>& out_nodes);
+
 	// ノード検索
 	gltf_model::node* find_nodes(const std::string name);
 
