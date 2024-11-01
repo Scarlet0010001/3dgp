@@ -209,7 +209,7 @@ public: //関数
 	void fetch_textures(ID3D11Device* device, const tinygltf::Model& gltf_model);
 	void fetch_animations(const tinygltf::Model& gltf_model);
 	void animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback = false);
-	bool is_animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback = false);
+	//bool is_animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback = false);
 	
 	//ブレンドアニメーション
 	void blend_animations(const std::vector<node>& from_nodes, const std::vector<node>& to_nodes, float factor, std::vector<node>& out_nodes);
@@ -218,4 +218,19 @@ public: //関数
 	gltf_model::node* find_nodes(const std::string name);
 
 	void render(ID3D11DeviceContext* immediate__context, const DirectX::XMFLOAT4X4& world,const std::vector<node>& animated_nodes,int skin_node = 0);
+
+public:
+	//ループ取得
+	const bool& GetIsLoop() const { return isLoop; }
+	//ループ設定
+	void SetIsLoop(const bool& Loop) { this->isLoop = Loop; }
+	//アニメおわり取得
+	const bool& GetIsEndAnimation() const { return isEndAnimation; }
+
+
+private:
+	// アニメーション変数
+	bool isLoop = false;
+	bool isEndAnimation = false;
+
 };

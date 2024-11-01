@@ -5,7 +5,7 @@
 #include "constant.h"
 #include "fullscreen_quad.h"
 
-class RadialBlur
+class RadialBlur//fullscreen_quad‚ğeƒNƒ‰ƒX‚É‚·‚é
 {
 private:
 	struct radial_blur_constants

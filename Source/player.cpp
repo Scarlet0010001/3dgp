@@ -103,29 +103,35 @@ void Player::Render_f(float elapsedTime)
 
 	//自機モデルのトランスフォーム更新
 	transform = Math::calc_world_matrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
-	//static std::vector<gltf_model::node> animated_nodes{ model->nodes };
-	//static float time{ 0 };
-	//ブレンドアニメーションはゲープロか福井先生のやつ
+	if (playerAnimation_transition != playerAnimation)
+	{
+		//playerAnimation_old = playerAnimation_transition;
+		playerAnimation_transition = playerAnimation;
+		transition_state = TransitionState::START;
+	}
+	
+	//ブレンドアニメーション
 	if (transition_state > 0 && transition_time > 0.0f)
 	{
 		switch (transition_state)
 		{
-		case 1:
+		case TransitionState::NONE:
+			break;
+		case TransitionState::START:
 			model->animate(playerAnimation_old, time, animated_nodes[playerAnimation_old]);
-			//playerAnimation = static_cast<PlayerAnimation>((playerAnimation + 1) % 2);
 			model->animate(playerAnimation, 0.0f, animated_nodes[playerAnimation]);
-			transition_state = 2;
+			transition_state = TransitionState::TRANSITION;
 			time = 0.0f;
 			factor = 0.0f;
 
-		case 2:
+		case TransitionState::TRANSITION:
 			factor = time / transition_time;
 			model->blend_animations(animated_nodes[playerAnimation_old], animated_nodes[playerAnimation], factor, blended_animated_nodes);
 			time += elapsedTime;
 			if (factor > 1.0f)
 			{
 				 //End of transition
-				transition_state = 0;
+				transition_state = TransitionState::NONE;
 				time = 0;
 			}
 			break;
@@ -142,6 +148,7 @@ void Player::Render_f(float elapsedTime)
 		model->animate(playerAnimation, time, animated_nodes[playerAnimation]);
 		model->render(graphics.Get_DC().Get(), transform, animated_nodes[playerAnimation]);
 		playerAnimation_old = playerAnimation;
+
 	}
 
 	//model->animate(playerAnimation, time += elapsedTime, animated_nodes, true);
@@ -214,10 +221,9 @@ bool Player::InputMove(float elapsedTime)
 {
 	//進行ベクトル取得
 	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
-
 	//移動処理
 	Move(move_vec.x, move_vec.z, charaParam.moveSpeed);
-	Turn(elapsedTime, move_vec, charaParam.turnSpeed, orientation);
+	Turn(elapsedTime, camera->GetForward(), charaParam.turnSpeed, orientation);
 
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
@@ -229,7 +235,8 @@ bool Player::InputMove(float elapsedTime, float restrictionMove, float restricti
 
 	//移動処理
 	Move(move_vec.x, move_vec.z, charaParam.moveSpeed / restrictionMove);
-	Turn(elapsedTime, move_vec, charaParam.turnSpeed / restrictionTurn, orientation);
+	//Turn(elapsedTime, move_vec, charaParam.turnSpeed / restrictionTurn, orientation);
+	Turn(elapsedTime, camera->GetForward(), charaParam.turnSpeed / restrictionTurn, orientation);
 
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
@@ -297,25 +304,6 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera) const
 	vec.x = (camera_forward_x * ay) + (camera_right_x * ax);
 	vec.y = (camera_forward_y * ay) + (camera_right_y * ax);
 	vec.z = (camera_forward_z * ay) + (camera_right_z * ax);
-
-
-	if (state == State::WING)
-	{
-		//vec.y = orientation.y;
-		//DirectX::XMVECTOR quat = DirectX::XMLoadFloat4(&orientation); // XMFLOAT4 を XMVECTOR に変換
-		//
-		//// 初期ベクトル (例えば Z 軸の前方向)
-		//DirectX::XMVECTOR forward = DirectX::XMVectorSet(0, 1, 0, 0); // Y 軸方向
-		//
-		//// orientation クォータニオンで forward ベクトルを回転させる
-		//DirectX::XMVECTOR rotatedForward = DirectX::XMVector3Rotate(forward, quat);
-		//
-		//// XMFLOAT3 に変換して使用
-		//DirectX::XMFLOAT3 direction;
-		//DirectX::XMStoreFloat3(&direction, rotatedForward);
-		//vec.y = direction.y;
-		//vec.y = 0;
-	}
 
 	return vec;
 }
@@ -441,12 +429,10 @@ bool Player::Flying()
 
 void Player::UpdateVerticalVelocity(float elapsed_frame)
 {
-	if(state != State::WING)
+	if(playerAnimation != PlayerAnimation::PLAYER_TRANSITION_WING)
 		velocity.y += gravity * elapsed_frame;
-	else
-	{
-		velocity.y += moveVec_y * charaParam.acceleration;
-	}
+	else 
+		velocity.y += (gravity * 0.5f) * elapsed_frame;
 }
 
 void Player::DebugGUI()
@@ -598,7 +584,6 @@ void Player::DebugGUI()
 				if (ImGui::Button("play", { 80,20 }))
 				{
 					playerAnimation = static_cast<PlayerAnimation>(item_current);
-					transition_state = 1;
 				}
 				ImGui::SliderFloat("transition_time", &transition_time, 0.0f, 5.0f);
 

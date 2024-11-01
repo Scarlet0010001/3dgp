@@ -5,25 +5,27 @@
 void Player::TransitionIdleState()
 {
 	p_update = &Player::UpdateIdleState;
-	//model->animate(PlayerAnimation::PLAYER_IDLE, anime_time,model->nodes, true);
 	state = State::IDLE;
 	playerAnimation = PlayerAnimation::PLAYER_IDLE;
+	model->SetIsLoop(true);
 	anime_time = 0.0f;
 }
 
 void Player::TransitionMoveState()
 {
 	p_update = &Player::UpdateMoveState;
-	//playerAnimation = PlayerAnimation::PLAYER_MOV;
 	state = State::MOVE;
+	model->SetIsLoop(true);
 
 }
 
 void Player::TransitionWingState()
 {
 	p_update = &Player::UpdateWingState;
-
+	playerAnimation = PlayerAnimation::PLAYER_TRANSITION_WING;
 	state = State::WING;
+	model->SetIsLoop(false);
+
 }
 
 void Player::TransitionWing_to_IdleState()
@@ -80,6 +82,14 @@ void Player::UpdateIdleState(float elapsedTime)
 
 void Player::UpdateMoveState(float elapsedTime)
 {
+	float ax = gamePad->GetAxis_LX();
+	float ay = gamePad->GetAxis_LY();
+
+	if (ax > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_RIGHT;
+	else if (ax < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_LEFT;
+	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
+	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
+
 	if (!InputMove(elapsedTime) && isGround)
 	{
 		TransitionIdleState();
@@ -102,16 +112,40 @@ void Player::UpdateMoveState(float elapsedTime)
 
 void Player::UpdateWingState(float elapsedTime)
 {
-	//Œü‚¢‚Ä‚¢‚é•ûŒü‚É‘¬“x‚ð‘«‚·
-	velocity.x = (forward * (param.wingSpeed)).x;
-	velocity.y = (forward * (param.wingSpeed)).y;
-	velocity.z = (forward * (param.wingSpeed)).z;
-
-	if (!InputMoveWing(elapsedTime) && isGround)
+	if (playerAnimation == PlayerAnimation::PLAYER_TRANSITION_WING)
 	{
-		//TransitionWing_to_IdleState();
+		if (model->GetIsEndAnimation())
+		{
+			playerAnimation = playerAnimation_transition = PlayerAnimation::PLAYER_WING;
+			model->SetIsLoop(true);
+		}
 	}
+	else
+	{
 
+		//Œü‚¢‚Ä‚¢‚é•ûŒü‚É‘¬“x‚ð‘«‚·
+		velocity.x = (forward * (param.wingSpeed)).x;
+		velocity.y = (forward * (param.wingSpeed)).y;
+		velocity.z = (forward * (param.wingSpeed)).z;
+
+		if (!InputMoveWing(elapsedTime) && isGround)
+		{
+			//TransitionWing_to_IdleState();
+		}
+	}
+	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)
+	{
+		playerAnimation = playerAnimation_transition = PlayerAnimation::PLAYER_TRANSITION_IDLE;
+		model->SetIsLoop(false);
+	}
+	if (playerAnimation == PlayerAnimation::PLAYER_TRANSITION_IDLE)
+	{
+		if (model->GetIsEndAnimation())
+		{
+			playerAnimation_transition = PlayerAnimation::PLAYER_IDLE;
+			TransitionIdleState();
+		}
+	}
 	//‰ñ”ð“ü—Í
 	InputAvoidance();
 

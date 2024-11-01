@@ -66,12 +66,12 @@ bool framework::initialize()
 	}
 	//IBLテクスチャをロード
 	D3D11_TEXTURE2D_DESC texture2d_desc;
-	load_texture_from_file(Graphics::Instance().GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/diffuse_iem.dds",
-		shader_resource_views[0].GetAddressOf(), &texture2d_desc);
-	load_texture_from_file(Graphics::Instance().GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/specular_pmrem.dds",
-		shader_resource_views[1].GetAddressOf(), &texture2d_desc);
+	//load_texture_from_file(Graphics::Instance().GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/diffuse_iem.dds",
+	//	shader_resource_views[0].GetAddressOf(), &texture2d_desc);
+	//load_texture_from_file(Graphics::Instance().GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/specular_pmrem.dds",
+	//	shader_resource_views[1].GetAddressOf(), &texture2d_desc);
 	load_texture_from_file(Graphics::Instance().GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/lut_ggx.dds",
-		shader_resource_views[2].GetAddressOf(), &texture2d_desc);
+		shader_resource_views[0].GetAddressOf(), &texture2d_desc);
 
 	return true;
 }
@@ -159,9 +159,7 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	graphics.Get_DC()->PSSetShaderResources(0, _countof(null_shader_resource_views), null_shader_resource_views);
 
 	// IBLテクスチャをバインド
-	graphics.Get_DC()->PSSetShaderResources(32, 1, shader_resource_views[0].GetAddressOf());
-	graphics.Get_DC()->PSSetShaderResources(33, 1, shader_resource_views[1].GetAddressOf());
-	graphics.Get_DC()->PSSetShaderResources(34, 1, shader_resource_views[2].GetAddressOf());
+	graphics.Get_DC()->PSSetShaderResources(35, 1, shader_resource_views[0].GetAddressOf());
 
 
 	FLOAT color[]{ 0.2f, 0.2f, 0.2f, 1.0f };

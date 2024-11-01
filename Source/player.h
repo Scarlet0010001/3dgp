@@ -78,6 +78,7 @@ private:
 		PLAYER_ANIME_COUNT,
 	};
 	PlayerAnimation playerAnimation = PLAYER_IDLE;
+	PlayerAnimation playerAnimation_transition = PLAYER_IDLE;
 	PlayerAnimation playerAnimation_old = PLAYER_IDLE;
 
 	//ブレンドアニメーション
@@ -85,8 +86,13 @@ private:
 	std::vector<gltf_model::node> blended_animated_nodes;
 	float time{ 0 };
 	float factor{ 0 };
-	int transition_state{ 0 };
-	float transition_time{ 1.0f };
+	float transition_time{ 0.09f };
+	enum TransitionState
+	{
+		NONE,
+		START,
+		TRANSITION,
+	}transition_state;
 
 
 	//ステート

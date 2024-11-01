@@ -98,7 +98,8 @@ void Character::Turn(float elapsed_time, DirectX::XMFLOAT3 move_vec, float speed
 {
 	// XMVECTORクラスへ変換
 	DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orien);
-	DirectX::XMVECTOR MoveVec = DirectX::XMLoadFloat3(&move_vec);
+	DirectX::XMFLOAT3 moveV = { move_vec.x, 0, move_vec.z };
+	DirectX::XMVECTOR MoveVec = DirectX::XMLoadFloat3(&moveV);
 	if (DirectX::XMVector3Equal(MoveVec, DirectX::XMVectorZero())) return; //もしmove_vecがゼロベクトルならリターン
 	DirectX::XMVECTOR forward, up;
 

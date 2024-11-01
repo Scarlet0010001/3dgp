@@ -573,96 +573,12 @@ void gltf_model::fetch_animations(const tinygltf::Model& Model)
 
 }
 
-void gltf_model::animate(size_t animation_index, 
-	float time, 
-	std::vector<node>& animated_nodes,
-	bool loopback)
-{
-	using namespace std;
-	using namespace DirectX;
-	
-	function<size_t(const vector<float>&, float, float&, bool)> indexof{
-		[](const vector<float>& timelines, float time, float& interpolation_factor, bool loopback)->size_t {
-		  const size_t keyframe_count{ timelines.size() };
-		  if (time > timelines.at(keyframe_count - 1))
-		  {
-			  if (loopback)
-			  {
-				  time = fmodf(time, timelines.at(keyframe_count - 1));
-			  }
-			  else
-			  {
-				  interpolation_factor = 1.0f;
-				  return keyframe_count - 2;
-			  }
-		  }
-		  else if (time < timelines.at(0))
-		  {
-			  interpolation_factor = 0.0f;
-			  return 0;
-		  }
-				size_t keyframe_index{ 0 };
-				for (size_t time_index = 1; time_index < keyframe_count; ++time_index)
-				{
-					if (time < timelines.at(time_index))
-					{
-						keyframe_index = max<size_t>(0LL, time_index - 1);
-						break;
-					}
-				}
-				interpolation_factor = (time - timelines.at(keyframe_index + 0)) /
-			   (timelines.at(keyframe_index + 1) - timelines.at(keyframe_index + 0));
-				return keyframe_index;
-	}   };
-	
-	if (animations.size() > 0)
-	{
-		const animation& animation{ animations.at(animation_index) };
-		for (vector<animation::channel>::const_reference channel : animation.channels)
-		{
-			const animation::sampler& sampler{ animation.samplers.at(channel.sampler) };
-			const vector<float>& timeline{ animation.timelines.at(sampler.input) };
-			if (timeline.size() == 0)
-			{
-				continue;
-			}
-			float interpolation_factor{};
-			size_t keyframe_index{ indexof(timeline, time, interpolation_factor, loopback) };
-			if (channel.target_path == "scale")
-			{
-				const vector<XMFLOAT3>& scales{ animation.scales.at(sampler.output) };
-				DirectX::XMStoreFloat3(&animated_nodes.at(channel.target_node).scale,
-					XMVectorLerp(DirectX::XMLoadFloat3(&scales.at(keyframe_index + 0)),
-						DirectX::XMLoadFloat3(&scales.at(keyframe_index + 1)), interpolation_factor));
-			}
-			else if (channel.target_path == "rotation")
-			{
-				const vector<XMFLOAT4>& rotations{ animation.rotations.at(sampler.output) };
-				DirectX::XMStoreFloat4(&animated_nodes.at(channel.target_node).rotation,
-					XMQuaternionNormalize(XMQuaternionSlerp(DirectX::XMLoadFloat4(&rotations.at(keyframe_index + 0)),
-						DirectX::XMLoadFloat4(&rotations.at(keyframe_index + 1)), interpolation_factor)));
-			}
-			else if (channel.target_path == "translation")
-			{
-				const vector<XMFLOAT3>& translations{ animation.translations.at(sampler.output) };
-				DirectX::XMStoreFloat3(&animated_nodes.at(channel.target_node).translation,
-					XMVectorLerp(DirectX::XMLoadFloat3(&translations.at(keyframe_index + 0)),
-						DirectX::XMLoadFloat3(&translations.at(keyframe_index + 1)), interpolation_factor));
-			}
-		}
-		cumulate_transforms(animated_nodes);
-	}
-	else
-	{
-		animated_nodes = nodes;
-	}
-}
-
-bool gltf_model::is_animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback)
+void gltf_model::animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback)
 {
 	using namespace std;
 	using namespace DirectX;
 	bool is = false;
+	loopback = isLoop;
 
 	function<size_t(const vector<float>&, float, float&, bool,bool&)> indexof{
 		[](const vector<float>& timelines, float time, float& interpolation_factor, bool loopback,bool& finish)->size_t {
@@ -741,7 +657,7 @@ bool gltf_model::is_animate(size_t animation_index, float time, std::vector<node
 		animated_nodes = nodes;
 	}
 
-	return is;
+	isEndAnimation = is;
 }
 
 void gltf_model::blend_animations(const std::vector<node>& from_nodes, const std::vector<node>& to_nodes, float factor, std::vector<node>& out_nodes)
