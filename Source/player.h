@@ -66,7 +66,10 @@ private:
 		PLAYER_WING_END,//地上変形
 
 		PLAYER_KILL_START,
+		PLAYER_KILL_POWERL,
+		PLAYER_KILL_ATTACK_R01,
 
+		PLAYER_IDLE_SHOT_L01,
 
 		PLAYER_ROLL,//回避
 		PLAYER_DAMAGE_FRONT,//前から被ダメ
@@ -109,8 +112,8 @@ private:
 		MOVE,
 		JUMP,
 		WING,
-		NORMAL_ATTACK,
 		SHOT,
+		NORMAL_ATTACK01,
 		DAMAGE,
 		ROLL,
 		SKILL,
@@ -184,6 +187,7 @@ private:
 	void TransitionAvoidanceState();//回避
 	void TransitionJumpState();//ジャンプ
 	void TransitionShotState();//射撃
+	void TransitionAttack01State();//近接
 
 
 	//--------各ステートのアップデート--------//r_はルートモーション付き
@@ -193,6 +197,7 @@ private:
 	void UpdateAvoidanceState(float elapsedTime);//回避
 	void UpdateJumpState(float elapsedTime);//ジャンプ
 	void UpdateShotState(float elapsedTime);//射撃
+	void UpdateAttack01State(float elapsedTime);//射撃
 
 
 	//更新関数の関数ポインタの定義
@@ -255,7 +260,7 @@ private:
 
 	std::unique_ptr <gltf_model> model;
 
-	float anime_time = 0.0f;
+	//float anime_time = 0.0f;
 
 	//現何回ジャンプしてるか
 	int jump_count = 0;

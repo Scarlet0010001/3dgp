@@ -8,7 +8,6 @@ void Player::TransitionIdleState()
 	state = State::IDLE;
 	playerAnimation = PlayerAnimation::PLAYER_IDLE;
 	model->SetIsLoop(true);
-	anime_time = 0.0f;
 }
 
 void Player::TransitionMoveState()
@@ -58,6 +57,15 @@ void Player::TransitionShotState()
 
 }
 
+void Player::TransitionAttack01State()
+{
+	p_update = &Player::UpdateAttack01State;
+	model->SetIsLoop(false);
+	playerAnimation = PlayerAnimation::PLAYER_KILL_ATTACK_R01;
+	state = State::NORMAL_ATTACK01;
+
+}
+
 void Player::UpdateIdleState(float elapsedTime)
 {
 	//model->animate(PlayerAnimation::PLAYER_IDLE, anime_time, model->nodes, true);
@@ -74,6 +82,7 @@ void Player::UpdateIdleState(float elapsedTime)
 	//UŒ‚“ü—Í
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
+		TransitionAttack01State();
 	}
 
 	//‘¬—Íˆ—XV
@@ -250,4 +259,15 @@ void Player::UpdateJumpState(float elapsedTime)
 
 void Player::UpdateShotState(float elapsedTime)
 {
+}
+
+void Player::UpdateAttack01State(float elapsedTime)
+{
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	{
+	}
+	if (model->GetIsEndAnimation())
+	{
+		TransitionIdleState();
+	}
 }

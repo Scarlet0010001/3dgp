@@ -579,6 +579,8 @@ void Player::DebugGUI()
 					"PLAYER_WING",
 					"PLAYER_TRANSITION_IDLE",
 					"PLAYER_TRANSITION_KILL",
+					"PLAYER_KILL_POWERL",
+					"PLAYER_KILL_ATTACK_R01",
 				};
 				static int item_current = 0;
 				static bool loop = false;
