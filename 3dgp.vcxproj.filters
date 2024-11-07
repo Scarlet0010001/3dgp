@@ -445,9 +445,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="HLSL\accumulate_husk_particles_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="HLSL\blur_ps.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
@@ -591,6 +588,9 @@
     </FxCompile>
     <FxCompile Include="HLSL\radial_blur_ps.hlsl">
       <Filter>Shaders\Radial_Blur</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\accumulate_husk_particles_ps.hlsl">
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

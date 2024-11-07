@@ -70,7 +70,6 @@ void SceneGame::Update(float elapsedTime)
 
     player->Update(cameraElapsedTime);
 
-    
     //**********ステージの更新**********//
     StageManager::Instance().Update(elapsedTime);
 

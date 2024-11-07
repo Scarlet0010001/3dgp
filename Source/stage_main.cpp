@@ -13,7 +13,7 @@ StageMain::StageMain()
 		"Resources/Stage/ExampleStage.gltf");
 		//"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf");
 	//modelCollision = std::make_unique<gltf_model>(graphics.GetDevice().Get(), ".\\resources\\Model\\Stage\\stage_hall_collision.fbx", 1);
-    scale = { 1.0f, 1.0f, 1.0f };
+    scale = { 2.0f, 2.0f, 2.0f };
     
     animeTimer = 0.0f;
     animated_nodes = model->nodes;

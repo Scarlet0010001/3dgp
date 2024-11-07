@@ -56,7 +56,7 @@ void Player::Initialize()
 	position = { 0.0f,2.0f,0.0f };
 	scale.x = scale.y = scale.z = 2.0f;
 
-	charaParam.moveSpeed = 5.0f;
+	charaParam.moveSpeed = 10.0f;
 
 	playerAnimation = PlayerAnimation::PLAYER_IDLE;
 	state = State::IDLE;
@@ -310,7 +310,8 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera) const
 
 void Player::InputJump()
 {
-	if (gamePad->GetButtonDown() & GamePad::BTN_A
+	if (gamePad->GetButtonDown() & GamePad::BTN_A 
+		|| gamePad->GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER
 		) //スペースを押したらジャンプ
 	{
 		if (jump_count < jump_limit)
@@ -429,7 +430,7 @@ bool Player::Flying()
 
 void Player::UpdateVerticalVelocity(float elapsed_frame)
 {
-	if(playerAnimation != PlayerAnimation::PLAYER_TRANSITION_WING)
+	if(playerAnimation != PlayerAnimation::PLAYER_WING_START)
 		velocity.y += gravity * elapsed_frame;
 	else 
 		velocity.y += (gravity * 0.5f) * elapsed_frame;
@@ -577,6 +578,7 @@ void Player::DebugGUI()
 					"PLAYER_TRANSITION_WING",
 					"PLAYER_WING",
 					"PLAYER_TRANSITION_IDLE",
+					"PLAYER_TRANSITION_KILL",
 				};
 				static int item_current = 0;
 				static bool loop = false;

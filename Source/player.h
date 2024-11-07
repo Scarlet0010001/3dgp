@@ -51,16 +51,23 @@ private:
 	enum  PlayerAnimation
 	{
 		PLAYER_IDLE,//待機
+
 		PLAYER_MOVE_FORWARD,//走り前
 		PLAYER_MOVE_LEFT,//走り左
 		PLAYER_MOVE_RIGHT,//走り右
 		PLAYER_MOVE_BACK,//走り後ろ
-		PLAYER_JUMP_INIT,//ジャンプ始め
-		PLAYER_JUMP_FALL,//ジャンプ途中
+
+		PLAYER_JUMP_START,//ジャンプ始め
+		PLAYER_JUMP,//ジャンプ途中
 		PLAYER_JUMP_END,//ジャンプ終わり
-		PLAYER_TRANSITION_WING,//飛行変形
+
+		PLAYER_WING_START,//飛行変形
 		PLAYER_WING,//飛行
-		PLAYER_TRANSITION_IDLE,//地上変形
+		PLAYER_WING_END,//地上変形
+
+		PLAYER_KILL_START,
+
+
 		PLAYER_ROLL,//回避
 		PLAYER_DAMAGE_FRONT,//前から被ダメ
 		PLAYER_ATK_SPRING_SLASH,//前回転切り
@@ -102,11 +109,10 @@ private:
 		MOVE,
 		JUMP,
 		WING,
-		ROLL,
-		SHOT,
-		LANDING,
-		FRONT_DAMAGE,
 		NORMAL_ATTACK,
+		SHOT,
+		DAMAGE,
+		ROLL,
 		SKILL,
 
 	};

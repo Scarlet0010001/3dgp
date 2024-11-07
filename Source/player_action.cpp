@@ -22,7 +22,7 @@ void Player::TransitionMoveState()
 void Player::TransitionWingState()
 {
 	p_update = &Player::UpdateWingState;
-	playerAnimation = PlayerAnimation::PLAYER_TRANSITION_WING;
+	playerAnimation = PlayerAnimation::PLAYER_WING_START;
 	state = State::WING;
 	model->SetIsLoop(false);
 
@@ -36,7 +36,7 @@ void Player::TransitionWing_to_IdleState()
 void Player::TransitionAvoidanceState()
 {
 	p_update = &Player::UpdateAvoidanceState;
-	//model->play_animation(PlayerAnimation::PLAYER_ROLL, false, 0.1f);
+
 	state = State::ROLL;
 	param.avoidanceTimer = 0;
 }
@@ -44,7 +44,8 @@ void Player::TransitionAvoidanceState()
 void Player::TransitionJumpState()
 {
 	p_update = &Player::UpdateJumpState;
-	//model->play_animation(PlayerAnimation::PLAYER_JUMP, false, 0.1f);
+	playerAnimation = PlayerAnimation::PLAYER_JUMP_START;
+	model->SetIsLoop(false);
 	state = State::JUMP;
 
 }
@@ -112,7 +113,7 @@ void Player::UpdateMoveState(float elapsedTime)
 
 void Player::UpdateWingState(float elapsedTime)
 {
-	if (playerAnimation == PlayerAnimation::PLAYER_TRANSITION_WING)
+	if (playerAnimation == PlayerAnimation::PLAYER_WING_START)
 	{
 		if (model->GetIsEndAnimation())
 		{
@@ -122,7 +123,6 @@ void Player::UpdateWingState(float elapsedTime)
 	}
 	else
 	{
-
 		//向いている方向に速度を足す
 		velocity.x = (forward * (param.wingSpeed)).x;
 		velocity.y = (forward * (param.wingSpeed)).y;
@@ -135,10 +135,10 @@ void Player::UpdateWingState(float elapsedTime)
 	}
 	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)
 	{
-		playerAnimation = playerAnimation_transition = PlayerAnimation::PLAYER_TRANSITION_IDLE;
+		playerAnimation = PlayerAnimation::PLAYER_WING_END;
 		model->SetIsLoop(false);
 	}
-	if (playerAnimation == PlayerAnimation::PLAYER_TRANSITION_IDLE)
+	if (playerAnimation == PlayerAnimation::PLAYER_WING_END)
 	{
 		if (model->GetIsEndAnimation())
 		{
@@ -206,12 +206,37 @@ void Player::UpdateAvoidanceState(float elapsedTime)
 
 void Player::UpdateJumpState(float elapsedTime)
 {
-	InputMove(elapsedTime);
+	if (playerAnimation == PlayerAnimation::PLAYER_JUMP_START)
+	{
+		if (model->GetIsEndAnimation())
+		{
+			playerAnimation =  PlayerAnimation::PLAYER_JUMP;
+			model->SetIsLoop(true);
+		}
+	}
 
 	if (isGround)
 	{
-		TransitionIdleState();
+		//あとで一定の速度で地面に当たると着地アニメーションを再生するようにする
+		if (velocity.y > 10.0f)
+		{
+			TransitionIdleState();
+		}
+		else
+		{
+			//is_end_animation = true;
+			playerAnimation = PlayerAnimation::PLAYER_JUMP_END;
+			model->SetIsLoop(false);
+
+			if (model->GetIsEndAnimation() && playerAnimation == PlayerAnimation::PLAYER_JUMP_END)
+			{
+				playerAnimation_transition = PlayerAnimation::PLAYER_IDLE;
+				TransitionIdleState();
+			}
+		}
 	}
+	InputMove(elapsedTime);
+
 	//飛行入力
 	InputWing();
 	//攻撃入力
@@ -219,10 +244,8 @@ void Player::UpdateJumpState(float elapsedTime)
 	{
 	}
 
-
 	//速力処理更新
 	UpdateVelocity(elapsedTime, position);
-
 }
 
 void Player::UpdateShotState(float elapsedTime)
