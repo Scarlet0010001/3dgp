@@ -71,25 +71,28 @@ private:
 
 		PLAYER_IDLE_SHOT_L01,
 
-		PLAYER_ROLL,//回避
-		PLAYER_DAMAGE_FRONT,//前から被ダメ
-		PLAYER_ATK_SPRING_SLASH,//前回転切り
-		PLAYER_PULL_SLASH,//敵を引き付けて斬る
-		PLAYER_ATK_GROUND,//地面に手を付けて口寄せみたいな
-		PLAYER_MAGIC_BUFF,//バフ
-		PLAYER_MAGIC_SLASH_UP,//空中に巻き上げ斬る
-		PLAYER_MAGIC_BULLET,//小さい魔法弾打つような
-		PLAYER_ATK_FORWARD_SLASH,//前進斬り
-		PLAYER_ATK_AIR,//ジャンプして地面に魔法うつ
-		PLAYER_ATK_COMBO1,//コンボ2-1
-		PLAYER_ATK_COMBO2,//コンボ2-2
-		PLAYER_ATK_COMBO3,//コンボ2-3
-		PLAYER_ATK_DODGE_BACK,//後方に回避しながら魔法
+		//PLAYER_ROLL,//回避
+		//PLAYER_DAMAGE_FRONT,//前から被ダメ
+		//PLAYER_ATK_SPRING_SLASH,//前回転切り
+		//PLAYER_PULL_SLASH,//敵を引き付けて斬る
+		//PLAYER_ATK_GROUND,//地面に手を付けて口寄せみたいな
+		//PLAYER_MAGIC_BUFF,//バフ
+		//PLAYER_MAGIC_SLASH_UP,//空中に巻き上げ斬る
+		//PLAYER_MAGIC_BULLET,//小さい魔法弾打つような
+		//PLAYER_ATK_FORWARD_SLASH,//前進斬り
+		//PLAYER_ATK_AIR,//ジャンプして地面に魔法うつ
+		//PLAYER_ATK_COMBO1,//コンボ2-1
+		//PLAYER_ATK_COMBO2,//コンボ2-2
+		//PLAYER_ATK_COMBO3,//コンボ2-3
+		//PLAYER_ATK_DODGE_BACK,//後方に回避しながら魔法
 		PLAYER_ANIME_COUNT,
 	};
 	PlayerAnimation playerAnimation = PLAYER_IDLE;
 	PlayerAnimation playerAnimation_transition = PLAYER_IDLE;
 	PlayerAnimation playerAnimation_old = PLAYER_IDLE;
+
+	//ループアニメーションの検索
+	bool FindLoopAnimation(PlayerAnimation playerAnimation);
 
 	//ブレンドアニメーション
 	std::vector<gltf_model::node> animated_nodes[PLAYER_ANIME_COUNT];
@@ -187,7 +190,9 @@ private:
 	void TransitionAvoidanceState();//回避
 	void TransitionJumpState();//ジャンプ
 	void TransitionShotState();//射撃
-	void TransitionAttack01State();//近接
+	void TransitionCombo_01_01_State();//近接
+	//void TransitionAttack01State();//近接
+	//void TransitionAttack01State();//近接
 
 
 	//--------各ステートのアップデート--------//r_はルートモーション付き
@@ -197,7 +202,7 @@ private:
 	void UpdateAvoidanceState(float elapsedTime);//回避
 	void UpdateJumpState(float elapsedTime);//ジャンプ
 	void UpdateShotState(float elapsedTime);//射撃
-	void UpdateAttack01State(float elapsedTime);//射撃
+	void UpdateCombo_01_01_State(float elapsedTime);//射撃
 
 
 	//更新関数の関数ポインタの定義

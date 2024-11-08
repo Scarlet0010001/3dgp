@@ -7,14 +7,12 @@ void Player::TransitionIdleState()
 	p_update = &Player::UpdateIdleState;
 	state = State::IDLE;
 	playerAnimation = PlayerAnimation::PLAYER_IDLE;
-	model->SetIsLoop(true);
 }
 
 void Player::TransitionMoveState()
 {
 	p_update = &Player::UpdateMoveState;
 	state = State::MOVE;
-	model->SetIsLoop(true);
 
 }
 
@@ -23,7 +21,6 @@ void Player::TransitionWingState()
 	p_update = &Player::UpdateWingState;
 	playerAnimation = PlayerAnimation::PLAYER_WING_START;
 	state = State::WING;
-	model->SetIsLoop(false);
 
 }
 
@@ -44,7 +41,6 @@ void Player::TransitionJumpState()
 {
 	p_update = &Player::UpdateJumpState;
 	playerAnimation = PlayerAnimation::PLAYER_JUMP_START;
-	model->SetIsLoop(false);
 	state = State::JUMP;
 
 }
@@ -52,15 +48,14 @@ void Player::TransitionJumpState()
 void Player::TransitionShotState()
 {
 	p_update = &Player::UpdateShotState;
-	//model->play_animation(PlayerAnimation::PLAYER_JUMP, false, 0.1f);
+	playerAnimation = PlayerAnimation::PLAYER_IDLE_SHOT_L01;
 	state = State::SHOT;
 
 }
 
-void Player::TransitionAttack01State()
+void Player::TransitionCombo_01_01_State()
 {
-	p_update = &Player::UpdateAttack01State;
-	model->SetIsLoop(false);
+	p_update = &Player::UpdateCombo_01_01_State;
 	playerAnimation = PlayerAnimation::PLAYER_KILL_ATTACK_R01;
 	state = State::NORMAL_ATTACK01;
 
@@ -68,7 +63,6 @@ void Player::TransitionAttack01State()
 
 void Player::UpdateIdleState(float elapsedTime)
 {
-	//model->animate(PlayerAnimation::PLAYER_IDLE, anime_time, model->nodes, true);
 	if (InputMove(elapsedTime))
 	{
 		TransitionMoveState();
@@ -82,7 +76,13 @@ void Player::UpdateIdleState(float elapsedTime)
 	//UŒ‚“ü—Í
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
-		TransitionAttack01State();
+		TransitionCombo_01_01_State();
+	}
+	//ŽËŒ‚“ü—Í
+	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
+		|| mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
+	{
+		TransitionShotState();
 	}
 
 	//‘¬—Íˆ—XV
@@ -126,8 +126,7 @@ void Player::UpdateWingState(float elapsedTime)
 	{
 		if (model->GetIsEndAnimation())
 		{
-			playerAnimation = playerAnimation_transition = PlayerAnimation::PLAYER_WING;
-			model->SetIsLoop(true);
+			playerAnimation = PlayerAnimation::PLAYER_WING;
 		}
 	}
 	else
@@ -145,13 +144,11 @@ void Player::UpdateWingState(float elapsedTime)
 	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)
 	{
 		playerAnimation = PlayerAnimation::PLAYER_WING_END;
-		model->SetIsLoop(false);
 	}
 	if (playerAnimation == PlayerAnimation::PLAYER_WING_END)
 	{
 		if (model->GetIsEndAnimation())
 		{
-			playerAnimation_transition = PlayerAnimation::PLAYER_IDLE;
 			TransitionIdleState();
 		}
 	}
@@ -220,7 +217,6 @@ void Player::UpdateJumpState(float elapsedTime)
 		if (model->GetIsEndAnimation())
 		{
 			playerAnimation =  PlayerAnimation::PLAYER_JUMP;
-			model->SetIsLoop(true);
 		}
 	}
 
@@ -235,11 +231,9 @@ void Player::UpdateJumpState(float elapsedTime)
 		{
 			//is_end_animation = true;
 			playerAnimation = PlayerAnimation::PLAYER_JUMP_END;
-			model->SetIsLoop(false);
 
 			if (model->GetIsEndAnimation() && playerAnimation == PlayerAnimation::PLAYER_JUMP_END)
 			{
-				playerAnimation_transition = PlayerAnimation::PLAYER_IDLE;
 				TransitionIdleState();
 			}
 		}
@@ -259,9 +253,16 @@ void Player::UpdateJumpState(float elapsedTime)
 
 void Player::UpdateShotState(float elapsedTime)
 {
+	if (gamePad->GetButtonUp() & gamePad->BTN_RIGHT_TRIGGER
+		|| mouse->GetButtonUp() & mouse->BTN_RIGHT_CLICK)
+	{
+		TransitionIdleState();
+	}
+
 }
 
-void Player::UpdateAttack01State(float elapsedTime)
+
+void Player::UpdateCombo_01_01_State(float elapsedTime)
 {
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{

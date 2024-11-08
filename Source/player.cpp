@@ -58,8 +58,7 @@ void Player::Initialize()
 
 	charaParam.moveSpeed = 10.0f;
 
-	playerAnimation = PlayerAnimation::PLAYER_IDLE;
-	state = State::IDLE;
+	TransitionIdleState();
 
 	damagedFunction = [=](int damage, float invincible, WINCE_TYPE type)->bool {return ApplyDamage(damage, invincible, type); };
 
@@ -109,7 +108,7 @@ void Player::Render_f(float elapsedTime)
 		playerAnimation_transition = playerAnimation;
 		transition_state = TransitionState::START;
 	}
-	
+	bool nowLoop = FindLoopAnimation(playerAnimation);
 	//ブレンドアニメーション
 	if (transition_state > 0 && transition_time > 0.0f)
 	{
@@ -118,8 +117,8 @@ void Player::Render_f(float elapsedTime)
 		case TransitionState::NONE:
 			break;
 		case TransitionState::START:
-			model->animate(playerAnimation_old, time, animated_nodes[playerAnimation_old]);
-			model->animate(playerAnimation, 0.0f, animated_nodes[playerAnimation]);
+			model->animate(playerAnimation_old, time, animated_nodes[playerAnimation_old], FindLoopAnimation(playerAnimation_old));
+			model->animate(playerAnimation, 0.0f, animated_nodes[playerAnimation], nowLoop);
 			transition_state = TransitionState::TRANSITION;
 			time = 0.0f;
 			factor = 0.0f;
@@ -143,16 +142,15 @@ void Player::Render_f(float elapsedTime)
 		time += elapsedTime;
 		if (model->animations.at(playerAnimation).duration < time)
 		{
-			time = 0;
+			if (nowLoop)
+				time = 0;
+			else time = model->animations.at(playerAnimation).duration;
 		}
-		model->animate(playerAnimation, time, animated_nodes[playerAnimation]);
+		model->animate(playerAnimation, time, animated_nodes[playerAnimation], nowLoop);
 		model->render(graphics.Get_DC().Get(), transform, animated_nodes[playerAnimation]);
 		playerAnimation_old = playerAnimation;
 
 	}
-
-	//model->animate(playerAnimation, time += elapsedTime, animated_nodes, true);
-	//model->render(graphics.Get_DC().Get(), transform, animated_nodes);
 
 	//デバッグGUI描画
 	DebugGUI();
@@ -180,6 +178,20 @@ void Player::CalcAttack_vs_Enemy(Capsule collider, AddDamageFunc damaged_func)
 
 void Player::JudgeSkillCollision(Capsule object_colider, AddDamageFunc damaged_func)
 {
+}
+
+bool Player::FindLoopAnimation(PlayerAnimation PA)
+{
+	if (PA == PlayerAnimation::PLAYER_IDLE
+		|| PA == PlayerAnimation::PLAYER_MOVE_FORWARD
+		|| PA == PlayerAnimation::PLAYER_MOVE_LEFT
+		|| PA == PlayerAnimation::PLAYER_MOVE_RIGHT
+		|| PA == PlayerAnimation::PLAYER_MOVE_BACK
+		|| PA == PlayerAnimation::PLAYER_WING
+		|| PA == PlayerAnimation::PLAYER_JUMP
+		|| PA == PlayerAnimation::PLAYER_IDLE_SHOT_L01
+		) return true;
+	return false;
 }
 
 void Player::Move(float vx, float vz, float speed)

@@ -221,16 +221,16 @@ public: //関数
 
 public:
 	//ループ取得
-	const bool& GetIsLoop() const { return isLoop; }
+	//const bool& GetIsLoop() const { return isLoop; }
 	//ループ設定
-	void SetIsLoop(const bool& Loop) { this->isLoop = Loop; }
+	//void SetIsLoop(const bool& Loop) { this->isLoop = Loop; }
 	//アニメおわり取得
 	const bool& GetIsEndAnimation() const { return isEndAnimation; }
 
 
 private:
 	// アニメーション変数
-	bool isLoop = false;
+	//bool isLoop = false;
 	bool isEndAnimation = false;
 
 };
