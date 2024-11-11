@@ -24,11 +24,6 @@ void Player::TransitionWingState()
 
 }
 
-void Player::TransitionWing_to_IdleState()
-{
-
-}
-
 void Player::TransitionAvoidanceState()
 {
 	p_update = &Player::UpdateAvoidanceState;
@@ -45,10 +40,18 @@ void Player::TransitionJumpState()
 
 }
 
+void Player::TransitionLandingState()
+{
+	p_update = &Player::UpdateLandingState;
+	playerAnimation = PlayerAnimation::PLAYER_JUMP_END;
+	state = State::JUMP;
+
+}
+
 void Player::TransitionShotState()
 {
 	p_update = &Player::UpdateShotState;
-	playerAnimation = PlayerAnimation::PLAYER_IDLE_SHOT_L01;
+	playerAnimation = PlayerAnimation::PLAYER_SHOT_IDLE;
 	state = State::SHOT;
 
 }
@@ -56,8 +59,44 @@ void Player::TransitionShotState()
 void Player::TransitionCombo_01_01_State()
 {
 	p_update = &Player::UpdateCombo_01_01_State;
-	playerAnimation = PlayerAnimation::PLAYER_KILL_ATTACK_R01;
+	playerAnimation = PlayerAnimation::PLAYER_ATTACK_01;
 	state = State::NORMAL_ATTACK01;
+	nextCombo = false;
+}
+
+void Player::TransitionCombo_01_02_State()
+{
+	p_update = &Player::UpdateCombo_01_02_State;
+	playerAnimation = PlayerAnimation::PLAYER_ATTACK_02;
+	state = State::NORMAL_ATTACK01;
+	nextCombo = false;
+
+}
+
+void Player::TransitionCombo_01_03_State()
+{
+	p_update = &Player::UpdateCombo_01_03_State;
+	playerAnimation = PlayerAnimation::PLAYER_ATTACK_03;
+	state = State::NORMAL_ATTACK01;
+	nextCombo = false;
+
+}
+
+void Player::TransitionCombo_PowerL_State()
+{
+	p_update = &Player::UpdateCombo_PowerL_State;
+	playerAnimation = PlayerAnimation::PLAYER_POWER_L;
+	state = State::NORMAL_ATTACK01;
+	nextCombo = false;
+
+}
+
+void Player::TransitionCombo_PowerR_State()
+{
+	p_update = &Player::UpdateCombo_PowerR_State;
+	playerAnimation = PlayerAnimation::PLAYER_POWER_R;
+	state = State::NORMAL_ATTACK01;
+	nextCombo = false;
 
 }
 
@@ -114,6 +153,12 @@ void Player::UpdateMoveState(float elapsedTime)
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
+	}
+	//射撃入力
+	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
+		|| mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
+	{
+		TransitionShotState();
 	}
 
 	//速力処理更新
@@ -222,6 +267,7 @@ void Player::UpdateJumpState(float elapsedTime)
 
 	if (isGround)
 	{
+
 		//あとで一定の速度で地面に当たると着地アニメーションを再生するようにする
 		if (velocity.y > 10.0f)
 		{
@@ -229,13 +275,7 @@ void Player::UpdateJumpState(float elapsedTime)
 		}
 		else
 		{
-			//is_end_animation = true;
-			playerAnimation = PlayerAnimation::PLAYER_JUMP_END;
-
-			if (model->GetIsEndAnimation() && playerAnimation == PlayerAnimation::PLAYER_JUMP_END)
-			{
-				TransitionIdleState();
-			}
+			TransitionLandingState();
 		}
 	}
 	InputMove(elapsedTime);
@@ -251,6 +291,14 @@ void Player::UpdateJumpState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
+void Player::UpdateLandingState(float elapsedTime)
+{
+	if (model->GetIsEndAnimation())
+	{
+		TransitionIdleState();
+	}
+}
+
 void Player::UpdateShotState(float elapsedTime)
 {
 	if (gamePad->GetButtonUp() & gamePad->BTN_RIGHT_TRIGGER
@@ -259,6 +307,29 @@ void Player::UpdateShotState(float elapsedTime)
 		TransitionIdleState();
 	}
 
+	float ax = gamePad->GetAxis_LX();
+	float ay = gamePad->GetAxis_LY();
+
+	if (ax > 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_RIGHT;
+	else if (ax < 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_LEFT;
+	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_FORWARD;
+	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_BACK;
+
+	InputMove(elapsedTime, param.floatingValue, 1);
+
+	//ジャンプ入力
+	//InputJump();
+	//回避入力
+	//InputAvoidance();
+	//飛行入力
+	InputWing();
+	//攻撃入力
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	{
+	}
+
+	//速力処理更新
+	UpdateVelocity(elapsedTime, position);
 }
 
 
@@ -266,9 +337,70 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 {
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
+		nextCombo = true;
+	}
+
+	if (0.23f < time && nextCombo)
+	{
+		TransitionCombo_01_02_State();
+	}
+
+	if (model->GetIsEndAnimation())
+	{
+		TransitionIdleState();
+	}
+}
+
+void Player::UpdateCombo_01_02_State(float elapsedTime)
+{
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	{
+		nextCombo = true;
+	}
+
+	if (0.3f < time && nextCombo)
+	{
+		TransitionCombo_01_03_State();
 	}
 	if (model->GetIsEndAnimation())
 	{
 		TransitionIdleState();
 	}
+}
+
+void Player::UpdateCombo_01_03_State(float elapsedTime)
+{
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	{
+		nextCombo = true;
+	}
+
+	if (0.48f < time && nextCombo)
+	{
+		TransitionCombo_01_03_State();
+	}
+	if (model->GetIsEndAnimation())
+	{
+		TransitionIdleState();
+	}
+}
+
+void Player::UpdateCombo_PowerL_State(float elapsedTime)
+{
+	if (0.6f < time)
+	{
+		if (gamePad->GetButtonDown() & gamePad->BTN_X)
+		{
+			TransitionCombo_01_03_State();
+		}
+	}
+	if (model->GetIsEndAnimation())
+	{
+		TransitionIdleState();
+	}
+
+}
+
+void Player::UpdateCombo_PowerR_State(float elapsedTime)
+{
 }

@@ -56,7 +56,7 @@ void Player::Initialize()
 	position = { 0.0f,2.0f,0.0f };
 	scale.x = scale.y = scale.z = 2.0f;
 
-	charaParam.moveSpeed = 10.0f;
+	charaParam.moveSpeed = 15.0f;
 
 	TransitionIdleState();
 
@@ -189,7 +189,11 @@ bool Player::FindLoopAnimation(PlayerAnimation PA)
 		|| PA == PlayerAnimation::PLAYER_MOVE_BACK
 		|| PA == PlayerAnimation::PLAYER_WING
 		|| PA == PlayerAnimation::PLAYER_JUMP
-		|| PA == PlayerAnimation::PLAYER_IDLE_SHOT_L01
+		|| PA == PlayerAnimation::PLAYER_SHOT_IDLE
+		|| PA == PlayerAnimation::PLAYER_SHOT_FORWARD
+		|| PA == PlayerAnimation::PLAYER_SHOT_LEFT
+		|| PA == PlayerAnimation::PLAYER_SHOT_RIGHT
+		|| PA == PlayerAnimation::PLAYER_SHOT_BACK
 		) return true;
 	return false;
 }
@@ -477,7 +481,6 @@ void Player::DebugGUI()
 				state_name = magic_enum::enum_name<State>(state);
 				ImGui::Text(state_name.c_str());
 				ImGui::DragFloat3("velocity:", &velocity.x);
-				ImGui::Checkbox("isWing:", &isWing);
 			}
 			if (ImGui::CollapsingHeader("Param", ImGuiTreeNodeFlags_DefaultOpen))
 			{

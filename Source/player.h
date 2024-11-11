@@ -65,11 +65,18 @@ private:
 		PLAYER_WING,//飛行
 		PLAYER_WING_END,//地上変形
 
-		PLAYER_KILL_START,
-		PLAYER_KILL_POWERL,
-		PLAYER_KILL_ATTACK_R01,
+		PLAYER_SHOT_IDLE, //射撃前
+		PLAYER_SHOT_FORWARD,//射撃前
+		PLAYER_SHOT_LEFT,//射撃左
+		PLAYER_SHOT_RIGHT,//射撃右
+		PLAYER_SHOT_BACK,//射撃後ろ
 
-		PLAYER_IDLE_SHOT_L01,
+		PLAYER_ATTACK_01,//近接01
+		PLAYER_ATTACK_02,//近接02
+		PLAYER_ATTACK_03,//近接03
+		PLAYER_POWER_L,//強攻撃左
+		PLAYER_POWER_R,//強攻撃右
+
 
 		//PLAYER_ROLL,//回避
 		//PLAYER_DAMAGE_FRONT,//前から被ダメ
@@ -138,7 +145,7 @@ private:
 		//飛行速度
 		float wingSpeed = 40;
 		//浮遊度
-		float floatingValue = 10.0f;
+		float floatingValue = 1.5f;
 		//剣エフェクトの速度
 		float swordSwingSpeed = 1500.0f;
 		//コンボ1攻撃のパラメーター
@@ -186,13 +193,15 @@ private:
 	void TransitionIdleState();//待機
 	void TransitionMoveState();//走り
 	void TransitionWingState();//飛行
-	void TransitionWing_to_IdleState();//飛行から待機へ
 	void TransitionAvoidanceState();//回避
 	void TransitionJumpState();//ジャンプ
+	void TransitionLandingState();//着地
 	void TransitionShotState();//射撃
-	void TransitionCombo_01_01_State();//近接
-	//void TransitionAttack01State();//近接
-	//void TransitionAttack01State();//近接
+	void TransitionCombo_01_01_State();//近接コンボ１
+	void TransitionCombo_01_02_State();//近接コンボ２
+	void TransitionCombo_01_03_State();//近接コンボ３
+	void TransitionCombo_PowerL_State();//強攻撃左
+	void TransitionCombo_PowerR_State();//強攻撃右
 
 
 	//--------各ステートのアップデート--------//r_はルートモーション付き
@@ -201,8 +210,13 @@ private:
 	void UpdateWingState(float elapsedTime);//飛行
 	void UpdateAvoidanceState(float elapsedTime);//回避
 	void UpdateJumpState(float elapsedTime);//ジャンプ
+	void UpdateLandingState(float elapsedTime);//着地
 	void UpdateShotState(float elapsedTime);//射撃
-	void UpdateCombo_01_01_State(float elapsedTime);//射撃
+	void UpdateCombo_01_01_State(float elapsedTime);//近接コンボ１
+	void UpdateCombo_01_02_State(float elapsedTime);//近接コンボ２
+	void UpdateCombo_01_03_State(float elapsedTime);//近接コンボ３
+	void UpdateCombo_PowerL_State(float elapsedTime);//強攻撃左
+	void UpdateCombo_PowerR_State(float elapsedTime);//強攻撃右
 
 
 	//更新関数の関数ポインタの定義
@@ -279,13 +293,12 @@ private:
 	//------------------攻撃関連--------------------------
 
 	AttackParam attackParam;
-
+	bool nextCombo = false;
 
 	DirectX::XMFLOAT3 forward;
 
 
 	//------------------デバッグ-------------------------
-	bool isWing = false;
 public:
 	//ダメージを受けたときに呼ばれる *関数を呼ぶのはダメージを与えたオブジェクト
 	AddDamageFunc damagedFunction;
