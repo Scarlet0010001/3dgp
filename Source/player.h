@@ -279,6 +279,16 @@ private:
 
 	std::unique_ptr <gltf_model> model;
 
+	//当たり判定ノード
+	enum LR
+	{
+		LEFT,
+		RIGHT,
+		COUNT,
+	};
+	gltf_model::node* beamSaber[LR::COUNT];
+	gltf_model::node* lowerArm[LR::COUNT];
+
 	//float anime_time = 0.0f;
 
 	//現何回ジャンプしてるか
@@ -304,6 +314,8 @@ public:
 	AddDamageFunc damagedFunction;
 	Capsule collider;
 
+private:
+	void DebugPrimitiveUpdate();
 
 };
 

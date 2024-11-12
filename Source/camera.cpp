@@ -299,8 +299,6 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
 			}
 		}
-
-
 	}
 	// orientationVec‚©‚çorientation‚ğXV
 	XMStoreFloat4(&orientation, orientationVec);

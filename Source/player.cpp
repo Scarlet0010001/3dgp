@@ -32,6 +32,11 @@ Player::Player()
 	//UI
 	//ui = std::make_unique<PlayerUI>();
 
+	beamSaber[LR::LEFT] = model->find_nodes("Left_wep1");
+	beamSaber[LR::RIGHT] = model->find_nodes("Right_wep1");
+	lowerArm[LR::LEFT] = model->find_nodes("lowerarm_l");
+	lowerArm[LR::RIGHT] = model->find_nodes("lowerarm_r");
+
 	mouse = &Device::Instance().GetMouse();
 	gamePad = &Device::Instance().GetGamePad();
 	camera = &Camera::Instance();
@@ -86,6 +91,8 @@ void Player::Update(float elapsedTime)
 
 	//ñ≥ìGéûä‘ÇÃçXêV
 	UpdateInvicibleTimer(elapsedTime);
+
+	DebugPrimitiveUpdate();
 
 	collider.start = position;
 	collider.end = { position.x,position.y + charaParam.height, position.z };
@@ -450,6 +457,32 @@ void Player::UpdateVerticalVelocity(float elapsed_frame)
 		velocity.y += gravity * elapsed_frame;
 	else 
 		velocity.y += (gravity * 0.5f) * elapsed_frame;
+}
+
+void Player::DebugPrimitiveUpdate()
+{
+	DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
+
+	std::function<DirectX::XMFLOAT3(DirectX::XMFLOAT4X4&, DirectX::XMFLOAT4X4&)> saber_position{
+		[](DirectX::XMFLOAT4X4& arm, DirectX::XMFLOAT4X4& saber)->DirectX::XMFLOAT3 {
+			
+			DirectX::XMFLOAT3 Arm{arm._41,arm._42,arm._43};
+			DirectX::XMFLOAT3 Saber{ saber._41,saber._42,saber._43};
+
+			DirectX::XMFLOAT3 direction = Math::calc_vector_AtoB_normalize(Arm, Saber);
+			float length = Math::calc_vector_AtoB_length(Arm, Saber);
+	
+			return Math::calc_designated_point(Arm, direction, length * 0.5f);
+	} };
+	//beamSaber
+	//lowerArm
+	debugRender->CreateSphere(
+		saber_position(lowerArm[LR::LEFT]->global_transform, beamSaber[LR::LEFT]->global_transform),
+		5.0f, { 1.0f,1.0f,1.0f,1.0f });
+	debugRender->CreateSphere(
+		saber_position(lowerArm[LR::RIGHT]->global_transform, beamSaber[LR::RIGHT]->global_transform),
+		10.0f, { 1.0f,1.0f,1.0f,1.0f });
+
 }
 
 void Player::DebugGUI()

@@ -581,7 +581,8 @@ void gltf_model::animate(size_t animation_index, float time, std::vector<node>& 
 
 	function<size_t(const vector<float>&, float, float&, bool,bool&)> indexof{
 		[](const vector<float>& timelines, float time, float& interpolation_factor, bool loopback,bool& finish)->size_t {
-		  const size_t keyframe_count{ timelines.size() };
+		  
+			const size_t keyframe_count{ timelines.size() };
 		  if (time >= timelines.at(keyframe_count - 1))
 		  {
 			  if (loopback)
