@@ -35,13 +35,6 @@ public:
     void SceneReset();
 
 protected:
-    struct SCENE_CONSTANTS
-    {
-        //DirectX::XMFLOAT4X4 view_projection; //ビュー・プロジェクション変換行列
-        //DirectX::XMFLOAT4 light_direction; //ライトの向き
-        //DirectX::XMFLOAT4 camera_position;
-    };
-    std::unique_ptr<Constants<SCENE_CONSTANTS>> scene_constants{};
 
 
 private:

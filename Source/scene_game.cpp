@@ -17,9 +17,6 @@ SceneGame::SceneGame()
 void SceneGame::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
-
-    //scene_constants = std::make_unique<Constants<SCENE_CONSTANTS>>(graphics.GetDevice().Get());
-    //scene_constantsƒoƒbƒtƒ@‚ðHLSL‚Å’T‚µ‚½‚è‚µ‚Ä˜M‚é
     
     framebuffers[0] = std::make_unique<framebuffer>(graphics.GetDevice().Get(), SCREEN_WIDTH, SCREEN_HEIGHT);
     bit_block_transfer = std::make_unique<fullscreen_quad>(graphics.GetDevice().Get());

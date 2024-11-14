@@ -22,7 +22,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     normal.w = 0;
     N = normalize((normal.x * T) + (normal.y * B) + (normal.z * N));
 
-    float3 L = normalize(-directional_light_direction[0].xyz);
+    float3 L = normalize(-light_direction.xyz);
     float3 diffuse = color.rgb * max(0, dot(N, L));
 
     float3 V = normalize(camera_position.xyz - pin.world_position.xyz);

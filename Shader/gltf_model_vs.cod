@@ -4,18 +4,7 @@
 //
 // Buffer Definitions: 
 //
-// cbuffer PRIMITIVE_CONSTANT_BUFFER
-// {
-//
-//   row_major float4x4 world;          // Offset:    0 Size:    64
-//   int material;                      // Offset:   64 Size:     4 [unused]
-//   bool has_tangent;                  // Offset:   68 Size:     4 [unused]
-//   int skin;                          // Offset:   72 Size:     4
-//   int pad;                           // Offset:   76 Size:     4 [unused]
-//
-// }
-//
-// cbuffer SCENE_CONSTANT_BUFFER
+// cbuffer SCENE_CONSTANTS
 // {
 //
 //   row_major float4x4 view;           // Offset:    0 Size:    64 [unused]
@@ -24,6 +13,22 @@
 //   float4 light_color;                // Offset:  192 Size:    16 [unused]
 //   float4 light_direction;            // Offset:  208 Size:    16 [unused]
 //   float4 camera_position;            // Offset:  224 Size:    16 [unused]
+//   float4 avatar_position;            // Offset:  240 Size:    16 [unused]
+//   float4 avatar_direction;           // Offset:  256 Size:    16 [unused]
+//   float2 resolution;                 // Offset:  272 Size:     8 [unused]
+//   float time;                        // Offset:  280 Size:     4 [unused]
+//   float delta_time;                  // Offset:  284 Size:     4 [unused]
+//
+// }
+//
+// cbuffer PRIMITIVE_CONSTANT_BUFFER
+// {
+//
+//   row_major float4x4 world;          // Offset:    0 Size:    64
+//   int material;                      // Offset:   64 Size:     4 [unused]
+//   bool has_tangent;                  // Offset:   68 Size:     4 [unused]
+//   int skin;                          // Offset:   72 Size:     4
+//   int pad;                           // Offset:   76 Size:     4 [unused]
 //
 // }
 //
@@ -40,8 +45,8 @@
 // Name                                 Type  Format         Dim      HLSL Bind  Count
 // ------------------------------ ---------- ------- ----------- -------------- ------
 // PRIMITIVE_CONSTANT_BUFFER         cbuffer      NA          NA            cb0      1 
-// SCENE_CONSTANT_BUFFER             cbuffer      NA          NA            cb1      1 
 // PRIMITIVE_JOINT_CONSTANTS         cbuffer      NA          NA            cb2      1 
+// SCENE_CONSTANTS                   cbuffer      NA          NA            cb3      1 
 //
 //
 //
@@ -69,8 +74,8 @@
 //
 vs_5_0
 dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_constantbuffer CB3[12], immediateIndexed
 dcl_constantbuffer CB0[5], immediateIndexed
-dcl_constantbuffer CB1[12], immediateIndexed
 dcl_constantbuffer CB2[2048], dynamicIndexed
 dcl_input v0.xyz
 dcl_input v1.xyz
@@ -237,33 +242,33 @@ endif
 itof r1.w, l(1)  // r1.w <- vin.position.w
 
 #line 22
-mul r2.xyzw, cb0[0].xxxx, cb1[8].xyzw
-mul r3.xyzw, cb0[0].yyyy, cb1[9].xyzw
+mul r2.xyzw, cb3[8].xyzw, cb0[0].xxxx
+mul r3.xyzw, cb3[9].xyzw, cb0[0].yyyy
 add r2.xyzw, r2.xyzw, r3.xyzw
-mul r3.xyzw, cb0[0].zzzz, cb1[10].xyzw
+mul r3.xyzw, cb3[10].xyzw, cb0[0].zzzz
 add r2.xyzw, r2.xyzw, r3.xyzw
-mul r3.xyzw, cb0[0].wwww, cb1[11].xyzw
+mul r3.xyzw, cb3[11].xyzw, cb0[0].wwww
 add r2.xyzw, r2.xyzw, r3.xyzw
-mul r3.xyzw, cb0[1].xxxx, cb1[8].xyzw
-mul r4.xyzw, cb0[1].yyyy, cb1[9].xyzw
+mul r3.xyzw, cb3[8].xyzw, cb0[1].xxxx
+mul r4.xyzw, cb3[9].xyzw, cb0[1].yyyy
 add r3.xyzw, r3.xyzw, r4.xyzw
-mul r4.xyzw, cb0[1].zzzz, cb1[10].xyzw
+mul r4.xyzw, cb3[10].xyzw, cb0[1].zzzz
 add r3.xyzw, r3.xyzw, r4.xyzw
-mul r4.xyzw, cb0[1].wwww, cb1[11].xyzw
+mul r4.xyzw, cb3[11].xyzw, cb0[1].wwww
 add r3.xyzw, r3.xyzw, r4.xyzw
-mul r4.xyzw, cb0[2].xxxx, cb1[8].xyzw
-mul r6.xyzw, cb0[2].yyyy, cb1[9].xyzw
+mul r4.xyzw, cb3[8].xyzw, cb0[2].xxxx
+mul r6.xyzw, cb3[9].xyzw, cb0[2].yyyy
 add r4.xyzw, r4.xyzw, r6.xyzw
-mul r6.xyzw, cb0[2].zzzz, cb1[10].xyzw
+mul r6.xyzw, cb3[10].xyzw, cb0[2].zzzz
 add r4.xyzw, r4.xyzw, r6.xyzw
-mul r6.xyzw, cb0[2].wwww, cb1[11].xyzw
+mul r6.xyzw, cb3[11].xyzw, cb0[2].wwww
 add r4.xyzw, r4.xyzw, r6.xyzw
-mul r6.xyzw, cb0[3].xxxx, cb1[8].xyzw
-mul r7.xyzw, cb0[3].yyyy, cb1[9].xyzw
+mul r6.xyzw, cb3[8].xyzw, cb0[3].xxxx
+mul r7.xyzw, cb3[9].xyzw, cb0[3].yyyy
 add r6.xyzw, r6.xyzw, r7.xyzw
-mul r7.xyzw, cb0[3].zzzz, cb1[10].xyzw
+mul r7.xyzw, cb3[10].xyzw, cb0[3].zzzz
 add r6.xyzw, r6.xyzw, r7.xyzw
-mul r7.xyzw, cb0[3].wwww, cb1[11].xyzw
+mul r7.xyzw, cb3[11].xyzw, cb0[3].wwww
 add r6.xyzw, r6.xyzw, r7.xyzw
 mul r2.xyzw, r0.yyyy, r2.xyzw
 mul r3.xyzw, r0.zzzz, r3.xyzw

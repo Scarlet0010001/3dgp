@@ -1,4 +1,4 @@
-//#include "constant_buffer.hlsli"
+#include "constant_buffer.hlsli"
 #include "gltf_model.hlsli"
 #define BASECOLOR_TEXTURE 0
 #define METALLIC_ROUGHNESS_TEXTURE 1

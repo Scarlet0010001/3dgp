@@ -191,16 +191,16 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 	//ビュー・プロジェクション変換行列を計算し、
 	//それを定数バッファにセット
 
-	D3D11_VIEWPORT viewport;
-	UINT num_viewports{ 1 };
-	graphics.Get_DC().Get()->RSGetViewports(&num_viewports, &viewport);
-	float aspect_ratio{ viewport.Width / viewport.Height };
-	XMMATRIX P{ XMMatrixPerspectiveFovLH(XMConvertToRadians(30), aspect_ratio, 0.1f, 1000.0f) };
-	XMVECTOR eye{ XMLoadFloat4(&camera_position) };
-	XMVECTOR focus{ XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f) };
-
-	XMVECTOR up{ XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) };
-	XMMATRIX V{ XMMatrixLookAtLH(eye, focus, up) };
+	//D3D11_VIEWPORT viewport;
+	//UINT num_viewports{ 1 };
+	//graphics.Get_DC().Get()->RSGetViewports(&num_viewports, &viewport);
+	//float aspect_ratio{ viewport.Width / viewport.Height };
+	//XMMATRIX P{ XMMatrixPerspectiveFovLH(XMConvertToRadians(30), aspect_ratio, 0.1f, 1000.0f) };
+	//XMVECTOR eye{ XMLoadFloat4(&camera_position) };
+	//XMVECTOR focus{ XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f) };
+	//
+	//XMVECTOR up{ XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) };
+	//XMMATRIX V{ XMMatrixLookAtLH(eye, focus, up) };
 
 	//// 定数バッファのデータを更新
 	//scene_constants data{};

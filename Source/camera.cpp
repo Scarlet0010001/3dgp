@@ -199,7 +199,6 @@ void Camera::Update(float elapsedTime)
 			
 			debugRender->CreateSphere(
 				trakkingTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
-			
 		}
 			//trackingtargetの位置に球を出す
 #ifdef USE_IMGUI
@@ -513,7 +512,7 @@ void Camera::CalcViewProjection(float elapsedTime)
 	sceneConstant->data.time += elapsedTime;
 	sceneConstant->data.delta_time = elapsedTime;
 	//すべてのシェーダーで使う可能性があるものなので全部に転送
-	sceneConstant->Bind(Graphics::Instance().Get_DC().Get(), 1, CB_FLAG::ALL);
+	sceneConstant->Bind(Graphics::Instance().Get_DC().Get(), 3, CB_FLAG::ALL);
 
 }
 

@@ -4,18 +4,7 @@
 //
 // Buffer Definitions: 
 //
-// cbuffer PRIMITIVE_CONSTANT_BUFFER
-// {
-//
-//   row_major float4x4 world;          // Offset:    0 Size:    64 [unused]
-//   int material;                      // Offset:   64 Size:     4
-//   bool has_tangent;                  // Offset:   68 Size:     4
-//   int skin;                          // Offset:   72 Size:     4 [unused]
-//   int pad;                           // Offset:   76 Size:     4 [unused]
-//
-// }
-//
-// cbuffer SCENE_CONSTANT_BUFFER
+// cbuffer SCENE_CONSTANTS
 // {
 //
 //   row_major float4x4 view;           // Offset:    0 Size:    64 [unused]
@@ -24,6 +13,22 @@
 //   float4 light_color;                // Offset:  192 Size:    16 [unused]
 //   float4 light_direction;            // Offset:  208 Size:    16
 //   float4 camera_position;            // Offset:  224 Size:    16
+//   float4 avatar_position;            // Offset:  240 Size:    16 [unused]
+//   float4 avatar_direction;           // Offset:  256 Size:    16 [unused]
+//   float2 resolution;                 // Offset:  272 Size:     8 [unused]
+//   float time;                        // Offset:  280 Size:     4 [unused]
+//   float delta_time;                  // Offset:  284 Size:     4 [unused]
+//
+// }
+//
+// cbuffer PRIMITIVE_CONSTANT_BUFFER
+// {
+//
+//   row_major float4x4 world;          // Offset:    0 Size:    64 [unused]
+//   int material;                      // Offset:   64 Size:     4
+//   bool has_tangent;                  // Offset:   68 Size:     4
+//   int skin;                          // Offset:   72 Size:     4 [unused]
+//   int pad;                           // Offset:   76 Size:     4 [unused]
 //
 // }
 //
@@ -110,7 +115,7 @@
 // specular_pmrem                    texture  float4        cube            t34      1 
 // lut_ggx                           texture  float4          2d            t35      1 
 // PRIMITIVE_CONSTANT_BUFFER         cbuffer      NA          NA            cb0      1 
-// SCENE_CONSTANT_BUFFER             cbuffer      NA          NA            cb1      1 
+// SCENE_CONSTANTS                   cbuffer      NA          NA            cb3      1 
 //
 //
 //
@@ -133,8 +138,8 @@
 //
 ps_5_0
 dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_constantbuffer CB3[15], immediateIndexed
 dcl_constantbuffer CB0[5], immediateIndexed
-dcl_constantbuffer CB1[15], immediateIndexed
 dcl_sampler s1, mode_default
 dcl_sampler s2, mode_default
 dcl_resource_structured t0, 96
@@ -299,7 +304,7 @@ add r2.xyz, r2.xyzx, r7.xyzx  // r2.x <- c_diff.x; r2.y <- c_diff.y; r2.z <- c_d
 
 #line 116
 mov r7.xyz, -v1.xyzx
-add r7.xyz, r7.xyzx, cb1[14].xyzx
+add r7.xyz, r7.xyzx, cb3[14].xyzx
 dp3 r0.z, r7.xyzx, r7.xyzx
 rsq r0.z, r0.z
 mul r7.xyz, r0.zzzz, r7.xyzx  // r7.x <- V.x; r7.y <- V.y; r7.z <- V.z
@@ -385,7 +390,7 @@ itof r4.yzw, l(0, 0, 0, 0)  // r4.y <- diffuse.x; r4.z <- diffuse.y; r4.w <- dif
 itof r9.xyz, l(0, 0, 0, 0)  // r9.x <- specular.x; r9.y <- specular.y; r9.z <- specular.z
 
 #line 140
-mov r10.xyz, -cb1[13].xyzx
+mov r10.xyz, -cb3[13].xyzx
 dp3 r0.z, r10.xyzx, r10.xyzx
 rsq r0.z, r0.z
 mul r10.xyz, r0.zzzz, r10.xyzx  // r10.x <- L.x; r10.y <- L.y; r10.z <- L.z

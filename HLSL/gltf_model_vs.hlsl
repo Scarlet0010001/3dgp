@@ -1,4 +1,4 @@
-//#include "constant_buffer.hlsli"
+#include "constant_buffer.hlsli"
 #include "gltf_model.hlsli"
 VS_OUT main(VS_IN vin)
 {

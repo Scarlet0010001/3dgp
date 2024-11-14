@@ -4,6 +4,16 @@ cbuffer SCENE_CONSTANTS : register(b3)
     row_major float4x4 view;
     row_major float4x4 projection;
     row_major float4x4 view_projection;
+    float4 light_color;
+    float4 light_direction;
+    float4 camera_position;
+    float4 avatar_position;
+    float4 avatar_direction;
+    float2 resolution;
+    float time;
+    float delta_time;
+
+    /*
     row_major float4x4 inverse_projection;
     row_major float4x4 inverse_view_projection;
     float4 directional_light_direction[1];
@@ -21,6 +31,7 @@ cbuffer SCENE_CONSTANTS : register(b3)
     float wind_strength;
     float rimlight_factor;
     float snow_factor;
+    */
 }
 
 cbuffer GRASS_CONSTANTS : register(b4)

@@ -93,15 +93,8 @@ private:
 	void render(float elapsed_time/*Elapsed seconds from last frame*/);
 	bool uninitialize();
 
-	//Microsoft::WRL::ComPtr<ID3D11Device> device;
-	//Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediate_context;
-	//Microsoft::WRL::ComPtr<IDXGISwapChain> swap_chain;
-	//Microsoft::WRL::ComPtr<ID3D11RenderTargetView> render_target_view;
-	//Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depth_stencil_view;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[8];
-	//
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
-	//
 	//Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shaders[8];
 	//
 	//Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler_states[4];
@@ -127,52 +120,6 @@ private:
 	//std::unique_ptr<framebuffer> framebuffers[8];
 	//
 	//std::unique_ptr<fullscreen_quad> bit_block_transfer;
-
-	struct scene_constants
-	{
-		DirectX::XMFLOAT4X4 view_projection; //ビュー・プロジェクション変換行列
-		DirectX::XMFLOAT4 light_direction; //ライトの向き
-		DirectX::XMFLOAT4 camera_position;
-
-		float smoothstep_minEdge;						//エッジの下限。この値以下では smoothstep の結果は 0 になります。
-		float smoothstep_maxEdge;						//エッジの上限。この値以上では smoothstep の結果は 1 になります。
-		
-		float gaussian_sigma;
-		float bloom_intensity;
-
-		float exposure;
-		float dummy1;
-		float dummy2;
-		float dummy3;
-
-	};
-
-
-	DirectX::XMFLOAT4 camera_position{ 0.0f, 0.0f, -10.0f, 1.0f };
-	DirectX::XMFLOAT4 light_direction{ 0.0f, 0.0f, 1.0f, 0.0f };
-
-	//luminance_extraction_ps
-	float smoothstep_minEdge;						//エッジの下限。この値以下では smoothstep の結果は 0 になります。
-	float smoothstep_maxEdge;						//エッジの上限。この値以上では smoothstep の結果は 1 になります。
-
-	//ガウシアン分布の標準偏差
-	//ぼかしの強さやぼかしの広がり	の調節
-	float gaussian_sigma = 2.0f;
-
-	//ブルーム（光芒）効果の強度を制御する
-	//bloom_intensity の調整により、シーン全体や特定の光源からの光がより美しく表現される
-	float bloom_intensity;
-
-	float exposure = 1.2f;
-
-	DirectX::XMFLOAT3 translation{ 0, 0, 0 };
-	DirectX::XMFLOAT3 scaling{ 1, 1, 1 };
-	DirectX::XMFLOAT3 rotation{ 0, 0, 0 };
-	DirectX::XMFLOAT4 material_color{ 1 ,1, 1, 1 };
-
-	float factor = 0.5f;
-	int clip_count = 0;
-	int clip_Max = 0;
 
 #if 0
 	DirectX::XMFLOAT3 axis{ 1, 0, 0 };
