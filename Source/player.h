@@ -286,8 +286,10 @@ private:
 		RIGHT,
 		COUNT,
 	};
-	gltf_model::node* beamSaber[LR::COUNT];
-	gltf_model::node* lowerArm[LR::COUNT];
+	gltf_model::node beamSaber[LR::COUNT];
+	gltf_model::node lowerArm[LR::COUNT];
+	DirectX::XMFLOAT3 beamSaber_position[LR::COUNT]{};
+	DirectX::XMFLOAT3 lowerArm_position[LR::COUNT]{};
 
 	//float anime_time = 0.0f;
 

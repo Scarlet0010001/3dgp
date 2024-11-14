@@ -215,7 +215,9 @@ public: //ä÷êî
 	void blend_animations(const std::vector<node>& from_nodes, const std::vector<node>& to_nodes, float factor, std::vector<node>& out_nodes);
 
 	// ÉmÅ[Éhåüçı
-	gltf_model::node* find_nodes(const std::string name);
+	node& find_nodes(const std::string name);
+
+	void fech_by_bone(const DirectX::XMFLOAT4X4& world, const node& bone, DirectX::XMFLOAT3& pos, DirectX::XMFLOAT4X4* mat = nullptr);
 
 	void render(ID3D11DeviceContext* immediate__context, const DirectX::XMFLOAT4X4& world,const std::vector<node>& animated_nodes,int skin_node = 0);
 

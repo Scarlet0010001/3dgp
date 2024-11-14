@@ -2,6 +2,7 @@
 #define TINYGLTF_IMPLEMENTATION
 #include "tinygltf-release/tiny_gltf.h"
 #include "misc.h"
+#include "user.h"
 #include <stack>
 #include <functional>
 #include <filesystem>
@@ -682,16 +683,51 @@ void gltf_model::blend_animations(const std::vector<node>& from_nodes, const std
 
 }
 
-gltf_model::node* gltf_model::find_nodes(const std::string name)
+gltf_model::node& gltf_model::find_nodes(const std::string name)
 {
+	gltf_model::node dummy = {};
 	for (auto& node : nodes)
 	{
 		if(::strcmp(node.name.c_str(), name.c_str()) == 0)
 		{
-			return &node;
+			return node;
 		}
 	}
-	return nullptr;
+	_ASSERT_EXPR(false, "指定された名前のノードがありません");
+	return dummy;
+}
+
+void gltf_model::fech_by_bone(const DirectX::XMFLOAT4X4& world, const node& bone, DirectX::XMFLOAT3& pos, DirectX::XMFLOAT4X4* mat)
+{
+	if (!animations.empty() && !bone.global_transform._11) return;
+
+
+	// グローバル変換行列を取得し、ワールド行列と掛け合わせて最終的なトランスフォームを計算
+	DirectX::XMFLOAT4X4 w;
+	XMStoreFloat4x4(&w, XMLoadFloat4x4(&bone.global_transform) * XMLoadFloat4x4(&world));
+
+	// ワールド変換から位置（pos）を抽出
+	pos = { w._41, w._42, w._43 };
+	
+	// 各列ベクトルの長さからスケールを計算
+	DirectX::XMFLOAT3 scale = {
+		Math::Length({w._11, w._12, w._13}),
+		Math::Length({w._21, w._22, w._23}),
+		Math::Length({w._31, w._32, w._33})
+	};
+
+	// スケール行列と位置行列を作成
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
+
+	// スケールと位置の影響を除去し、ボーンの回転行列を抽出
+	DirectX::XMMATRIX R = DirectX::XMLoadFloat4x4(&w) * DirectX::XMMatrixInverse(nullptr, S) * DirectX::XMMatrixInverse(nullptr, T);
+
+	// 姿勢行列が要求されている場合、計算した回転行列を返す
+	if (mat)
+	{
+		DirectX::XMStoreFloat4x4(mat, R);
+	}
 }
 
 void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4& world,const std::vector<node>& animated_nodes,int skin_node)
