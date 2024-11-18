@@ -12,6 +12,7 @@
 //#include <filesystem>
 #include "collision_mesh.h"
 
+
 class gltf_model
 {
 	std::string filename;
@@ -27,6 +28,7 @@ public:
 	struct node
 	{
 		std::string name;
+		int index{ -1 }; //ノード番号
 		int skin{ -1 }; //index of skin refereced by this node
 		int mesh{ -1 }; //index of mesh refereced by this node
 
@@ -217,7 +219,7 @@ public: //関数
 	// ノード検索
 	node& find_nodes(const std::string name);
 
-	void fech_by_bone(const DirectX::XMFLOAT4X4& world, const node& bone, DirectX::XMFLOAT3& pos, DirectX::XMFLOAT4X4* mat = nullptr);
+	void fech_by_bone(size_t anime_index, float time, const DirectX::XMFLOAT4X4& world, const node& bone, DirectX::XMFLOAT3& pos, DirectX::XMFLOAT4X4* mat = nullptr);
 
 	void render(ID3D11DeviceContext* immediate__context, const DirectX::XMFLOAT4X4& world,const std::vector<node>& animated_nodes,int skin_node = 0);
 

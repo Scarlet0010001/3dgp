@@ -117,10 +117,12 @@ gltf_model::gltf_model(ID3D11Device* device, const std::string& filename, bool e
 
 void gltf_model::fetch_nodes(const tinygltf::Model& Model)
 {
+	int i{};
 	for (std::vector<tinygltf::Node>::const_reference gltf_node : Model.nodes)
 	{
 		node& node{ nodes.emplace_back() };
 		node.name = gltf_node.name;
+		node.index = i++;
 		node.skin = gltf_node.skin;
 		node.mesh = gltf_node.mesh;
 		node.children = gltf_node.children;
@@ -697,14 +699,23 @@ gltf_model::node& gltf_model::find_nodes(const std::string name)
 	return dummy;
 }
 
-void gltf_model::fech_by_bone(const DirectX::XMFLOAT4X4& world, const node& bone, DirectX::XMFLOAT3& pos, DirectX::XMFLOAT4X4* mat)
+//size_t animation_index, float time, std::vector<node>& animated_nodes,
+void gltf_model::fech_by_bone(size_t anime_index,
+	float time,
+	const DirectX::XMFLOAT4X4& world,
+	const node& bone,
+	DirectX::XMFLOAT3& pos,
+	DirectX::XMFLOAT4X4* mat)
 {
-	if (!animations.empty() && !bone.global_transform._11) return;
+	if (animations.empty()) return;
+	//const animation& animation{ animations.at(anime_index) };
+	std::vector<node> n = nodes;
 
+	animate(anime_index, time, n);
 
 	// グローバル変換行列を取得し、ワールド行列と掛け合わせて最終的なトランスフォームを計算
 	DirectX::XMFLOAT4X4 w;
-	XMStoreFloat4x4(&w, XMLoadFloat4x4(&bone.global_transform) * XMLoadFloat4x4(&world));
+	XMStoreFloat4x4(&w, XMLoadFloat4x4(&n[bone.index].global_transform) * XMLoadFloat4x4(&world));
 
 	// ワールド変換から位置（pos）を抽出
 	pos = { w._41, w._42, w._43 };

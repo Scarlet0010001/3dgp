@@ -465,49 +465,53 @@ void Player::DebugPrimitiveUpdate()
 {
 	DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
 	
-	model->fech_by_bone(transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
-	model->fech_by_bone(transform, lowerArm[LR::LEFT], lowerArm_position[LR::LEFT]);
-	model->fech_by_bone(transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
-	model->fech_by_bone(transform, lowerArm[LR::RIGHT], lowerArm_position[LR::RIGHT]);
+	//ƒT[ƒxƒ‹‚Ì“–‚½‚è”»’è
+	{
+		model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
+		model->fech_by_bone(playerAnimation, time, transform, lowerArm[LR::LEFT], lowerArm_position[LR::LEFT]);
+		model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
+		model->fech_by_bone(playerAnimation, time, transform, lowerArm[LR::RIGHT], lowerArm_position[LR::RIGHT]);
 
-	//std::function<DirectX::XMFLOAT3(DirectX::XMFLOAT3&, DirectX::XMFLOAT3&)> saber_position{
-	//	[](DirectX::XMFLOAT3& arm, DirectX::XMFLOAT3& saber)->DirectX::XMFLOAT3 {
-	//		
-	//		DirectX::XMFLOAT3 Arm{ arm };
-	//		DirectX::XMFLOAT3 Saber{ saber };
-	//
-	//		DirectX::XMFLOAT3 direction = Math::calc_vector_AtoB_normalize(Arm, Saber);
-	//		float length = Math::calc_vector_AtoB_length(Arm, Saber);
-	//
-	//		return Math::calc_designated_point(Arm, direction, length * 0.5f);
-	//} };
-	
-	std::function<DirectX::XMFLOAT3(DirectX::XMFLOAT4X4&, DirectX::XMFLOAT4X4&)> saber_position{
-		[](DirectX::XMFLOAT4X4& arm, DirectX::XMFLOAT4X4& saber)->DirectX::XMFLOAT3 {
-			
-			DirectX::XMFLOAT3 Arm{arm._41,arm._42,arm._43};
-			DirectX::XMFLOAT3 Saber{ saber._41,saber._42,saber._43};
+		std::function<DirectX::XMFLOAT3(DirectX::XMFLOAT3&, DirectX::XMFLOAT3&)> saber_position{
+			[](DirectX::XMFLOAT3& arm, DirectX::XMFLOAT3& saber)->DirectX::XMFLOAT3 {
 
-			DirectX::XMFLOAT3 direction = Math::calc_vector_AtoB_normalize(Arm, Saber);
-			float length = Math::calc_vector_AtoB_length(Arm, Saber);
-	
-			return Math::calc_designated_point(Arm, direction, length * 0.5f);
-	} };
-	//beamSaber
-	//lowerArm
-	debugRender->CreateSphere(
-		saber_position(lowerArm[LR::LEFT].global_transform, beamSaber[LR::LEFT].global_transform),
-		1.0f, { 1.0f,0.0f,0.0f,1.0f });
-	debugRender->CreateSphere(
-		saber_position(lowerArm[LR::RIGHT].global_transform, beamSaber[LR::RIGHT].global_transform),
-		1.0f, { 1.0f,0.0f,0.0f,1.0f });
-	
-	//debugRender->CreateSphere(
-	//	saber_position(lowerArm_position[LR::LEFT], beamSaber_position[LR::LEFT]),
-	//	1.0f, { 1.0f,0.0f,0.0f,1.0f });
-	//debugRender->CreateSphere(
-	//	saber_position(lowerArm_position[LR::RIGHT], beamSaber_position[LR::RIGHT]),
-	//	1.0f, { 1.0f,0.0f,0.0f,1.0f });
+				DirectX::XMFLOAT3 Arm{ arm };
+				DirectX::XMFLOAT3 Saber{ saber };
+
+				DirectX::XMFLOAT3 direction = Math::calc_vector_AtoB_normalize(Arm, Saber);
+				float length = Math::calc_vector_AtoB_length(Arm, Saber);
+
+				return Math::calc_designated_point(Arm, direction, length * 0.5f);
+		} };
+		/*
+		std::function<DirectX::XMFLOAT3(DirectX::XMFLOAT4X4&, DirectX::XMFLOAT4X4&)> saber_position{
+			[](DirectX::XMFLOAT4X4& arm, DirectX::XMFLOAT4X4& saber)->DirectX::XMFLOAT3 {
+
+				DirectX::XMFLOAT3 Arm{arm._41,arm._42,arm._43};
+				DirectX::XMFLOAT3 Saber{ saber._41,saber._42,saber._43};
+
+				DirectX::XMFLOAT3 direction = Math::calc_vector_AtoB_normalize(Arm, Saber);
+				float length = Math::calc_vector_AtoB_length(Arm, Saber);
+
+				return Math::calc_designated_point(Arm, direction, length * 0.5f);
+		} };
+		//beamSaber
+		//lowerArm
+		debugRender->CreateSphere(
+			saber_position(lowerArm[LR::LEFT].global_transform, beamSaber[LR::LEFT].global_transform),
+			1.0f, { 1.0f,0.0f,0.0f,1.0f });
+		debugRender->CreateSphere(
+			saber_position(lowerArm[LR::RIGHT].global_transform, beamSaber[LR::RIGHT].global_transform),
+			1.0f, { 1.0f,0.0f,0.0f,1.0f });
+		*/
+
+		debugRender->CreateSphere(
+			saber_position(lowerArm_position[LR::LEFT], beamSaber_position[LR::LEFT]),
+			1.0f, { 1.0f,0.0f,0.0f,1.0f });
+		debugRender->CreateSphere(
+			saber_position(lowerArm_position[LR::RIGHT], beamSaber_position[LR::RIGHT]),
+			1.0f, { 1.0f,0.0f,0.0f,1.0f });
+	}
 
 }
 
