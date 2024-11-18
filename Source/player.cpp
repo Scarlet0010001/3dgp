@@ -375,8 +375,14 @@ void Player::OnLanding()
 	if (velocity.y < gravity * 30.0f)// 坂道歩いているときは遷移しない程度に調整
 	{
 		// 着地ステートへ遷移
-		TransitionIdleState();
+		//TransitionIdleState();
+		//if(velocity.y)
+		TransitionLandingState();
 		velocity = { 0,0,0 };
+	}
+	else
+	{
+		TransitionIdleState();
 	}
 
 }

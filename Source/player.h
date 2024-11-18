@@ -173,20 +173,6 @@ private:
 		}
 	};
 
-	struct ShieldParam
-	{
-		bool isShield;//ガード状態か
-		bool shieldable;//ガード可能状態か
-		bool isBreakShield;//シールドが破壊状態か
-		float shieldTime;
-		float justGuardTime;
-		float recastShieldTime;
-		float shieldHp;//耐久
-		float recastRate;
-		float SHIELD_HP_MAX = 50;
-
-	};
-
 private:
 
 	//------------遷移--------------//

@@ -265,19 +265,21 @@ void Player::UpdateJumpState(float elapsedTime)
 		}
 	}
 
-	if (isGround)
-	{
+	//if (isGround)
+	//{
+	//	//あとで一定の速度で地面に当たると着地アニメーションを再生するようにする
+	//	if (velocity.y > 10.0f)
+	//	{
+	//		TransitionIdleState();
+	//	}
+	//	else
+	//	{
+	//		TransitionLandingState();
+	//	}
+	//}
+	
+	//OnLanding();
 
-		//あとで一定の速度で地面に当たると着地アニメーションを再生するようにする
-		if (velocity.y > 10.0f)
-		{
-			TransitionIdleState();
-		}
-		else
-		{
-			TransitionLandingState();
-		}
-	}
 	InputMove(elapsedTime);
 
 	//飛行入力
