@@ -89,8 +89,8 @@ public:
 
 private:
 	bool initialize();
-	void update(float elapsed_time/*Elapsed seconds from last frame*/);
-	void render(float elapsed_time/*Elapsed seconds from last frame*/);
+	void update(float elapsedTime/*Elapsed seconds from last frame*/);
+	void render(float elapsedTime/*Elapsed seconds from last frame*/);
 	bool uninitialize();
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[8];
@@ -130,10 +130,10 @@ private:
 private:
 	high_resolution_timer tictoc;
 	uint32_t frames{ 0 };
-	float elapsed_time{ 0.0f };
+	float elapsedTime{ 0.0f };
 	void calculate_frame_stats()
 	{
-		if (++frames, (tictoc.time_stamp() - elapsed_time) >= 1.0f)
+		if (++frames, (tictoc.time_stamp() - elapsedTime) >= 1.0f)
 		{
 			float fps = static_cast<float>(frames);
 			std::wostringstream outs;
@@ -142,7 +142,7 @@ private:
 			SetWindowTextW(hwnd, outs.str().c_str());
 
 			frames = 0;
-			elapsed_time += 1.0f;
+			elapsedTime += 1.0f;
 		}
 	}
 };

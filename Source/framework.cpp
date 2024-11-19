@@ -76,7 +76,7 @@ bool framework::initialize()
 	return true;
 }
 
-void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
+void framework::update(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 #ifdef USE_IMGUI
 	ImGui_ImplDX11_NewFrame();
@@ -84,12 +84,12 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 	ImGui::NewFrame();
 #endif
 
-	Device::Instance().Update(hwnd, elapsed_time);
+	Device::Instance().Update(hwnd, elapsedTime);
 	Device::Instance().GetMouse().OperationActivation();
 	Device::Instance().GetGamePad().OperationActivation();
 
 	Graphics::Instance().SetHwnd(hwnd);
-	SceneManager::Instance().Update(elapsed_time);
+	SceneManager::Instance().Update(elapsedTime);
 	Graphics::Instance().DebugGui();
 
 #ifdef USE_IMGUI
@@ -143,7 +143,7 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 #endif
 }
 
-void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
+void framework::render(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 	//別スレッド中にデバイスコンテキストが使われていた場合に
 	//同時アクセスしないように排他制御する
@@ -181,7 +181,7 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
 
 	graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::SOLID_ONESIDE);
 	
-	SceneManager::Instance().Render(elapsed_time);
+	SceneManager::Instance().Render(elapsedTime);
 
 	////////////////////////////////////////////////////////////////////////
 	// ここから移動

@@ -86,7 +86,7 @@ void Player::Update(float elapsedTime)
 	{
 		camera->SetLockOn();
 	}
-	if (state == State::WING) orientation = camera->GetOrientation();
+	if (state == State::WING || state == State::SHOT) orientation = camera->GetOrientation();
 
 	//プレイヤーの正面情報を更新
 	forward = Math::get_posture_forward(orientation);
@@ -375,8 +375,6 @@ void Player::OnLanding()
 	if (velocity.y < gravity * 30.0f)// 坂道歩いているときは遷移しない程度に調整
 	{
 		// 着地ステートへ遷移
-		//TransitionIdleState();
-		//if(velocity.y)
 		TransitionLandingState();
 		velocity = { 0,0,0 };
 	}

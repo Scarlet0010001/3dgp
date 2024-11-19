@@ -18,20 +18,20 @@ void SceneManager::Initialize()
     }
 }
 
-void SceneManager::Update(float elapsed_time)
+void SceneManager::Update(float elapsedTime)
 {
     if (currentScene != nullptr)
     {
-        currentScene->Update(elapsed_time);
+        currentScene->Update(elapsedTime);
     }
 
 }
 
-void SceneManager::Render(float elapsed_time)
+void SceneManager::Render(float elapsedTime)
 {
     if (currentScene != nullptr)
     {
-        currentScene->Render(elapsed_time);
+        currentScene->Render(elapsedTime);
     }
 
 }

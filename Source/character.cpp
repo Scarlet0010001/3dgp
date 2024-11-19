@@ -53,9 +53,9 @@ void Character::Move(float vx, float vz, float speed)
 
 }
 
-void Character::Turn(float elapsed_time, float vx, float vz, float speed)
+void Character::Turn(float elapsedTime, float vx, float vz, float speed)
 {
-	speed *= elapsed_time;
+	speed *= elapsedTime;
 	float length = sqrtf(vx * vx + vz * vz);
 	if (length < 0.001f) return;
 
@@ -94,7 +94,7 @@ void Character::Turn(float elapsed_time, float vx, float vz, float speed)
 
 }
 
-void Character::Turn(float elapsed_time, DirectX::XMFLOAT3 move_vec, float speed, DirectX::XMFLOAT4& orien)
+void Character::Turn(float elapsedTime, DirectX::XMFLOAT3 move_vec, float speed, DirectX::XMFLOAT4& orien)
 {
 	// XMVECTORクラスへ変換
 	DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orien);
@@ -139,14 +139,14 @@ void Character::Turn(float elapsed_time, DirectX::XMFLOAT3 move_vec, float speed
 			q = DirectX::XMQuaternionRotationAxis(axis, turnAngle);//正の方向に動くクオータニオン
 
 			DirectX::XMVECTOR End = DirectX::XMQuaternionMultiply(orientationVec, q);
-			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, End, rate * elapsed_time);
+			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, End, rate * elapsedTime);
 		}
 		else
 		{
 			DirectX::XMVECTOR q;
 			q = DirectX::XMQuaternionRotationAxis(axis, -turnAngle);//負の方向に動くクオータニオン
 			DirectX::XMVECTOR End = DirectX::XMQuaternionMultiply(orientationVec, q);
-			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, End, rate * elapsed_time);
+			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, End, rate * elapsedTime);
 		}
 
 	}
@@ -163,31 +163,31 @@ void Character::Jump(float speed)
 
 }
 
-void Character::UpdateVelocity(float elapsed_time, DirectX::XMFLOAT3& position)
+void Character::UpdateVelocity(float elapsedTime, DirectX::XMFLOAT3& position)
 {
 	//経過フレーム
-	float elapsed_frame = 60.0f * elapsed_time;
+	float elapsed_frame = 60.0f * elapsedTime;
 
 
 	//垂直速力更新処理
 	UpdateVerticalVelocity(elapsed_frame);
 
 	//垂直移動更新処理
-	UpdateVerticalMove(elapsed_time, position);
+	UpdateVerticalMove(elapsedTime, position);
 
 	//水平速力更新処理
 	UpdateHorizontalVelocity(elapsed_frame);
 
 	//水平移動更新処理
-	UpdateHorizontalMove(elapsed_time, position);
+	UpdateHorizontalMove(elapsedTime, position);
 
 }
 
-void Character::UpdateInvicibleTimer(float elapsed_time)
+void Character::UpdateInvicibleTimer(float elapsedTime)
 {
 	if (invincibleTimer > 0.0f)
 	{
-		invincibleTimer -= elapsed_time;
+		invincibleTimer -= elapsedTime;
 	}
 	else
 	{
@@ -202,10 +202,10 @@ void Character::UpdateVerticalVelocity(float elapsed_frame)
 
 }
 
-void Character::UpdateVerticalMove(float elapsed_time, DirectX::XMFLOAT3& position)
+void Character::UpdateVerticalMove(float elapsedTime, DirectX::XMFLOAT3& position)
 {
 	// キャラクターの下方向の移動量
-	float my = velocity.y * elapsed_time;
+	float my = velocity.y * elapsedTime;
 
 
 	// キャラクターのY軸方向となる法線ベクトル
@@ -277,7 +277,7 @@ void Character::UpdateVerticalMove(float elapsed_time, DirectX::XMFLOAT3& positi
 			q = DirectX::XMQuaternionRotationAxis(axis, angle);
 			DirectX::XMVECTOR End = DirectX::XMQuaternionMultiply(OrientationVec, q);
 			float rate = 10.0f;
-			OrientationVec = DirectX::XMQuaternionSlerp(OrientationVec, End, rate * elapsed_time);
+			OrientationVec = DirectX::XMQuaternionSlerp(OrientationVec, End, rate * elapsedTime);
 		}
 		// orientationVecからorientationを更新
 		DirectX::XMStoreFloat4(&orientation, OrientationVec);
@@ -344,7 +344,7 @@ void Character::UpdateHorizontalVelocity(float elapsed_frame)
 
 }
 
-void Character::UpdateHorizontalMove(float elapsed_time, DirectX::XMFLOAT3& position)
+void Character::UpdateHorizontalMove(float elapsedTime, DirectX::XMFLOAT3& position)
 {
 	// 水平速力計算
 	float velocity_length_xz = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
@@ -353,8 +353,8 @@ void Character::UpdateHorizontalMove(float elapsed_time, DirectX::XMFLOAT3& posi
 	{
 
 		// 水平移動値
-		float mx = velocity.x * elapsed_time;
-		float mz = velocity.z * elapsed_time;
+		float mx = velocity.x * elapsedTime;
+		float mz = velocity.z * elapsedTime;
 
 		// レイの開始位置と終点位置
 		DirectX::XMFLOAT3 start = { position.x - mx / 50.0f, position.y + stepOffset * 2, position.z - mz / 50.0f };

@@ -15,7 +15,7 @@ public:
 		return instance;
 	}
 	// 更新処理
-	void Update(HWND hwnd, float elapsed_time);
+	void Update(HWND hwnd, float elapsedTime);
 
 	// ゲームパッド取得
 	GamePad& GetGamePad() { return gamePad; }

@@ -181,10 +181,7 @@ void Player::UpdateWingState(float elapsedTime)
 		velocity.y = (forward * (param.wingSpeed)).y;
 		velocity.z = (forward * (param.wingSpeed)).z;
 
-		if (!InputMoveWing(elapsedTime) && isGround)
-		{
-			//TransitionWing_to_IdleState();
-		}
+		InputMoveWing(elapsedTime);
 	}
 	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)
 	{
@@ -264,21 +261,6 @@ void Player::UpdateJumpState(float elapsedTime)
 			playerAnimation =  PlayerAnimation::PLAYER_JUMP;
 		}
 	}
-
-	//if (isGround)
-	//{
-	//	//あとで一定の速度で地面に当たると着地アニメーションを再生するようにする
-	//	if (velocity.y > 10.0f)
-	//	{
-	//		TransitionIdleState();
-	//	}
-	//	else
-	//	{
-	//		TransitionLandingState();
-	//	}
-	//}
-	
-	//OnLanding();
 
 	InputMove(elapsedTime);
 

@@ -4,8 +4,8 @@ Device::Device()
 {
 }
 
-void Device::Update(HWND hwnd, float elapsed_time)
+void Device::Update(HWND hwnd, float elapsedTime)
 {
 	mouse.Update(hwnd);
-	gamePad.Update(elapsed_time);
+	gamePad.Update(elapsedTime);
 }

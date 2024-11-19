@@ -14,8 +14,8 @@ public:
 	}
 
 	void Initialize();
-	void Update(float elapsed_time);
-	void Render(float elapsed_time);
+	void Update(float elapsedTime);
+	void Render(float elapsedTime);
 
 	//シーンクリア
 	void Clear();

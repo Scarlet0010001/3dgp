@@ -95,17 +95,17 @@ public:
 
 protected:
 	virtual void Move(float vx, float vz, float speed);
-	void Turn(float elapsed_time, float vx, float vz, float speed);//オイラー
-	void Turn(float elapsed_time, DirectX::XMFLOAT3 move_vec, float speed, DirectX::XMFLOAT4& orien);//クォータニオン
+	void Turn(float elapsedTime, float vx, float vz, float speed);//オイラー
+	void Turn(float elapsedTime, DirectX::XMFLOAT3 move_vec, float speed, DirectX::XMFLOAT4& orien);//クォータニオン
 	//ジャンプ処理
 	void Jump(float speed);
 	//速力処理更新
-	void UpdateVelocity(float elapsed_time, DirectX::XMFLOAT3& position);
+	void UpdateVelocity(float elapsedTime, DirectX::XMFLOAT3& position);
 	virtual void OnLanding() {}
 	//死亡したときに呼ばれる
 	virtual void OnDead() {}
 	virtual void OnDamaged(WINCE_TYPE type) {}
-	void UpdateInvicibleTimer(float elapsed_time);
+	void UpdateInvicibleTimer(float elapsedTime);
 
 	//-----------変数--------------//
 
@@ -146,11 +146,11 @@ private:
 	//垂直速力更新処理
 	virtual void UpdateVerticalVelocity(float elapsed_frame);
 	//垂直移動更新処理
-	void UpdateVerticalMove(float elapsed_time, DirectX::XMFLOAT3& position);
+	void UpdateVerticalMove(float elapsedTime, DirectX::XMFLOAT3& position);
 	//水平速力更新処理
 	void UpdateHorizontalVelocity(float elapsed_frame);
 	//水平移動更新処理
-	void UpdateHorizontalMove(float elapsed_time, DirectX::XMFLOAT3& position);
+	void UpdateHorizontalMove(float elapsedTime, DirectX::XMFLOAT3& position);
 
 };
 

@@ -18,9 +18,9 @@ public:
 	//更新処理
 	void Update(float elapsedTime);
 	//描画処理
-	void Render(float elapsed_time);
-	//void Render(float elapsed_time, Camera* camera);
-	//void shadow_render(float elapsed_time);
+	void Render(float elapsedTime);
+	//void Render(float elapsedTime, Camera* camera);
+	//void shadow_render(float elapsedTime);
 	//ステージ登録
 	void Register(Stage* stage);
 	//ステージ全削除

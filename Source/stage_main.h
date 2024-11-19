@@ -20,7 +20,7 @@ public:
 
 	//描画処理
 	void Render(float elapsedTime)override;
-	//void  shadow_render(float elapsed_time)override;
+	//void  shadow_render(float elapsedTime)override;
 	// レイキャスト
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit) override;
 

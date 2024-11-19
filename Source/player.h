@@ -18,16 +18,16 @@ public:
 	//初期化処理
 	void Initialize();
 	//更新処理
-	void Update(float elapsed_time);
+	void Update(float elapsedTime);
 	//描画処理
 //ディファードでレンダリングするオブジェクト
-	void Render_d(float elapsed_time);
+	void Render_d(float elapsedTime);
 	//フォワードレンダリングするオブジェクト
-	void Render_f(float elapsed_time);
+	void Render_f(float elapsedTime);
 	//シャドウレンダリングするオブジェクト
-	void Render_s(float elapsed_time);
+	void Render_s(float elapsedTime);
 	//UI描画
-	void RenderUI(float elapsed_time);
+	void RenderUI(float elapsedTime);
 	//デバッグ用GUI描画
 	void DebugGUI();
 
