@@ -1,6 +1,6 @@
 #include "player.h"
 #include "operators.h"
-
+#include "bullet_straight.h"
 
 void Player::TransitionIdleState()
 {
@@ -294,10 +294,13 @@ void Player::UpdateShotState(float elapsedTime)
 	float ax = gamePad->GetAxis_LX();
 	float ay = gamePad->GetAxis_LY();
 
+	playerAnimation = PlayerAnimation::PLAYER_SHOT_IDLE;
 	if (ax > 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_RIGHT;
 	else if (ax < 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_LEFT;
 	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_FORWARD;
 	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_BACK;
+
+	if(time <= 0) InputShot();
 
 	InputMove(elapsedTime, param.floatingValue, 1);
 

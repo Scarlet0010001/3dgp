@@ -37,6 +37,8 @@ void BulletStraight::Render(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
     model->render(graphics.Get_DC().Get(), transform, animated_nodes);
+    
+    DrawDebugPrimitive();
 }
 
 void BulletStraight::Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position)

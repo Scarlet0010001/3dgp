@@ -6,6 +6,8 @@
 #include "scene_title.h"
 #include "scene_loading.h"
 
+#include "bullet_manager.h"
+
 #include "stage_manager.h"
 #include "stage_main.h"
 
@@ -54,6 +56,7 @@ void SceneGame::Update(float elapsedTime)
     Graphics& graphics = Graphics::Instance();
     //ゲームパッド
     GamePad& gamepad = Device::Instance().GetGamePad();
+    BulletManager& bulletManager = BulletManager::Instance();
 
     //**********カメラの更新**********//
     camera->Update(elapsedTime);
@@ -65,7 +68,11 @@ void SceneGame::Update(float elapsedTime)
         //カメラの経過時間
     float cameraElapsedTime = camera->HitStopUpdate(elapsedTime);
 
+    //**********プレイヤーの更新**********//
     player->Update(cameraElapsedTime);
+
+    //**********弾の更新**********//
+    bulletManager.Update(elapsedTime);
 
     //**********ステージの更新**********//
     StageManager::Instance().Update(elapsedTime);
@@ -76,8 +83,9 @@ void SceneGame::Render(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
     StageManager& stageManager = StageManager::Instance();
+    BulletManager& bulletManager = BulletManager::Instance();
 
-    framebuffers[0]->clear(graphics.Get_DC().Get(), 
+    framebuffers[0]->clear(graphics.Get_DC().Get(),
         FB_FLAG::COLOR_DEPTH_STENCIL);
     framebuffers[0]->activate(graphics.Get_DC().Get(),
         FB_FLAG::COLOR_DEPTH_STENCIL);
@@ -133,6 +141,8 @@ void SceneGame::Render(float elapsedTime)
         ST_RASTERIZER::CULL_NONE);
 
     player->Render_f(elapsedTime);
+
+    bulletManager.Render(elapsedTime);
 
     //-------------------DebugPrimitive----------------------//
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::WIREFRAME_CULL_BACK);

@@ -230,6 +230,9 @@ private:
 	//”òs“ü—Í
 	void InputWing();
 
+	//ËŒ‚“ü—Í
+	void InputShot();
+
 	//’…’n‚µ‚½‚©
 	void OnLanding()override;
 	//€–S‚µ‚½‚Æ‚«‚Ìˆ—

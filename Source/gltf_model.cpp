@@ -409,7 +409,12 @@ void gltf_model::fetch_materials(ID3D11Device* device,const tinygltf::Model& Mod
 	{
 		material_data.emplace_back(material.data);
 	}
-	
+	if (materials.size() == 0)
+	{
+		material::cbuffer data;
+		material_data.emplace_back(data);
+	}
+
 	HRESULT hr;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> material_buffer;
 	D3D11_BUFFER_DESC buffer_desc{};

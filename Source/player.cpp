@@ -1,4 +1,6 @@
 #include "player.h"
+#include "bullet_straight.h"
+#include "bullet_manager.h"
 #include"camera.h"
 #include "shader.h"
 #include"user.h"
@@ -366,6 +368,21 @@ void Player::InputWing()
 	{
 		TransitionWingState();
 	}
+}
+
+void Player::InputShot()
+{
+	BulletManager& bulletManager = BulletManager::Instance();
+
+	//前方向
+	DirectX::XMFLOAT3 dir = Math::get_posture_forward(transform);
+	//発射位置(プレイヤーの腰あたり)
+	DirectX::XMFLOAT3 pos = position;
+
+	BulletStraight* bullet = 
+		new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Player);
+	bullet->Launch(dir, pos);
+
 }
 
 void Player::OnLanding()
