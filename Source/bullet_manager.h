@@ -24,8 +24,14 @@ public:
     //デバッグプリミティブ描画
     void DrawDebugPrimitive();
 
+    //デバッグGUI描画
+    void DebugGUI();
+
     //弾丸登録
     void Register(Bullet* bullet);
+
+    //弾丸設定
+    void Setting();
 
     //弾丸削除
     void Remove(Bullet* bullet);
@@ -54,4 +60,23 @@ private:
     std::vector<Bullet*> bullets;
 
     std::set<Bullet*> removes;
+
+    struct BulletParam
+    {
+        DirectX::XMFLOAT3 scale = { 1,1,1 };
+        float speed = 100.0f;
+        float lifeTimer = 3.0f;
+        float radius = 1.0f;
+        
+        DirectX::XMFLOAT3 target = { 0,0,0 };
+        float turnSpeed = DirectX::XMConvertToRadians(180);
+    };
+    BulletParam P_param;
+    BulletParam E_param;
+
+    Bullet* setting{};
+
+    //--------------ImGui--------------//
+    bool displayBulletImgui = false;
+    
 };

@@ -374,10 +374,17 @@ void Player::InputShot()
 {
 	BulletManager& bulletManager = BulletManager::Instance();
 
+	model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
+	model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
+
 	//前方向
 	DirectX::XMFLOAT3 dir = Math::get_posture_forward(transform);
 	//発射位置(プレイヤーの腰あたり)
-	DirectX::XMFLOAT3 pos = position;
+	DirectX::XMFLOAT3 pos;
+	if(playerAnimation == PlayerAnimation::PLAYER_SHOT_RIGHT
+		|| playerAnimation == PlayerAnimation::PLAYER_SHOT_BACK)
+		pos = beamSaber_position[LR::RIGHT];
+	else pos = beamSaber_position[LR::LEFT];
 
 	BulletStraight* bullet = 
 		new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Player);

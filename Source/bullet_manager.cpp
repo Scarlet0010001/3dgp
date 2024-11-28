@@ -1,4 +1,5 @@
 #include "bullet_manager.h"
+#include "user.h"
 
 BulletManager::BulletManager()
 {
@@ -48,6 +49,7 @@ void BulletManager::Render(float elapsedTime)
     {
         bullet->Render(elapsedTime);
     }
+    DebugGUI();
 }
 
 void BulletManager::DrawDebugPrimitive()
@@ -61,7 +63,31 @@ void BulletManager::DrawDebugPrimitive()
 
 void BulletManager::Register(Bullet* bullet)
 {
+    setting = bullet;
     bullets.emplace_back(bullet);
+}
+
+void BulletManager::Setting()
+{
+    if (setting->GetMasterType() == Bullet::BULLET_MASTER::Player)
+    {
+        setting->SetScale(P_param.scale);
+        setting->SetSpeed(P_param.speed);
+        setting->SetLifeTime(P_param.lifeTimer);
+        setting->SetRadius(P_param.radius);
+        setting->SetTarget(P_param.target);
+        setting->SetTurnSpeed(P_param.turnSpeed);
+    }
+    else
+    {
+        setting->SetScale(E_param.scale);
+        setting->SetSpeed(E_param.speed);
+        setting->SetLifeTime(E_param.lifeTimer);
+        setting->SetRadius(E_param.radius);
+        setting->SetTarget(E_param.target);
+        setting->SetTurnSpeed(E_param.turnSpeed);
+    }
+    setting = nullptr;
 }
 
 void BulletManager::Remove(Bullet* bullet)
@@ -102,4 +128,46 @@ void BulletManager::CollisionBulletVsBullet()
     }
     */
 
+}
+
+void BulletManager::DebugGUI()
+{
+#ifdef USE_IMGUI
+    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+    imguiMenuBar("Bullet", "Bullet", displayBulletImgui);
+
+    if (displayBulletImgui)
+    {
+        if (ImGui::Begin("Player", nullptr, ImGuiWindowFlags_None))
+        {
+            if (ImGui::CollapsingHeader("Param", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::DragFloat3("Scale", &P_param.scale.x);
+                ImGui::DragFloat("speed:", &P_param.speed);
+                ImGui::DragFloat("lifeTimer:", &P_param.lifeTimer);
+                ImGui::DragFloat("radius:", &P_param.radius);
+                ImGui::DragFloat3("target:", &P_param.target.x);
+                ImGui::DragFloat("turnSpeed:", &P_param.turnSpeed);
+            }
+        }
+        ImGui::End();
+
+        if (ImGui::Begin("Enemy", nullptr, ImGuiWindowFlags_None))
+        {
+            if (ImGui::CollapsingHeader("Param", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::DragFloat3("Scale", &E_param.scale.x);
+                ImGui::DragFloat("speed:", &E_param.speed);
+                ImGui::DragFloat("lifeTimer:", &E_param.lifeTimer);
+                ImGui::DragFloat("radius:", &E_param.radius);
+                ImGui::DragFloat3("target:", &E_param.target.x);
+                ImGui::DragFloat("turnSpeed:", &E_param.turnSpeed);
+            }
+        }
+        ImGui::End();
+
+    }
+
+#endif // USE_IMGUI
 }

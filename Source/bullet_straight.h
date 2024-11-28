@@ -6,7 +6,7 @@ class BulletStraight :
     public Bullet
 {
 public:
-    BulletStraight(BulletManager* manager, int MasterType);
+    BulletStraight(BulletManager* manager, BULLET_MASTER MasterType);
     ~BulletStraight() {};
 
     //XVˆ—
@@ -18,14 +18,11 @@ public:
     //”­Ë
     void Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position);
 
-protected:
+private:
     //‹““®
     void Move(float elapsedTime, float speed);
-private:
-    std::unique_ptr<gltf_model> model = nullptr;
-    float speed = 50.0f;
-    float lifeTimer = 3.0f;
 
+private:
     std::vector<gltf_model::node> animated_nodes{};
 
 };

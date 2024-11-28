@@ -1,7 +1,8 @@
 #include "bullet_straight.h"
+#include "bullet_manager.h"
 #include "user.h"
 
-BulletStraight::BulletStraight(BulletManager* manager, int MasterType)
+BulletStraight::BulletStraight(BulletManager* manager, BULLET_MASTER MasterType)
     :Bullet(manager)
 {
     Graphics& graphics = Graphics::Instance();
@@ -11,6 +12,8 @@ BulletStraight::BulletStraight(BulletManager* manager, int MasterType)
     masterType = MasterType;
     //表示サイズを調整
     scale.x = scale.y = scale.z = 1.0f;
+
+    BulletManager::Instance().Setting();
 
     animated_nodes = model->nodes;
 }
