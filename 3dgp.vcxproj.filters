@@ -109,6 +109,9 @@
     <Filter Include="Sources\Bullet">
       <UniqueIdentifier>{ec566bd4-eadf-45f5-bb04-39786b90883c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Character\Boss">
+      <UniqueIdentifier>{e3d7d09c-7115-4999-be16-5574c0a8c72f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\resource_manager.cpp">
@@ -266,6 +269,9 @@
     </ClCompile>
     <ClCompile Include="Source\bullet_straight.cpp">
       <Filter>Sources\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\boss.cpp">
+      <Filter>Sources\Character\Boss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -463,6 +469,9 @@
     </ClInclude>
     <ClInclude Include="Source\bullet_straight.h">
       <Filter>Sources\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\boss.h">
+      <Filter>Sources\Character\Boss</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
