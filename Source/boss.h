@@ -66,6 +66,36 @@ private:
 		//WALK
 
 	};
+	enum class ATTACK_TYPE
+	{
+		NORMAL,
+		SKILL1,
+		SKILL2,
+		SKILL3,
+		MAX_NUM
+	};
+	struct BodyCollision
+	{
+		Capsule capsule;
+		float height;
+	};
+
+
+	struct BossParam
+	{
+		//基底クラスのパラメーター
+		CharacterParam chara_init_param;
+		float run_speed;
+
+		template<class Archive>
+		void serialize(Archive& archive)
+		{
+			archive(
+				cereal::make_nvp("chara_param", chara_init_param),
+				cereal::make_nvp("run_speed", run_speed)
+			);
+		}
+	};
 
 public:
 	//==============================================================
@@ -78,20 +108,20 @@ public:
 	~Boss() {};
 
 	//初期化
-	void initialize();
+	void Initialize();
 
 	//更新
-	void update(float elapsed_time, Camera* camera);
+	void Update(float elapsedTime);
 
 	//描画処理
 	//ディファードでレンダリングするオブジェクト
-	void render_d(float elapsed_time, Camera* camera);
+	//void render_d(float elapsed_time, Camera* camera);
 	//フォワードレンダリングするオブジェクト
-	void render_f(float elapsed_time, Camera* camera);
+	void render_f(float elapsedTime);
 	//シャドウレンダリングするオブジェクト
-	void render_s(float elapsed_time, Camera* camera);
+	//void render_s(float elapsed_time, Camera* camera);
 	//UIの描画
-	void render_ui(float elapsed_time);
+	void render_ui(float elapsedTime);
 
 	//デバッグ用GUI描画
 	void debug_gui();
@@ -102,11 +132,87 @@ public:
 	//攻撃対象の位置を取得
 	void set_location_of_attack_target(DirectX::XMFLOAT3 target) { target_pos = target; }
 
-	BodyCollision get_body_collision() { return boss_body_collision; }
+	//BodyCollision get_body_collision() { return boss_body_collision; }
 
 	//カメラがボスを見るときに注視するポイント
 	DirectX::XMFLOAT3 get_gazing_point() { return DirectX::XMFLOAT3(position.x, position.y + (chara_param.height + 3), position.z); }
 
+
+private:
+	/*--------------------状態遷移------------------------*/
+
+	//			移動系				//
+	void TransitionIdleState();//待機
+	void TransitionWalkState();//歩行
+	void TransitionRunState();//走り
+
+	//			攻撃系				//
+	void TransitionAttack_Melee_State();//近接攻撃
+	void TransitionAttack_ShotStraight_State();//射撃
+	void TransitionAttack_ShotHoming_State();//ホーミングミサイル
+	//void TransitionSkill_1_State();
+
+	//			ダウン系			//
+
+	void TransitionDamageState();
+	void TransitionDeadState();
+	void TransitionDownState();
+
+
+	void OnDead() override;
+	void OnDamaged(WINCE_TYPE type) override;
+
+	//データファイル
+	//void load_data_file();
+	//void save_data_file();
+	//const char* file_path = "./resources/Data/boss_param.json";
+
+	// 変数
+	typedef void (Boss::* ActUpdate)(float elapsedTime);
+	ActUpdate act_update = &Boss::UpdateIdleState;
+	std::unique_ptr<gltf_model> model;
+	//std::unique_ptr<BossUi> ui;
+
+	gltf_model::node arm;
+	Capsule sickle_hand_colide;
+
+	float action_time = 0;
+	bool display_imgui = false;
+
+	//ステートのタイマー
+	float state_timer;
+	//アイドル状態のままでいる時間
+	float state_duration;
+	//攻撃までの猶予時間
+	float attack_responder_timer;
+	//攻撃対象
+	DirectX::XMFLOAT3 target_pos;
+
+	State state;
+
+	BossParam param;
+
+#if _DEBUG
+	bool is_update = true;
+	bool is_render = true;
+#endif
+	//==============================================================
+	// 
+	// 定数
+	// 
+	//==============================================================
+
+	//歩くスピード
+	float WALK_SPEED = 15;
+	//走るスピード
+	float RUN_SPEED = 30;
+	//通常攻撃の射程
+	float ATTACK_ACTION_LENGTH = 17;
+	//通常攻撃のクールタイム
+	float NORMAL_ATTACK_COOLTIME = 1;
+
+	public:
+		AddDamageFunc damaged_function;
 
 };
 
