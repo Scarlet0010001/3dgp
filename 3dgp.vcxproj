@@ -201,6 +201,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\boss.cpp" />
+    <ClCompile Include="Source\boss_action.cpp" />
     <ClCompile Include="Source\bullet.cpp" />
     <ClCompile Include="Source\bullet_manager.cpp" />
     <ClCompile Include="Source\bullet_straight.cpp" />

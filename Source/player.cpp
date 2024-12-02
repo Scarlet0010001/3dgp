@@ -1,7 +1,6 @@
 #include "player.h"
 #include "bullet_straight.h"
 #include "bullet_manager.h"
-#include"camera.h"
 #include "shader.h"
 #include"user.h"
 #include "texture.h"

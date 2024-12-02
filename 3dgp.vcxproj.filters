@@ -273,6 +273,9 @@
     <ClCompile Include="Source\boss.cpp">
       <Filter>Sources\Character\Boss</Filter>
     </ClCompile>
+    <ClCompile Include="Source\boss_action.cpp">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\inline.h">

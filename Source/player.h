@@ -2,7 +2,7 @@
 #include "device.h"
 #include "camera.h"
 #include "character.h"
-#include "gltf_model.h"
+//#include "gltf_model.h"
 
 #include "primitive.h"
 #include <cereal/cereal.hpp>
@@ -103,17 +103,6 @@ private:
 
 	//ブレンドアニメーション
 	std::vector<gltf_model::node> animated_nodes[PLAYER_ANIME_COUNT];
-	std::vector<gltf_model::node> blended_animated_nodes;
-	float time{ 0 };
-	float factor{ 0 };
-	float transition_time{ 0.09f };
-	enum TransitionState
-	{
-		NONE,
-		START,
-		TRANSITION,
-	}transition_state;
-
 
 	//ステート
 	enum class State

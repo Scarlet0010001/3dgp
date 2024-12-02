@@ -1,6 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 #include "damage_func.h"
+#include "gltf_model.h"
 
 class Character
 {
@@ -134,6 +135,18 @@ protected:
 
 	//体力
 	int32_t health;
+
+	//ブレンドアニメーション
+	std::vector<gltf_model::node> blended_animated_nodes;
+	float time{ 0 };
+	float factor{ 0 };
+	float transition_time{ 0.09f };
+	enum TransitionState
+	{
+		NONE,
+		START,
+		TRANSITION,
+	}transition_state;
 
 
 	float vs_wall_ray_power = 5.0f;

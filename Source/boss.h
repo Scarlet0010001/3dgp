@@ -2,7 +2,7 @@
 #include "device.h"
 #include "camera.h"
 #include "character.h"
-#include "gltf_model.h"
+//#include "gltf_model.h"
 
 #include "primitive.h"
 #include <cereal/cereal.hpp>
@@ -18,7 +18,7 @@ private:
 
 	enum  BossAnimation
 	{
-		IDLE,
+		BOSS_IDLE,
 		//AIRBORNE,
 		//ATTACK,
 		//DAMAGE,
@@ -39,7 +39,7 @@ private:
 		//STAND,
 		//STUN,
 		//WALK
-
+		BOSS_ANIME_COUNT,
 	};
 	enum class State
 	{
@@ -117,17 +117,17 @@ public:
 	//ディファードでレンダリングするオブジェクト
 	//void render_d(float elapsed_time, Camera* camera);
 	//フォワードレンダリングするオブジェクト
-	void render_f(float elapsedTime);
+	void Render_f(float elapsedTime);
 	//シャドウレンダリングするオブジェクト
 	//void render_s(float elapsed_time, Camera* camera);
 	//UIの描画
-	void render_ui(float elapsedTime);
+	void Render_ui(float elapsedTime);
 
 	//デバッグ用GUI描画
-	void debug_gui();
+	void DebugDUI();
 
 	//プレイヤーの攻撃との当たり判定
-	void calc_attack_vs_player(DirectX::XMFLOAT3 capsule_start, DirectX::XMFLOAT3 capsule_end, float colider_radius, AddDamageFunc damaged_func);
+	void CalcAttack_vs_Player(DirectX::XMFLOAT3 capsule_start, DirectX::XMFLOAT3 capsule_end, float colider_radius, AddDamageFunc damaged_func);
 
 	//攻撃対象の位置を取得
 	void set_location_of_attack_target(DirectX::XMFLOAT3 target) { target_pos = target; }
@@ -135,7 +135,7 @@ public:
 	//BodyCollision get_body_collision() { return boss_body_collision; }
 
 	//カメラがボスを見るときに注視するポイント
-	DirectX::XMFLOAT3 get_gazing_point() { return DirectX::XMFLOAT3(position.x, position.y + (chara_param.height + 3), position.z); }
+	DirectX::XMFLOAT3 get_gazing_point() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 3), position.z); }
 
 
 private:
@@ -153,11 +153,32 @@ private:
 	//void TransitionSkill_1_State();
 
 	//			ダウン系			//
-
 	void TransitionDamageState();
 	void TransitionDeadState();
 	void TransitionDownState();
 
+	/*---------------状態更新------------------------*/
+
+	//			移動系				//
+	void UpdateIdleState(float elapsedTime);//待機
+	void UpdateWalkState(float elapsedTime);//歩行
+	void UpdateRunState(float elapsedTime);//走り
+
+	//			攻撃系				//
+	void UpdateAttack_Melee_State(float elapsedTime);//近接攻撃
+	void UpdateAttack_ShotStraight_State(float elapsedTime);//射撃
+	void UpdateAttack_ShotHoming_State(float elapsedTime);//ホーミングミサイル
+
+	//			ダウン系			//
+	void UpdateDamageState(float elapsedTime);
+	void UpdateDeadState(float elapsedTime);
+	void UpdateDownState(float elapsedTime);
+
+	//攻撃方法選択
+	void AttackRoutine(float elapsedTime);
+	void SelectAttackTypeShort();
+
+	void SelectAttackTypeLong();
 
 	void OnDead() override;
 	void OnDamaged(WINCE_TYPE type) override;
@@ -176,25 +197,37 @@ private:
 	gltf_model::node arm;
 	Capsule sickle_hand_colide;
 
-	float action_time = 0;
-	bool display_imgui = false;
+	float actionTime = 0;
+	bool displayImgui = false;
+
+	BossAnimation bossAnimation = BOSS_IDLE;
+	BossAnimation bossAnimation_transition = BOSS_IDLE;
+	BossAnimation bossAnimation_old = BOSS_IDLE;
+
+	//ループアニメーションの検索
+	bool FindLoopAnimation(BossAnimation PA);
+
+	//ブレンドアニメーション
+	std::vector<gltf_model::node> animated_nodes[BOSS_ANIME_COUNT];
+
 
 	//ステートのタイマー
-	float state_timer;
+	float stateTimer;
 	//アイドル状態のままでいる時間
 	float state_duration;
 	//攻撃までの猶予時間
-	float attack_responder_timer;
+	float attackResponderTimer;
 	//攻撃対象
 	DirectX::XMFLOAT3 target_pos;
 
 	State state;
 
 	BossParam param;
+	BodyCollision bossBodyCollision;
 
 #if _DEBUG
-	bool is_update = true;
-	bool is_render = true;
+	bool isUpdate = true;
+	bool isRender = true;
 #endif
 	//==============================================================
 	// 
@@ -212,7 +245,7 @@ private:
 	float NORMAL_ATTACK_COOLTIME = 1;
 
 	public:
-		AddDamageFunc damaged_function;
+		AddDamageFunc damagedFunction;
 
 };
 
