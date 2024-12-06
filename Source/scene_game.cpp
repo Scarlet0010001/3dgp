@@ -154,6 +154,8 @@ void SceneGame::Render(float elapsedTime)
     { framebuffers[0]->get_color_map().Get()/*, framebuffers[0]->depth_map().Get() */};
     
     bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1);
+    LightManager::Instance().Draw(shader_resource_views, 1);
+    LightManager::Instance().DebugGUI();
     radialBlur->blit(graphics.Get_DC().Get(), shader_resource_views);
 
 #if USE_IMGUI

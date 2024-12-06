@@ -111,6 +111,7 @@ private:
 		MOVE,
 		JUMP,
 		WING,
+		HOVER,
 		SHOT,
 		NORMAL_ATTACK01,
 		DAMAGE,
@@ -133,6 +134,8 @@ private:
 		int avoidanceTimer = 0;
 		//飛行速度
 		float wingSpeed = 40;
+		//ブースト
+		float boostTimer = 10.0f;
 		//浮遊度
 		float floatingValue = 1.5f;
 		//剣エフェクトの速度
@@ -153,6 +156,7 @@ private:
 				cereal::make_nvp("jumpSpeed", jumpSpeed),
 				cereal::make_nvp("avoidanceSpeed", avoidanceSpeed),
 				cereal::make_nvp("wingSpeed", wingSpeed),
+				cereal::make_nvp("boostTimer", boostTimer),
 				cereal::make_nvp("floatingValue", floatingValue),
 				cereal::make_nvp("swordSwingSpeed", swordSwingSpeed),
 				cereal::make_nvp("attack_combo_1", combo_1),
@@ -168,6 +172,7 @@ private:
 	void TransitionIdleState();//待機
 	void TransitionMoveState();//走り
 	void TransitionWingState();//飛行
+	void TransitionHoverState();//ホバー
 	void TransitionAvoidanceState();//回避
 	void TransitionJumpState();//ジャンプ
 	void TransitionLandingState();//着地
@@ -183,6 +188,7 @@ private:
 	void UpdateIdleState(float elapsedTime);//待機
 	void UpdateMoveState(float elapsedTime);//走り
 	void UpdateWingState(float elapsedTime);//飛行
+	void UpdateHoverState(float elapsedTime);//飛行
 	void UpdateAvoidanceState(float elapsedTime);//回避
 	void UpdateJumpState(float elapsedTime);//ジャンプ
 	void UpdateLandingState(float elapsedTime);//着地
@@ -277,8 +283,6 @@ private:
 	const int jump_limit = 1;
 
 	bool displayPlayerImgui = false;
-
-
 
 	//------------------攻撃関連--------------------------
 

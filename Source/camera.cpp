@@ -197,8 +197,8 @@ void Camera::Update(float elapsedTime)
 		{
 			DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
 			
-			debugRender->CreateSphere(
-				trakkingTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
+			//debugRender->CreateSphere(
+			//	trakkingTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
 		}
 			//trackingtarget‚ÌˆÊ’u‚É‹…‚ğo‚·
 #ifdef USE_IMGUI
@@ -206,6 +206,7 @@ void Camera::Update(float elapsedTime)
 		{
 			ImGui::Begin("main_camera");
 			ImGui::DragFloat2("nearFar", &nearFar.x, 0.1f, 0.1f, 2000.0f);
+			ImGui::Checkbox("FreeCamera", &isFreeCamera);
 			ImGui::End();
 		}
 #endif // USE_IMGUI

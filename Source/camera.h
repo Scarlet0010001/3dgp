@@ -216,6 +216,8 @@ private:
     bool displayCameraImgui = false;
     bool cameraOperateStop;
 
+    //デバッグ
+    bool isFreeCamera = false;
 
     //ロックオンフラグ
     bool lockOn = false;

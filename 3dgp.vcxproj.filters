@@ -112,6 +112,9 @@
     <Filter Include="Sources\Character\Boss">
       <UniqueIdentifier>{e3d7d09c-7115-4999-be16-5574c0a8c72f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\User">
+      <UniqueIdentifier>{65b026b9-f5f4-4b5e-9a6a-51a7b480c1b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\resource_manager.cpp">
@@ -276,6 +279,9 @@
     <ClCompile Include="Source\boss_action.cpp">
       <Filter>Sources\Character\Boss</Filter>
     </ClCompile>
+    <ClCompile Include="Source\noise.cpp">
+      <Filter>Sources\User</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\inline.h">
@@ -287,13 +293,7 @@
     <ClInclude Include="Source\model_resource.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Source\operators.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
     <ClInclude Include="Source\resource_manager.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\user.h">
       <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="Source\character.h">
@@ -475,6 +475,15 @@
     </ClInclude>
     <ClInclude Include="Source\boss.h">
       <Filter>Sources\Character\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\user.h">
+      <Filter>Sources\User</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\operators.h">
+      <Filter>Sources\User</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\noise.h">
+      <Filter>Sources\User</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

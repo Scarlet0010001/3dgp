@@ -1,5 +1,6 @@
 #include "user.h"
 #include "mouse.h"
+#include "graphics.h"
 
 static const int KeyMap[] =
 {
@@ -72,8 +73,8 @@ void Mouse::UpdateCursor(HWND hwnd)
 	cursorPosition.x = (float)point.x - 15.0f;
 	cursorPosition.y = (float)point.y - 15.0f;
 	//　カーソルの範囲
-	cursorPosition.x = std::clamp(cursorPosition.x, 0.0f, 1280.0f);
-	cursorPosition.y = std::clamp(cursorPosition.y, 0.0f, 720.0f);
+	cursorPosition.x = std::clamp(cursorPosition.x, 0.0f, static_cast<float>(SCREEN_WIDTH));
+	cursorPosition.y = std::clamp(cursorPosition.y, 0.0f, static_cast<float>(SCREEN_HEIGHT));
 	// マウスの操作
 	switch (state)
 	{

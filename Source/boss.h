@@ -69,10 +69,9 @@ private:
 	enum class ATTACK_TYPE
 	{
 		NORMAL,
-		SKILL1,
-		SKILL2,
-		SKILL3,
-		MAX_NUM
+		SHOT_S,
+		SHOT_H,
+		MAX_COUNT
 	};
 	struct BodyCollision
 	{
@@ -219,10 +218,12 @@ private:
 	float attackResponderTimer;
 	//攻撃対象
 	DirectX::XMFLOAT3 target_pos;
+	DirectX::XMFLOAT3 shot_pos;
 
 	State state;
 
 	BossParam param;
+	AttackParam AttackParam;
 	BodyCollision bossBodyCollision;
 
 #if _DEBUG
@@ -243,6 +244,10 @@ private:
 	float ATTACK_ACTION_LENGTH = 17;
 	//通常攻撃のクールタイム
 	float NORMAL_ATTACK_COOLTIME = 1;
+
+	float ATTACK_RESPONDER_TIME = 3.0f;
+	//ダメージを受けたときのスタン時間
+	float DAMAGE_STUN_DURATION = 0.7f;
 
 	public:
 		AddDamageFunc damagedFunction;

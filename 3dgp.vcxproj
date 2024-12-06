@@ -239,6 +239,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\mouse.cpp" />
+    <ClCompile Include="Source\noise.cpp" />
     <ClCompile Include="Source\player.cpp" />
     <ClCompile Include="Source\player_action.cpp" />
     <ClCompile Include="Source\radial_blur.cpp" />
@@ -315,6 +316,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Source\mouse.h" />
+    <ClInclude Include="Source\noise.h" />
     <ClInclude Include="Source\operators.h" />
     <ClInclude Include="Source\par_shapes.h" />
     <ClInclude Include="Source\player.h" />

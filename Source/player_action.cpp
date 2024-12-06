@@ -24,10 +24,17 @@ void Player::TransitionWingState()
 
 }
 
+void Player::TransitionHoverState()
+{
+	p_update = &Player::UpdateHoverState;
+	state = State::HOVER;
+
+}
+
 void Player::TransitionAvoidanceState()
 {
 	p_update = &Player::UpdateAvoidanceState;
-
+	playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
 	state = State::ROLL;
 	param.avoidanceTimer = 0;
 }
@@ -207,6 +214,43 @@ void Player::UpdateWingState(float elapsedTime)
 
 }
 
+void Player::UpdateHoverState(float elapsedTime)
+{
+	float ax = gamePad->GetAxis_LX();
+	float ay = gamePad->GetAxis_LY();
+
+	if (ax > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_RIGHT;
+	else if (ax < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_LEFT;
+	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
+	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
+
+	if (!InputMove(elapsedTime))
+	{
+		TransitionIdleState();
+	}
+
+	//回避入力
+	InputAvoidance();
+
+	//飛行入力
+	InputWing();
+
+	//攻撃入力
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	{
+	}
+	//射撃入力
+	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
+		|| mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
+	{
+		TransitionShotState();
+	}
+
+	//速力処理更新
+	UpdateVelocity(elapsedTime, position);
+	param.boostTimer -= elapsedTime;
+}
+
 void Player::UpdateAvoidanceState(float elapsedTime)
 {
 	//徐々に速度を落としていく
@@ -216,7 +260,7 @@ void Player::UpdateAvoidanceState(float elapsedTime)
 	//速力処理更新
 	UpdateVelocity(elapsedTime, position);
 	//if (model->animations.anime_param.frame_index > 33 / 2)
-	if (param.avoidanceTimer > 20)
+	if (param.avoidanceTimer > 30)
 	{
 		//地面に足がついたフレームからはさらに速度落とす
 		velocity.x /= 2.0f;
@@ -234,8 +278,6 @@ void Player::UpdateAvoidanceState(float elapsedTime)
 	//if (model->anime_param.frame_index > 35 / 2)
 	if(param.avoidanceTimer > 30)
 	{
-		//ジャンプステートへ移行
-		TransitionJumpState();
 		// MOVEステートへ移行
 		if (InputMove(elapsedTime))
 		{
@@ -245,7 +287,7 @@ void Player::UpdateAvoidanceState(float elapsedTime)
 	}
 
 	//if (model->is_end_animation())
-	if (param.avoidanceTimer > 60)
+	if (param.avoidanceTimer > 40)
 	{
 		TransitionIdleState();
 	}
