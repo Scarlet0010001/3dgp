@@ -226,10 +226,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\imgui\imgui.cpp" />
+    <ClCompile Include="Source\imgui\imgui_demo.cpp" />
     <ClCompile Include="Source\imgui\imgui_draw.cpp" />
     <ClCompile Include="Source\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="Source\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="Source\imgui\imgui_ja_gryph_ranges.cpp" />
+    <ClCompile Include="Source\imgui\imgui_tables.cpp" />
     <ClCompile Include="Source\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Source\light.cpp" />
     <ClCompile Include="Source\light_manager.cpp" />

@@ -26,6 +26,7 @@ void SceneGame::Initialize()
     //camera = std::make_unique<Camera>();
     camera = &Camera::Instance();
     player = std::make_unique<Player>();
+    boss = std::make_unique<Boss>();
 
     StageManager& stageManager = StageManager::Instance();
     StageMain* stageMain = new StageMain();
@@ -70,6 +71,9 @@ void SceneGame::Update(float elapsedTime)
 
     //**********プレイヤーの更新**********//
     player->Update(cameraElapsedTime);
+
+    //**********ボスの更新**********//
+    boss->Update(cameraElapsedTime);
 
     //**********弾の更新**********//
     bulletManager.Update(elapsedTime);
@@ -141,6 +145,8 @@ void SceneGame::Render(float elapsedTime)
         ST_RASTERIZER::CULL_NONE);
 
     player->Render_f(elapsedTime);
+
+    boss->Render_f(elapsedTime);
 
     bulletManager.Render(elapsedTime);
 

@@ -2,6 +2,7 @@
 #include "scene.h"
 #include "camera.h"
 #include "player.h"
+#include "boss.h"
 
 #include "light_manager.h"
 #include "deferred_renderer.h"
@@ -43,6 +44,8 @@ private:
     Camera* camera = nullptr;
     //プレイヤー
     std::unique_ptr<Player> player = nullptr;
+    //ボス
+    std::unique_ptr<Boss> boss = nullptr;
     //キャラ初期位置
     DirectX::XMFLOAT3 charaPos{};
     //平行光
@@ -50,8 +53,6 @@ private:
     //ディファードレンダー
     std::unique_ptr<DeferredRenderer> deferred = nullptr;
     /*
-    //ボス
-    std::unique_ptr<Boss> boss = nullptr;
     //スカイボックス
     std::unique_ptr<SkyBox> skybox = nullptr;
     //操作説明UI（仮）

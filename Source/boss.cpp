@@ -13,7 +13,7 @@ Boss::Boss()
 	Graphics& graphics = Graphics::Instance();
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
-		"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/DamagedHelmet.glb", true);
+		"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", false);
 		//"Resources/Boss/glb/white_crow.glb", true);
 	for (auto& node : animated_nodes)
 	{
@@ -34,7 +34,7 @@ Boss::Boss()
 void Boss::Initialize()
 {
 	//パラメーター初期化
-	position = { 0.0f, 0.0f, 0.0f };
+	position = { 0.0f, 0.0f, 10.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.chara_init_param;
@@ -114,14 +114,14 @@ void Boss::Render_f(float elapsedTime)
 	}
 	else
 	{
-		time += elapsedTime;
-		if (model->animations.at(bossAnimation).duration < time)
-		{
-			if (nowLoop)
-				time = 0;
-			else time = model->animations.at(bossAnimation).duration;
-		}
-		model->animate(bossAnimation, time, animated_nodes[bossAnimation], nowLoop);
+		//time += elapsedTime;
+		//if (model->animations.at(bossAnimation).duration < time)
+		//{
+		//	if (nowLoop)
+		//		time = 0;
+		//	else time = model->animations.at(bossAnimation).duration;
+		//}
+		//model->animate(bossAnimation, time, animated_nodes[bossAnimation], nowLoop);
 		model->render(graphics.Get_DC().Get(), transform, animated_nodes[bossAnimation]);
 		bossAnimation_old = bossAnimation;
 
@@ -141,7 +141,6 @@ void Boss::DebugDUI()
 	imguiMenuBar("Character", "boss", displayImgui);
 	if (displayImgui)
 	{
-
 		if (ImGui::Begin("Boss", nullptr, ImGuiWindowFlags_None))
 		{
 #if _DEBUG
