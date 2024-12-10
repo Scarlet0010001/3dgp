@@ -71,7 +71,7 @@ void Camera::Update(float elapsedTime)
 	if (lockOn)
 	{
 		//ロックオン時のカメラの挙動
-		p_update = &Camera::UpdateWithLockOn;
+		UpdateWithLockOn(elapsedTime);
 	}
 	else
 	{
@@ -197,8 +197,10 @@ void Camera::Update(float elapsedTime)
 		{
 			DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
 			
-			//debugRender->CreateSphere(
-			//	trakkingTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
+			debugRender->CreateSphere(
+				trakkingTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
+			debugRender->CreateSphere(
+				lockOnTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
 		}
 			//trackingtargetの位置に球を出す
 #ifdef USE_IMGUI
@@ -256,12 +258,12 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 	// XMVECTORクラスへ変換
 // カメラの現在位置から、目標座標への方向を求める
 	DirectX::XMFLOAT3 dir = lockOnTarget - eye;
-	DirectX::XMVECTOR TargeVecNorm = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&dir));
+	DirectX::XMVECTOR TargetVecNorm = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&dir));
 	DirectX::XMVECTOR Forward = Math::get_posture_forward_vec(orientation);
 	DirectX::XMVECTOR Up = { 0.0f,1.0f,0.0f };
 	DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
 
-	DirectX::XMVECTOR dot = DirectX::XMVector3Dot(Forward, TargeVecNorm);
+	DirectX::XMVECTOR dot = DirectX::XMVector3Dot(Forward, TargetVecNorm);
 	DirectX::XMStoreFloat(&lockOnAngle, dot);
 	lockOnAngle = acosf(lockOnAngle);
 
@@ -270,14 +272,14 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 	DirectX::XMFLOAT3 d_vec{};//dの値をfloat3に
 	DirectX::XMStoreFloat3(&forward, Forward);
 	DirectX::XMStoreFloat3(&up, Up);
-	DirectX::XMStoreFloat3(&d_vec, TargeVecNorm);
+	DirectX::XMStoreFloat3(&d_vec, TargetVecNorm);
 
-	//回転
+	//横回転
 	{
 		//回転軸
 		DirectX::XMVECTOR axis = Up;
 		//回転角度がこの値を超えたときのみ計算
-		const float extrapolated_angle = 5.0f;
+		const float extrapolated_angle = 1.0f;
 		if (fabsf(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
 		{
 			float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
@@ -300,9 +302,22 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 			}
 		}
 	}
+	//縦回転
+	{
+		//回転軸
+		DirectX::XMVECTOR axis = DirectX::XMVector3Cross(Forward, Up);
+
+		if (fabs(angle.x) > DirectX::XMConvertToRadians(0.1f))
+		{
+			//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+			DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, angle.x);
+			//矢印を徐々に目標座標に向ける
+			DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, sensitivityRate);
+		}
+	}
 	// orientationVecからorientationを更新
 	XMStoreFloat4(&orientation, orientationVec);
-
 }
 
 void Camera::UpdateWithWing(float elapsedTime)

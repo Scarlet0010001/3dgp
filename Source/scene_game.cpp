@@ -64,9 +64,9 @@ void SceneGame::Update(float elapsedTime)
     camera->CalcViewProjection(elapsedTime);
     camera->SetTrakkingTarget(player.get()->GetGazingPoint());
     camera->SetPlayerOrientation(player->GetOrientation());
-    //camera->set_lock_on_target(boss.get()->get_position());
+    camera->SetLockOnTarget(boss.get()->GetPosition());
 
-        //カメラの経過時間
+    //カメラの経過時間
     float cameraElapsedTime = camera->HitStopUpdate(elapsedTime);
 
     //**********プレイヤーの更新**********//
@@ -74,6 +74,7 @@ void SceneGame::Update(float elapsedTime)
 
     //**********ボスの更新**********//
     boss->Update(cameraElapsedTime);
+    boss->SetLocationOfAttackTarget(player->GetPosition());
 
     //**********弾の更新**********//
     bulletManager.Update(elapsedTime);

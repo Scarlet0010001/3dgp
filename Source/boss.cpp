@@ -135,6 +135,49 @@ void Boss::Render_ui(float elapsedTime)
 {
 }
 
+void Boss::ShotBullet(ATTACK_TYPE type)
+{
+	BulletManager& bulletManager = BulletManager::Instance();
+
+	//model->fech_by_bone(bossAnimation, time, transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
+	//model->fech_by_bone(bossAnimation, time, transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
+
+	//前方向
+	DirectX::XMFLOAT3 dir = Math::get_posture_forward(transform);
+	//発射位置(プレイヤーの腰あたり)
+	DirectX::XMFLOAT3 pos = { position.x,position.y + charaParam.height,position.z };
+	//if (bossAnimation == BossAnimation::PLAYER_SHOT_RIGHT
+	//	|| bossAnimation == BossAnimation::PLAYER_SHOT_BACK)
+	//	pos = beamSaber_position[LR::RIGHT];
+	//else pos = beamSaber_position[LR::LEFT];
+
+	BulletStraight* bullet =
+		type == ATTACK_TYPE::SHOT_S ? new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy)
+		: new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy);
+	bullet->Launch(dir, pos);
+
+}
+
+void Boss::CalcAttack_vs_Player(DirectX::XMFLOAT3 capsule_start, DirectX::XMFLOAT3 capsule_end, float colider_radius, AddDamageFunc damaged_func)
+{
+}
+
+void Boss::OnDead()
+{
+}
+
+void Boss::OnDamaged(WINCE_TYPE type)
+{
+}
+
+bool Boss::FindLoopAnimation(BossAnimation PA)
+{
+	if (PA == BossAnimation::BOSS_IDLE
+		//|| PA == BossAnimation::PLAYER_MOVE_FORWARD
+		) return true;
+	return false;
+}
+
 void Boss::DebugDUI()
 {
 #if USE_IMGUI
@@ -196,22 +239,13 @@ void Boss::DebugDUI()
 #endif
 }
 
-void Boss::CalcAttack_vs_Player(DirectX::XMFLOAT3 capsule_start, DirectX::XMFLOAT3 capsule_end, float colider_radius, AddDamageFunc damaged_func)
+void Boss::DebugPrimitiveUpdate()
 {
+	DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
+	
+	debugRender->CreateSphere(
+		position,
+		1.0f, { 1.0f,0.0f,0.0f,1.0f });
+
 }
 
-void Boss::OnDead()
-{
-}
-
-void Boss::OnDamaged(WINCE_TYPE type)
-{
-}
-
-bool Boss::FindLoopAnimation(BossAnimation PA)
-{
-	if (PA == BossAnimation::BOSS_IDLE
-		//|| PA == BossAnimation::PLAYER_MOVE_FORWARD
-		) return true;
-	return false;
-}

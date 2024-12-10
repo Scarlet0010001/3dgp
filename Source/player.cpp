@@ -97,6 +97,11 @@ void Player::Update(float elapsedTime)
 
 	DebugPrimitiveUpdate();
 
+	if (isGround) 
+		param.boostTimer += elapsedTime * 1.5f;
+	if (param.boostTimer >= MAX_BOOST_TIMER)
+		param.boostTimer = MAX_BOOST_TIMER;
+
 	collider.start = position;
 	collider.end = { position.x,position.y + charaParam.height, position.z };
 	collider.radius = 1.0f;
@@ -342,14 +347,17 @@ void Player::InputJump()
 	{
 		if (jump_count < jump_limit)
 		{
-			TransitionJumpState();
-			Jump(param.jumpSpeed);
+			if (jump_count - 1 == jump_limit) TransitionHoverState();
+			else
+			{
+				TransitionJumpState();
+				Jump(param.jumpSpeed);
+			}
 			isGround = false;//ƒWƒƒƒ“ƒv‚µ‚Ä‚à’n–Ê‚É‚Â‚¢‚Ä‚¢‚é‚Æ‚¢‚¤‚ ‚è‚¦‚È‚¢ó‹µ‚ð‰ñ”ð‚·‚é‚½‚ß
 
 			++jump_count;
 		}
 	}
-
 }
 
 void Player::InputAvoidance()
@@ -482,10 +490,12 @@ bool Player::Flying()
 
 void Player::UpdateVerticalVelocity(float elapsed_frame)
 {
-	if(playerAnimation != PlayerAnimation::PLAYER_WING_START)
+	if (state == State::HOVER)
+		velocity.y = 0.0f;
+	else if (playerAnimation != PlayerAnimation::PLAYER_WING_START)
 		velocity.y += gravity * elapsed_frame;
-	else 
-		velocity.y += (gravity * 0.5f) * elapsed_frame;
+	else if(playerAnimation == PlayerAnimation::PLAYER_WING_START)
+		velocity.y += (gravity * 0.3f) * elapsed_frame;
 }
 
 void Player::DebugPrimitiveUpdate()
@@ -665,8 +675,6 @@ void Player::DebugGUI()
 			//		ImGui::DragFloat("combo3_hit_viberation.l_moter", &param.combo_3.hit_viberation.l_moter, 0.1f);
 			//		ImGui::DragFloat("combo3_hit_viberation.r_moter", &param.combo_3.hit_viberation.r_moter, 0.1f);
 			//		ImGui::DragFloat("combo3_vibe_time", &param.combo_3.hit_viberation.vibe_time, 0.1f);
-
-
 			//	}
 			//}
 			if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))

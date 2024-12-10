@@ -12,25 +12,39 @@ void Boss::TransitionIdleState()
 void Boss::TransitionWalkState()
 {
 	act_update = &Boss::UpdateWalkState;
-	state = State::IDLE;
+	state = State::WALK;
 	//bossAnimation = BossAnimation::BOSS_IDLE;
 
 }
 
 void Boss::TransitionRunState()
 {
+	act_update = &Boss::UpdateRunState;
+	state = State::RUN;
+	//bossAnimation = BossAnimation::BOSS_IDLE;
 }
 
 void Boss::TransitionAttack_Melee_State()
 {
+	act_update = &Boss::UpdateAttack_Melee_State;
+	state = State::MELEE;
+	//bossAnimation = BossAnimation::BOSS_IDLE;
 }
 
 void Boss::TransitionAttack_ShotStraight_State()
 {
+	act_update = &Boss::UpdateAttack_ShotStraight_State;
+	state = State::SHOT_S;
+	//bossAnimation = BossAnimation::BOSS_IDLE;
+
 }
 
 void Boss::TransitionAttack_ShotHoming_State()
 {
+	act_update = &Boss::UpdateAttack_ShotHoming_State;
+	state = State::SHOT_H;
+	//bossAnimation = BossAnimation::BOSS_IDLE;
+
 }
 
 void Boss::TransitionDamageState()
@@ -97,6 +111,7 @@ void Boss::UpdateRunState(float elapsedTime)
 void Boss::UpdateAttack_Melee_State(float elapsedTime)
 {
 	AttackParam.isAttack = true;
+	TransitionIdleState();
 	if (model->GetIsEndAnimation())
 	{
 		TransitionIdleState();
@@ -105,12 +120,19 @@ void Boss::UpdateAttack_Melee_State(float elapsedTime)
 	}
 	//速度更新
 	UpdateVelocity(elapsedTime, position);
-
 }
 
 void Boss::UpdateAttack_ShotStraight_State(float elapsedTime)
 {
-	
+	ShotBullet(ATTACK_TYPE::SHOT_S);
+	TransitionIdleState();
+
+	if (model->GetIsEndAnimation())
+	{
+		TransitionIdleState();
+		state_duration = NORMAL_ATTACK_COOLTIME;
+
+	}
 
 	//速度更新
 	UpdateVelocity(elapsedTime, position);
@@ -118,6 +140,14 @@ void Boss::UpdateAttack_ShotStraight_State(float elapsedTime)
 
 void Boss::UpdateAttack_ShotHoming_State(float elapsedTime)
 {
+	ShotBullet(ATTACK_TYPE::SHOT_S);
+	TransitionIdleState();
+	if (model->GetIsEndAnimation())
+	{
+		TransitionIdleState();
+		state_duration = NORMAL_ATTACK_COOLTIME;
+
+	}
 
 	//速度更新
 	UpdateVelocity(elapsedTime, position);
@@ -198,3 +228,4 @@ void Boss::SelectAttackTypeLong()
 		break;
 	}
 }
+

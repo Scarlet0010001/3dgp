@@ -121,6 +121,7 @@ private:
 	};
 
 	const float JUST_GURD_TIME = 3.0f;
+	const float MAX_BOOST_TIMER = 10.0f;
 
 	struct PlayerParam
 	{
@@ -280,7 +281,7 @@ private:
 	//現何回ジャンプしてるか
 	int jump_count = 0;
 	//ジャンプ可能回数
-	const int jump_limit = 1;
+	const int jump_limit = 2;
 
 	bool displayPlayerImgui = false;
 

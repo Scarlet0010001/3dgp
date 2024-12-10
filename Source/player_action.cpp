@@ -160,6 +160,7 @@ void Player::UpdateMoveState(float elapsedTime)
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
+		TransitionCombo_01_01_State();
 	}
 	//射撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
@@ -238,6 +239,7 @@ void Player::UpdateHoverState(float elapsedTime)
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
+		TransitionCombo_01_01_State();
 	}
 	//射撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
@@ -306,6 +308,9 @@ void Player::UpdateJumpState(float elapsedTime)
 
 	InputMove(elapsedTime);
 
+	//ホバー入力
+	InputJump();
+
 	//飛行入力
 	InputWing();
 	//攻撃入力
@@ -355,6 +360,7 @@ void Player::UpdateShotState(float elapsedTime)
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
+		TransitionCombo_01_01_State();
 	}
 
 	//速力処理更新

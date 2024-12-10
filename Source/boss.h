@@ -44,6 +44,11 @@ private:
 	enum class State
 	{
 		IDLE,
+		WALK,
+		RUN,
+		MELEE,
+		SHOT_S,
+		SHOT_H,
 		//AIRBORNE,
 		//ATTACK,
 		//DAMAGE,
@@ -55,7 +60,6 @@ private:
 		//GROGGY_END,
 		//GROGGY_LOOP,
 		//GROGGY_START,
-		//RUN,
 		//SKILL_1,
 		//SKILL_2_END,
 		//SKILL_2_LOOP,
@@ -63,7 +67,6 @@ private:
 		//SKILL_3,
 		//STAND,
 		//STUN,
-		//WALK
 
 	};
 	enum class ATTACK_TYPE
@@ -125,16 +128,19 @@ public:
 	//デバッグ用GUI描画
 	void DebugDUI();
 
+	//デバッグ用当たり判定
+	void DebugPrimitiveUpdate();
+
 	//プレイヤーの攻撃との当たり判定
 	void CalcAttack_vs_Player(DirectX::XMFLOAT3 capsule_start, DirectX::XMFLOAT3 capsule_end, float colider_radius, AddDamageFunc damaged_func);
 
 	//攻撃対象の位置を取得
-	void set_location_of_attack_target(DirectX::XMFLOAT3 target) { target_pos = target; }
+	void SetLocationOfAttackTarget(DirectX::XMFLOAT3 target) { target_pos = target; }
 
 	//BodyCollision get_body_collision() { return boss_body_collision; }
 
 	//カメラがボスを見るときに注視するポイント
-	DirectX::XMFLOAT3 get_gazing_point() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 3), position.z); }
+	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 3), position.z); }
 
 
 private:
@@ -178,6 +184,9 @@ private:
 	void SelectAttackTypeShort();
 
 	void SelectAttackTypeLong();
+
+	//射撃
+	void ShotBullet(ATTACK_TYPE type);
 
 	void OnDead() override;
 	void OnDamaged(WINCE_TYPE type) override;
@@ -237,9 +246,9 @@ private:
 	//==============================================================
 
 	//歩くスピード
-	float WALK_SPEED = 15;
+	float WALK_SPEED = 5;
 	//走るスピード
-	float RUN_SPEED = 30;
+	float RUN_SPEED = 12;
 	//通常攻撃の射程
 	float ATTACK_ACTION_LENGTH = 17;
 	//通常攻撃のクールタイム
