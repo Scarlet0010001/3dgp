@@ -248,8 +248,9 @@ void Camera::UpdateWithTracking(float elapsedTime)
 	pos.x = trakkingTarget.x - forward.x * hit.distance;
 	pos.y = trakkingTarget.y - forward.y * hit.distance;
 	pos.z = trakkingTarget.z - forward.z * hit.distance;
-	eye = Math::Lerp(eye, pos, attendRate * elapsedTime);
-
+	//eye = Math::Lerp(eye, pos, attendRate * elapsedTime);
+	eye = Math::Lerp(eye, pos, std::min(attendRate * elapsedTime, 1.0f));
+	
 }
 
 
@@ -307,13 +308,28 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 		//回転軸
 		DirectX::XMVECTOR axis = DirectX::XMVector3Cross(Forward, Up);
 
-		if (fabs(angle.x) > DirectX::XMConvertToRadians(0.1f))
+		//回転角度がこの値を超えたときのみ計算
+		const float extrapolated_angle = 1.0f;
+		if (fabsf(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
 		{
-			//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-			DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, angle.x);
-			//矢印を徐々に目標座標に向ける
-			DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, sensitivityRate);
+			float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
+			//クオータニオンは回転の仕方(どの向きに)
+			if (cross < 0.0f)
+			{
+				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
+				//矢印を徐々に目標座標に向ける
+				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+			}
+			else
+			{
+				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
+				//矢印を徐々に目標座標に向ける
+				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+			}
 		}
 	}
 	// orientationVecからorientationを更新
