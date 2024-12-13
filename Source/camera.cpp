@@ -199,8 +199,8 @@ void Camera::Update(float elapsedTime)
 			
 			debugRender->CreateSphere(
 				trakkingTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
-			debugRender->CreateSphere(
-				lockOnTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
+			//debugRender->CreateSphere(
+			//	lockOnTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
 		}
 			//trackingtarget‚ÌˆÊ’u‚É‹…‚ğo‚·
 #ifdef USE_IMGUI

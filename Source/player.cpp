@@ -80,6 +80,9 @@ Player::~Player()
 void Player::Update(float elapsedTime)
 {
 	Graphics& graphics = Graphics::Instance();
+
+	//滞空処理
+	BoostUpdate(elapsedTime);
 	//更新処理
 	(this->*p_update)(elapsedTime);
 
@@ -96,11 +99,6 @@ void Player::Update(float elapsedTime)
 	UpdateInvicibleTimer(elapsedTime);
 
 	DebugPrimitiveUpdate();
-
-	if (isGround) 
-		param.boostTimer += elapsedTime * 1.5f;
-	if (param.boostTimer >= MAX_BOOST_TIMER)
-		param.boostTimer = MAX_BOOST_TIMER;
 
 	collider.start = position;
 	collider.end = { position.x,position.y + charaParam.height, position.z };
@@ -123,7 +121,7 @@ void Player::Render_f(float elapsedTime)
 		playerAnimation_transition = playerAnimation;
 		transition_state = TransitionState::START;
 	}
-	bool nowLoop = FindLoopAnimation(playerAnimation);
+	bool isLoop = FindLoopAnimation(playerAnimation);
 	//ブレンドアニメーション
 	if (transition_state > 0 && transition_time > 0.0f)
 	{
@@ -133,7 +131,7 @@ void Player::Render_f(float elapsedTime)
 			break;
 		case TransitionState::START:
 			model->animate(playerAnimation_old, time, animated_nodes[playerAnimation_old], FindLoopAnimation(playerAnimation_old));
-			model->animate(playerAnimation, 0.0f, animated_nodes[playerAnimation], nowLoop);
+			model->animate(playerAnimation, 0.0f, animated_nodes[playerAnimation], isLoop);
 			transition_state = TransitionState::TRANSITION;
 			time = 0.0f;
 			factor = 0.0f;
@@ -157,11 +155,11 @@ void Player::Render_f(float elapsedTime)
 		time += elapsedTime;
 		if (model->animations.at(playerAnimation).duration < time)
 		{
-			if (nowLoop)
+			if (isLoop)
 				time = 0;
 			else time = model->animations.at(playerAnimation).duration;
 		}
-		model->animate(playerAnimation, time, animated_nodes[playerAnimation], nowLoop);
+		model->animate(playerAnimation, time, animated_nodes[playerAnimation], isLoop);
 		model->render(graphics.Get_DC().Get(), transform, animated_nodes[playerAnimation]);
 		playerAnimation_old = playerAnimation;
 
@@ -245,6 +243,34 @@ void Player::Move(float vx, float vy, float vz, float speed)
 	{
 		//最大速度設定
 		charaParam.maxMoveSpeed = speed;
+	}
+}
+
+void Player::BoostUpdate(float elapsedTime)
+{
+	if (isGround)
+		param.boostTimer += elapsedTime * 3.0f;
+	if (isHover)
+		param.boostTimer -= elapsedTime;
+	if (param.boostTimer >= MAX_BOOST_TIMER)
+		param.boostTimer = MAX_BOOST_TIMER;
+
+	if (param.boostTimer < 0 && isHover)
+	{
+		isHover = false;
+		TransitionJumpState();
+	}
+
+	if (state != State::WING
+		&& state != State::DAMAGE
+		&& state != State::DIE
+		)
+	{
+		if (!isGround
+			&& gamePad->GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
+		{
+			isHover = !isHover;
+		}
 	}
 }
 
@@ -347,8 +373,6 @@ void Player::InputJump()
 	{
 		if (jump_count < jump_limit)
 		{
-			if (jump_count - 1 == jump_limit) TransitionHoverState();
-			else
 			{
 				TransitionJumpState();
 				Jump(param.jumpSpeed);
@@ -490,12 +514,12 @@ bool Player::Flying()
 
 void Player::UpdateVerticalVelocity(float elapsed_frame)
 {
-	if (state == State::HOVER)
+	if (isHover)
 		velocity.y = 0.0f;
 	else if (playerAnimation != PlayerAnimation::PLAYER_WING_START)
 		velocity.y += gravity * elapsed_frame;
 	else if(playerAnimation == PlayerAnimation::PLAYER_WING_START)
-		velocity.y += (gravity * 0.3f) * elapsed_frame;
+		velocity.y += (gravity * 0.2f) * elapsed_frame;
 }
 
 void Player::DebugPrimitiveUpdate()
@@ -591,6 +615,7 @@ void Player::DebugGUI()
 				ImGui::DragFloat("gravity", &gravity);
 				ImGui::DragFloat("floating_value", &param.floatingValue);
 				ImGui::DragFloat("invinsible_timer", &invincibleTimer);
+				ImGui::DragFloat("boostTimer", &param.boostTimer);
 				ImGui::DragFloat("TurnSpeed", &charaParam.turnSpeed, 0.1f);
 				ImGui::DragFloat("MoveSpeed", &charaParam.moveSpeed, 0.1f);
 				ImGui::DragFloat("wingSpeed", &param.wingSpeed, 0.1f);

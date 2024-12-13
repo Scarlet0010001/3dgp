@@ -111,10 +111,10 @@ private:
 		MOVE,
 		JUMP,
 		WING,
-		HOVER,
 		SHOT,
 		NORMAL_ATTACK01,
 		DAMAGE,
+		DIE,
 		ROLL,
 		SKILL,
 
@@ -173,7 +173,6 @@ private:
 	void TransitionIdleState();//待機
 	void TransitionMoveState();//走り
 	void TransitionWingState();//飛行
-	void TransitionHoverState();//ホバー
 	void TransitionAvoidanceState();//回避
 	void TransitionJumpState();//ジャンプ
 	void TransitionLandingState();//着地
@@ -189,7 +188,6 @@ private:
 	void UpdateIdleState(float elapsedTime);//待機
 	void UpdateMoveState(float elapsedTime);//走り
 	void UpdateWingState(float elapsedTime);//飛行
-	void UpdateHoverState(float elapsedTime);//飛行
 	void UpdateAvoidanceState(float elapsedTime);//回避
 	void UpdateJumpState(float elapsedTime);//ジャンプ
 	void UpdateLandingState(float elapsedTime);//着地
@@ -206,6 +204,8 @@ private:
 
 	void Move(float vx, float vz, float speed)override;
 	void Move(float vx, float vy, float vz, float speed);
+
+	void BoostUpdate(float elapsedTime);
 
 	//プレイヤーの移動入力処理
 	bool InputMove(float elapsedTime);
@@ -281,7 +281,9 @@ private:
 	//現何回ジャンプしてるか
 	int jump_count = 0;
 	//ジャンプ可能回数
-	const int jump_limit = 2;
+	const int jump_limit = 1;
+
+	bool isHover = false;
 
 	bool displayPlayerImgui = false;
 

@@ -21,14 +21,7 @@ void Player::TransitionWingState()
 	p_update = &Player::UpdateWingState;
 	playerAnimation = PlayerAnimation::PLAYER_WING_START;
 	state = State::WING;
-
-}
-
-void Player::TransitionHoverState()
-{
-	p_update = &Player::UpdateHoverState;
-	state = State::HOVER;
-
+	isHover = false;
 }
 
 void Player::TransitionAvoidanceState()
@@ -146,7 +139,7 @@ void Player::UpdateMoveState(float elapsedTime)
 	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
 	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
 
-	if (!InputMove(elapsedTime) && isGround)
+	if (!InputMove(elapsedTime) /*&& isGround*/)
 	{
 		TransitionIdleState();
 	}
@@ -203,7 +196,7 @@ void Player::UpdateWingState(float elapsedTime)
 		}
 	}
 	//回避入力
-	InputAvoidance();
+	//InputAvoidance();
 
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
@@ -213,44 +206,6 @@ void Player::UpdateWingState(float elapsedTime)
 	//速力処理更新
 	UpdateVelocity(elapsedTime, position);
 
-}
-
-void Player::UpdateHoverState(float elapsedTime)
-{
-	float ax = gamePad->GetAxis_LX();
-	float ay = gamePad->GetAxis_LY();
-
-	if (ax > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_RIGHT;
-	else if (ax < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_LEFT;
-	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
-	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
-
-	if (!InputMove(elapsedTime))
-	{
-		TransitionIdleState();
-	}
-
-	//回避入力
-	InputAvoidance();
-
-	//飛行入力
-	InputWing();
-
-	//攻撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
-	{
-		TransitionCombo_01_01_State();
-	}
-	//射撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
-		|| mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
-	{
-		TransitionShotState();
-	}
-
-	//速力処理更新
-	UpdateVelocity(elapsedTime, position);
-	param.boostTimer -= elapsedTime;
 }
 
 void Player::UpdateAvoidanceState(float elapsedTime)
@@ -308,8 +263,8 @@ void Player::UpdateJumpState(float elapsedTime)
 
 	InputMove(elapsedTime);
 
-	//ホバー入力
-	InputJump();
+	if (isHover)
+		TransitionIdleState();
 
 	//飛行入力
 	InputWing();
