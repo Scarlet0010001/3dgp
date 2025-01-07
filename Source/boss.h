@@ -19,26 +19,12 @@ private:
 	enum  BossAnimation
 	{
 		BOSS_IDLE,
-		//AIRBORNE,
-		//ATTACK,
-		//DAMAGE,
-		//DEAD,
-		//DIE,
-		//DOWN,
-		//DOWNDEAD,
-		//FALL,
-		//GROGGY_END,
-		//GROGGY_LOOP,
-		//GROGGY_START,
-		//RUN,
-		//SKILL_1,
-		//SKILL_2_END,
-		//SKILL_2_LOOP,
-		//SKILL_2_START,
-		//SKILL_3,
-		//STAND,
-		//STUN,
-		//WALK
+		BOSS_WALK,
+		BOSS_RUN,
+		BOSS_JUMP,
+		BOSS_MISSILE,
+		BOSS_HIT,
+		BOSS_DEAD,
 		BOSS_ANIME_COUNT,
 	};
 	enum class State
@@ -46,28 +32,12 @@ private:
 		IDLE,
 		WALK,
 		RUN,
-		MELEE,
+		JUMP,
+		TACKLE,
 		SHOT_S,
 		SHOT_H,
-		//AIRBORNE,
-		//ATTACK,
-		//DAMAGE,
-		//DEAD,
-		//DIE,
-		//DOWN,
-		//DOWNDEAD,
-		//FALL,
-		//GROGGY_END,
-		//GROGGY_LOOP,
-		//GROGGY_START,
-		//SKILL_1,
-		//SKILL_2_END,
-		//SKILL_2_LOOP,
-		//SKILL_2_START,
-		//SKILL_3,
-		//STAND,
-		//STUN,
-
+		DAMAGE,
+		DEAD,
 	};
 	enum class ATTACK_TYPE
 	{
@@ -152,7 +122,7 @@ private:
 	void TransitionRunState();//走り
 
 	//			攻撃系				//
-	void TransitionAttack_Melee_State();//近接攻撃
+	void TransitionAttack_Tackle_State();//近接攻撃
 	void TransitionAttack_ShotStraight_State();//射撃
 	void TransitionAttack_ShotHoming_State();//ホーミングミサイル
 	//void TransitionSkill_1_State();
@@ -170,7 +140,7 @@ private:
 	void UpdateRunState(float elapsedTime);//走り
 
 	//			攻撃系				//
-	void UpdateAttack_Melee_State(float elapsedTime);//近接攻撃
+	void UpdateAttack_Tackle_State(float elapsedTime);//近接攻撃
 	void UpdateAttack_ShotStraight_State(float elapsedTime);//射撃
 	void UpdateAttack_ShotHoming_State(float elapsedTime);//ホーミングミサイル
 
@@ -213,7 +183,7 @@ private:
 	BossAnimation bossAnimation_old = BOSS_IDLE;
 
 	//ループアニメーションの検索
-	bool FindLoopAnimation(BossAnimation PA);
+	bool FindLoopAnimation(BossAnimation BA);
 
 	//ブレンドアニメーション
 	std::vector<gltf_model::node> animated_nodes[BOSS_ANIME_COUNT];
@@ -227,6 +197,7 @@ private:
 	float attackResponderTimer;
 	//攻撃対象
 	DirectX::XMFLOAT3 target_pos;
+	DirectX::XMFLOAT3 tackle_pos{};
 	DirectX::XMFLOAT3 shot_pos;
 
 	State state;

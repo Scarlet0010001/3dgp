@@ -14,7 +14,7 @@ void Boss::TransitionWalkState()
 	act_update = &Boss::UpdateWalkState;
 	state = State::WALK;
 	charaParam.moveSpeed = WALK_SPEED;
-	//bossAnimation = BossAnimation::BOSS_IDLE;
+	bossAnimation = BossAnimation::BOSS_WALK;
 
 }
 
@@ -26,11 +26,15 @@ void Boss::TransitionRunState()
 	//bossAnimation = BossAnimation::BOSS_IDLE;
 }
 
-void Boss::TransitionAttack_Melee_State()
+void Boss::TransitionAttack_Tackle_State()
 {
-	act_update = &Boss::UpdateAttack_Melee_State;
-	state = State::MELEE;
-	//bossAnimation = BossAnimation::BOSS_IDLE;
+	act_update = &Boss::UpdateAttack_Tackle_State;
+	state = State::TACKLE;
+
+	tackle_pos.x = target_pos.x;
+	tackle_pos.z = target_pos.z;
+
+	bossAnimation = BossAnimation::BOSS_RUN;
 }
 
 void Boss::TransitionAttack_ShotStraight_State()
@@ -45,16 +49,24 @@ void Boss::TransitionAttack_ShotHoming_State()
 {
 	act_update = &Boss::UpdateAttack_ShotHoming_State;
 	state = State::SHOT_H;
-	//bossAnimation = BossAnimation::BOSS_IDLE;
+	bossAnimation = BossAnimation::BOSS_MISSILE;
 
 }
 
 void Boss::TransitionDamageState()
 {
+	act_update = &Boss::UpdateDamageState;
+	state = State::DAMAGE;
+	bossAnimation = BossAnimation::BOSS_HIT;
+
 }
 
 void Boss::TransitionDeadState()
 {
+	act_update = &Boss::UpdateDeadState;
+	state = State::DEAD;
+	bossAnimation = BossAnimation::BOSS_DEAD;
+
 }
 
 void Boss::TransitionDownState()
@@ -66,12 +78,12 @@ void Boss::UpdateIdleState(float elapsedTime)
 	stateTimer += elapsedTime;
 	if (stateTimer > state_duration)
 	{
-		if (health < charaParam.maxHealth / 2)
-		{
-			//HP半分以下なら走る
-			TransitionRunState();
-		}
-		else
+		//if (health < charaParam.maxHealth / 2)
+		//{
+		//	//HP半分以下なら走る
+		//	TransitionRunState();
+		//}
+		//else
 		{
 			TransitionWalkState();
 		}
@@ -110,15 +122,32 @@ void Boss::UpdateRunState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Boss::UpdateAttack_Melee_State(float elapsedTime)
+void Boss::UpdateAttack_Tackle_State(float elapsedTime)
 {
+	stateTimer += elapsedTime;
+	if (stateTimer < 1.0f)
+	{
+		return;
+	}
+
+	//目標地点までXZ平面での距離判定
+	float vx = tackle_pos.x - position.x;
+	float vz = tackle_pos.z - position.z;
+	float distSq = vx * vx + vz * vz;
+
 	AttackParam.isAttack = true;
-	TransitionIdleState();
-	if (model->GetIsEndAnimation())
+	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, tackle_pos);
+	Move(dir_target_vec.x, dir_target_vec.z, param.run_speed);
+	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);	
+
+	const float radius = 3.0f;
+	if (distSq < radius * radius)
 	{
 		TransitionIdleState();
 		state_duration = NORMAL_ATTACK_COOLTIME;
 		AttackParam.isAttack = false;
+		stateTimer = 0;
+
 	}
 	//速度更新
 	UpdateVelocity(elapsedTime, position);
@@ -199,7 +228,7 @@ void Boss::SelectAttackTypeShort()
 	switch (attack_type)
 	{
 	case ATTACK_TYPE::NORMAL:
-		TransitionAttack_Melee_State();
+		TransitionAttack_Tackle_State();
 		break;
 
 	case ATTACK_TYPE::SHOT_S:
@@ -221,6 +250,9 @@ void Boss::SelectAttackTypeLong()
 	//通常攻撃は除外し、遠距離攻撃のみ選択
 	switch (attack_type)
 	{
+	case ATTACK_TYPE::NORMAL:
+		TransitionAttack_Tackle_State();
+		break;
 	case ATTACK_TYPE::SHOT_S:
 		TransitionAttack_ShotStraight_State();
 		break;

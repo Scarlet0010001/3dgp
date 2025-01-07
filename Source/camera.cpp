@@ -266,6 +266,7 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 	DirectX::XMVECTOR Up = { 0.0f,1.0f,0.0f };
 	DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
 
+
 	DirectX::XMVECTOR dot = DirectX::XMVector3Dot(Forward, TargetVecNorm);
 	DirectX::XMStoreFloat(&lockOnAngle, dot);
 	lockOnAngle = acosf(lockOnAngle);
@@ -343,6 +344,52 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 	// orientationVecからorientationを更新
 	DirectX::XMStoreFloat4(&orientation, orientationVec);
 #else
+	// XMVECTORクラスへ変換
+// カメラの現在位置から、目標座標への方向を求める
+	DirectX::XMFLOAT3 dir = lockOnTarget - eye;
+	DirectX::XMVECTOR TargetVecNorm = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&dir));
+	DirectX::XMVECTOR Forward = Math::get_posture_forward_vec(orientation);
+	DirectX::XMVECTOR Up = { 0.0f,1.0f,0.0f };
+	DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
+
+	DirectX::XMVECTOR Cross = DirectX::XMVector3Cross(DirectX::XMVector3Normalize(Forward), TargetVecNorm);
+	DirectX::XMVECTOR dot = DirectX::XMVector3Dot(Forward, TargetVecNorm);
+	DirectX::XMStoreFloat(&lockOnAngle, dot);
+	lockOnAngle = acosf(lockOnAngle);
+
+	//DirectX::XMFLOAT3 forward{};//forwardの値をfloat3に
+	//DirectX::XMFLOAT3 up{};//upの値をfloat3に
+	//DirectX::XMFLOAT3 d_vec{};//dの値をfloat3に
+	//DirectX::XMStoreFloat3(&forward, Forward);
+	//DirectX::XMStoreFloat3(&up, Up);
+	//DirectX::XMStoreFloat3(&d_vec, TargetVecNorm);
+
+	//回転角度がこの値を超えたときのみ計算
+	const float extrapolated_angle = 1.0f;
+	if (fabsf(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
+	{
+		DirectX::XMVECTOR q{};
+		//クオータニオンは回転の仕方(どの向きに)
+		//if (cross < 0.0f)
+		{
+			//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+			q = DirectX::XMQuaternionRotationAxis(Cross, lockOnAngle);
+		}
+		//else
+		//{
+		//	//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+		//	q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
+		//}
+		//矢印を徐々に目標座標に向ける
+		DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+		orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, std::min(lockOnRate * elapsedTime, 1.0f));
+
+	}
+
+	// orientationVecからorientationを更新
+	DirectX::XMStoreFloat4(&orientation, orientationVec);
+
+	/*
 	using namespace DirectX::SimpleMath;
 	using namespace DirectX;
 
@@ -370,6 +417,7 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 
 	//trakkingTarget = target;
 	eye = Math::Lerp(eye, pos, std::min(lockOnRate * elapsedTime, 1.0f));
+	*/
 
 #endif
 }

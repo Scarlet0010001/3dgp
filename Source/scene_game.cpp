@@ -73,8 +73,8 @@ void SceneGame::Update(float elapsedTime)
     player->Update(cameraElapsedTime);
 
     //**********ボスの更新**********//
-    boss->Update(cameraElapsedTime);
     boss->SetLocationOfAttackTarget(player->GetPosition());
+    boss->Update(cameraElapsedTime);
 
     //**********弾の更新**********//
     bulletManager.Update(elapsedTime);

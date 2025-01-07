@@ -7,6 +7,7 @@
 #include "operators.h"
 #include "collision.h"
 #include "Graphics.h"
+#include "magic_enum/include/magic_enum.hpp"
 
 Boss::Boss()
 {
@@ -20,6 +21,8 @@ Boss::Boss()
 		node = model->nodes;
 	}
 	blended_animated_nodes = model->nodes;
+
+	//model->find_nodes();
 
 	//skill_manager = std::make_unique<SkillManager>();
 	//UI 
@@ -48,6 +51,7 @@ void Boss::Initialize()
 
 	charaParam.moveSpeed = WALK_SPEED;
 	state_duration = 2.0f;
+	param.run_speed = RUN_SPEED;
 	bossBodyCollision.capsule.start = position;
 	bossBodyCollision.capsule.radius = 10;
 	bossBodyCollision.height = 25;
@@ -169,10 +173,11 @@ void Boss::OnDamaged(WINCE_TYPE type)
 {
 }
 
-bool Boss::FindLoopAnimation(BossAnimation PA)
+bool Boss::FindLoopAnimation(BossAnimation BA)
 {
-	if (PA == BossAnimation::BOSS_IDLE
-		//|| PA == BossAnimation::PLAYER_MOVE_FORWARD
+	if (BA == BossAnimation::BOSS_IDLE
+		|| BA == BossAnimation::BOSS_WALK
+		|| BA == BossAnimation::BOSS_RUN
 		) return true;
 	return false;
 }
@@ -224,6 +229,10 @@ void Boss::DebugDUI()
 				//‘¬“x
 				ImGui::DragFloat3("velocity:", &velocity.x);
 			}
+			std::string state_name;
+			state_name = magic_enum::enum_name<State>(state);
+			ImGui::Text(state_name.c_str());
+
 			ImGui::DragInt("hp", &health);
 			ImGui::DragFloat("height", &charaParam.height);
 			ImGui::DragFloat("moveSpeed", &charaParam.moveSpeed, 0.1f);
