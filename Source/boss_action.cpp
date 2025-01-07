@@ -13,6 +13,7 @@ void Boss::TransitionWalkState()
 {
 	act_update = &Boss::UpdateWalkState;
 	state = State::WALK;
+	charaParam.moveSpeed = WALK_SPEED;
 	//bossAnimation = BossAnimation::BOSS_IDLE;
 
 }
@@ -21,6 +22,7 @@ void Boss::TransitionRunState()
 {
 	act_update = &Boss::UpdateRunState;
 	state = State::RUN;
+	charaParam.moveSpeed = RUN_SPEED;
 	//bossAnimation = BossAnimation::BOSS_IDLE;
 }
 
@@ -84,7 +86,7 @@ void Boss::UpdateWalkState(float elapsedTime)
 {
 	//プレイヤー方向に歩く
 	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, target_pos);
-	Move(dir_target_vec.x, dir_target_vec.z, WALK_SPEED);
+	Move(dir_target_vec.x, dir_target_vec.z, charaParam.moveSpeed);
 	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);
 
 	//攻撃のルーチン
@@ -98,7 +100,7 @@ void Boss::UpdateWalkState(float elapsedTime)
 void Boss::UpdateRunState(float elapsedTime)
 {
 	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, target_pos);
-	Move(dir_target_vec.x, dir_target_vec.z, RUN_SPEED);
+	Move(dir_target_vec.x, dir_target_vec.z, charaParam.moveSpeed);
 	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);
 
 	//攻撃のルーチン

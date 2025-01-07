@@ -20,7 +20,7 @@ Player::Player()
 	Graphics& graphics = Graphics::Instance();
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
-		"Resources/Player/glb/white_crow.glb", true);
+		"Resources/Character/Player/glb/white_crow.glb", true);
 	for (auto& node : animated_nodes)
 	{
 		node = model->nodes;

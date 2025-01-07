@@ -105,7 +105,14 @@ public:
     void SetLockOnTarget(const DirectX::XMFLOAT3& t) { lockOnTarget = t; }
     const DirectX::XMFLOAT3& GetLockOnTarget() const { return lockOnTarget; }
     // 追尾する対象
-    void SetTrakkingTarget(const DirectX::XMFLOAT3& t) { trakkingTarget = t; }
+    DirectX::XMFLOAT3 newTrakkingTarget{};
+    void SetTrakkingTarget(const DirectX::XMFLOAT3& t) {
+        newTrakkingTarget = t;
+
+	    trakkingTarget.x+= (newTrakkingTarget.x - trakkingTarget.x) * 0.2f;
+        trakkingTarget .y+= (newTrakkingTarget.y - trakkingTarget.y) * 0.2f;
+        trakkingTarget.z += (newTrakkingTarget.z- trakkingTarget.z) * 0.2f;
+    }
     const DirectX::XMFLOAT3& GetTrakkingTarget() const { return trakkingTarget; }
 
     // 角度
@@ -176,6 +183,7 @@ private:
     DirectX::XMFLOAT3 eye; //視点
     DirectX::XMFLOAT3 trakkingTarget;//注視点
     DirectX::XMFLOAT3 lockOnTarget;//注視点
+    DirectX::XMFLOAT3 oldLockOnTarget;//注視点
     DirectX::XMFLOAT3 wingTarget;//注視点
     DirectX::XMFLOAT3 angle;
     DirectX::XMFLOAT4 orientation = { 0,0,0,1 };

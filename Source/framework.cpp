@@ -93,53 +93,6 @@ void framework::update(float elapsedTime/*Elapsed seconds from last frame*/)
 	Graphics::Instance().DebugGui();
 
 #ifdef USE_IMGUI
-//	if (ImGui::Begin("ImGUI"))
-//	{
-//		ImGui::SliderFloat("camera_position.x", &camera_position.x, -100.0f, +100.0f);
-//		ImGui::SliderFloat("camera_position.y", &camera_position.y, -100.0f, +100.0f);
-//		ImGui::SliderFloat("camera_position.z", &camera_position.z, -100.0f, +100.0f);
-//
-//		ImGui::SliderFloat("light_direction.x", &light_direction.x, -1.0f, +1.0f);
-//		ImGui::SliderFloat("light_direction.y", &light_direction.y, -1.0f, +1.0f);
-//		ImGui::SliderFloat("light_direction.z", &light_direction.z, -1.0f, +1.0f);
-//
-//		ImGui::SliderFloat("translation.x", &translation.x, -10.0f, +10.0f);
-//		ImGui::SliderFloat("translation.y", &translation.y, -10.0f, +10.0f);
-//		ImGui::SliderFloat("translation.z", &translation.z, -10.0f, +10.0f);
-//
-//		ImGui::SliderFloat("scaling.x", &scaling.x, -10.0f, +10.0f);
-//		ImGui::SliderFloat("scaling.y", &scaling.y, -10.0f, +10.0f);
-//		ImGui::SliderFloat("scaling.z", &scaling.z, -10.0f, +10.0f);
-//
-//		ImGui::SliderFloat("rotation.x", &rotation.x, -10.0f, +10.0f);
-//		ImGui::SliderFloat("rotation.y", &rotation.y, -10.0f, +10.0f);
-//		ImGui::SliderFloat("rotation.z", &rotation.z, -10.0f, +10.0f);
-//
-//		ImGui::SliderFloat("factor", &factor, 0.0f, +1.0f);
-//
-//		ImGui::SliderInt("animation_clip", &clip_count, 0, clip_Max);
-//#if 0
-//		ImGui::SliderFloat("axis.x", &axis.x, -5.0f, +5.0f);
-//		ImGui::SliderFloat("axis.y", &axis.y, -5.0f, +5.0f);
-//		ImGui::SliderFloat("axis.z", &axis.z, -5.0f, +5.0f);
-//
-//		ImGui::SliderFloat("kf_Translation.x", &kf_Translation.x, -300.0f, +300.0f);
-//		ImGui::SliderFloat("kf_Translation.y", &kf_Translation.y, -300.0f, +300.0f);
-//		ImGui::SliderFloat("kf_Translation.z", &kf_Translation.z, -300.0f, +300.0f);
-//#endif
-//		ImGui::ColorEdit4("material_color", reinterpret_cast<float*>(&material_color));
-//
-//		//if (ImGui::TreeNode("luminance_extraction_ps"))
-//		//{
-//			ImGui::SliderFloat("smoothstep_minEdge", &smoothstep_minEdge, 0.0f, +1.0f);
-//			ImGui::SliderFloat("smoothstep_maxEdge", &smoothstep_maxEdge, 0.0f, +1.0f);
-//		//}
-//			ImGui::SliderFloat("gaussian_sigma", &gaussian_sigma, 0.0f, +10.0f);
-//			ImGui::SliderFloat("bloom_intensity", &bloom_intensity, 0.0f, +1.0f);
-//			
-//			ImGui::SliderFloat("exposure", &exposure, 0.0f, +10.0f);
-//	}
-//	ImGui::End();
 #endif
 }
 

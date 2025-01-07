@@ -4,6 +4,7 @@
 #include "stage_manager.h"
 #include "operators.h"
 #include "debug_renderer.h"
+#include <SimpleMath.h>
 
 Camera::Camera()
 	: range(10.0f)
@@ -167,7 +168,7 @@ void Camera::Update(float elapsedTime)
 				}
 
 				// orientationVecからorientationを更新
-				XMStoreFloat4(&orientation, orientationVec);
+				DirectX::XMStoreFloat4(&orientation, orientationVec);
 
 			}
 		}
@@ -256,6 +257,7 @@ void Camera::UpdateWithTracking(float elapsedTime)
 
 void Camera::UpdateWithLockOn(float elapsedTime)
 {
+#if 0
 	// XMVECTORクラスへ変換
 // カメラの現在位置から、目標座標への方向を求める
 	DirectX::XMFLOAT3 dir = lockOnTarget - eye;
@@ -284,56 +286,92 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 		if (fabsf(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
 		{
 			float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
+
+			DirectX::XMVECTOR q{};
 			//クオータニオンは回転の仕方(どの向きに)
 			if (cross < 0.0f)
 			{
 				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
-				//矢印を徐々に目標座標に向ける
-				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+				q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
 			}
 			else
 			{
 				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
-				//矢印を徐々に目標座標に向ける
-				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+				q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
 			}
+			//矢印を徐々に目標座標に向ける
+			DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, std::min(lockOnRate * elapsedTime, 1.0f));
+
 		}
 	}
 	//縦回転
 	{
 		//回転軸
 		DirectX::XMVECTOR axis = DirectX::XMVector3Cross(Forward, Up);
+		//axis = DirectX::XMVector3Normalize(axis); // 正規化
 
 		//回転角度がこの値を超えたときのみ計算
 		const float extrapolated_angle = 1.0f;
 		if (fabsf(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
 		{
-			float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
+			float cross{};
+			// クォータニオンで縦回転
+			if (dir.z >= 0)
+				cross = forward.y * d_vec.z - forward.z * d_vec.y;
+			else
+				cross = forward.y * d_vec.x - forward.x * d_vec.y;
+
+			DirectX::XMVECTOR q{};
 			//クオータニオンは回転の仕方(どの向きに)
 			if (cross < 0.0f)
 			{
 				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
-				//矢印を徐々に目標座標に向ける
-				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+				q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
 			}
 			else
 			{
 				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
-				//矢印を徐々に目標座標に向ける
-				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+				q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
 			}
+			//矢印を徐々に目標座標に向ける
+			DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, std::min(lockOnRate * elapsedTime, 1.0f));
 		}
 	}
+
 	// orientationVecからorientationを更新
-	XMStoreFloat4(&orientation, orientationVec);
+	DirectX::XMStoreFloat4(&orientation, orientationVec);
+#else
+	using namespace DirectX::SimpleMath;
+	using namespace DirectX;
+
+	Quaternion Q = Quaternion::CreateFromYawPitchRoll(angle.y, angle.x, angle.z);
+	Matrix M = Matrix::CreateFromQuaternion(Q);
+
+	Vector3 F = { M._31,M._32,M._33 };
+	F.Normalize();
+
+	DirectX::XMFLOAT3 forward = F;
+
+	DirectX::XMFLOAT3 target = trakkingTarget;
+	lockOnRate = std::max(0.0f, std::min(lockOnRate, 1.0f));
+
+	Vector3 current_target = trakkingTarget;
+	Vector3 next_target = lockOnTarget;
+
+	DirectX::XMStoreFloat3(&target,
+		DirectX::XMVectorLerp(current_target, next_target, lockOnRate));
+
+	DirectX::XMFLOAT3 pos;
+	pos.x = trakkingTarget.x - forward.x * range;
+	pos.y = trakkingTarget.y - forward.y * range;
+	pos.z = trakkingTarget.z - forward.z * range;
+
+	//trakkingTarget = target;
+	eye = Math::Lerp(eye, pos, std::min(lockOnRate * elapsedTime, 1.0f));
+
+#endif
 }
 
 void Camera::UpdateWithWing(float elapsedTime)

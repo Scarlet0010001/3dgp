@@ -139,7 +139,7 @@ void Player::UpdateMoveState(float elapsedTime)
 	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
 	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
 
-	if (!InputMove(elapsedTime) && isGround)
+	if (!InputMove(elapsedTime) /*&& isGround*/)
 	{
 		TransitionIdleState();
 	}

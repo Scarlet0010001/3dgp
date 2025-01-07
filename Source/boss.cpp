@@ -13,8 +13,8 @@ Boss::Boss()
 	Graphics& graphics = Graphics::Instance();
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
-		"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", false);
-		//"Resources/Boss/glb/white_crow.glb", true);
+		"Resources/Character/Boss/RobotDog_main.glb", false);
+		//"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", false);
 	for (auto& node : animated_nodes)
 	{
 		node = model->nodes;
@@ -22,7 +22,7 @@ Boss::Boss()
 	blended_animated_nodes = model->nodes;
 
 	//skill_manager = std::make_unique<SkillManager>();
-	//UI
+	//UI 
 	//ui = std::make_unique<PlayerUI>();
 
 	//arm = model->find_nodes("lowerarm_l");
@@ -36,6 +36,7 @@ void Boss::Initialize()
 	//パラメーター初期化
 	position = { 0.0f, 0.0f, 10.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
+	scale.x = scale.y = scale.z = 10.0f;
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.chara_init_param;
 
@@ -44,10 +45,8 @@ void Boss::Initialize()
 	//体力初期化
 	health = charaParam.maxHealth;
 
-	position = { 0.0f,2.0f,10.0f };
-	scale.x = scale.y = scale.z = 2.0f;
 
-	charaParam.moveSpeed = 15.0f;
+	charaParam.moveSpeed = WALK_SPEED;
 	state_duration = 2.0f;
 	bossBodyCollision.capsule.start = position;
 	bossBodyCollision.capsule.radius = 10;
@@ -114,14 +113,14 @@ void Boss::Render_f(float elapsedTime)
 	}
 	else
 	{
-		//time += elapsedTime;
-		//if (model->animations.at(bossAnimation).duration < time)
-		//{
-		//	if (nowLoop)
-		//		time = 0;
-		//	else time = model->animations.at(bossAnimation).duration;
-		//}
-		//model->animate(bossAnimation, time, animated_nodes[bossAnimation], nowLoop);
+		time += elapsedTime;
+		if (model->animations.at(bossAnimation).duration < time)
+		{
+			if (nowLoop)
+				time = 0;
+			else time = model->animations.at(bossAnimation).duration;
+		}
+		model->animate(bossAnimation, time, animated_nodes[bossAnimation], nowLoop);
 		model->render(graphics.Get_DC().Get(), transform, animated_nodes[bossAnimation]);
 		bossAnimation_old = bossAnimation;
 
@@ -227,6 +226,7 @@ void Boss::DebugDUI()
 			}
 			ImGui::DragInt("hp", &health);
 			ImGui::DragFloat("height", &charaParam.height);
+			ImGui::DragFloat("moveSpeed", &charaParam.moveSpeed, 0.1f);
 			ImGui::DragFloat("turnspeed", &charaParam.turnSpeed, 0.1f);
 			ImGui::DragFloat("boss_collision.radius", &bossBodyCollision.capsule.radius, 0.1f);
 			ImGui::DragFloat("boss_collision.height", &bossBodyCollision.height, 0.1f);

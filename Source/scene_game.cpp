@@ -60,11 +60,11 @@ void SceneGame::Update(float elapsedTime)
     BulletManager& bulletManager = BulletManager::Instance();
 
     //**********カメラの更新**********//
-    camera->Update(elapsedTime);
-    camera->CalcViewProjection(elapsedTime);
     camera->SetTrakkingTarget(player.get()->GetGazingPoint());
     camera->SetPlayerOrientation(player->GetOrientation());
     camera->SetLockOnTarget(boss.get()->GetPosition());
+    camera->Update(elapsedTime);
+    camera->CalcViewProjection(elapsedTime);
 
     //カメラの経過時間
     float cameraElapsedTime = camera->HitStopUpdate(elapsedTime);
