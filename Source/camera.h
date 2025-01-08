@@ -3,7 +3,7 @@
 #include <DirectXMath.h>
 #include "constant.h"
 #include "user.h"
-
+#include "noise.h"
 #include <cereal/cereal.hpp>
 
 class Camera

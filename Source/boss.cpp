@@ -22,7 +22,19 @@ Boss::Boss()
 	}
 	blended_animated_nodes = model->nodes;
 
-	//model->find_nodes();
+	// 初期姿勢時の頭ノードのローカル空間前方向を求める
+	{
+		DirectX::XMMATRIX WorldTransform =
+			DirectX::XMLoadFloat4x4(&transform);
+		DirectX::XMMATRIX InverseWorldTransform =
+			DirectX::XMMatrixInverse(nullptr, WorldTransform);
+		DirectX::XMVECTOR HeadWorldForward = DirectX::XMVectorSet(0, 0, 1, 0);
+		DirectX::XMVECTOR HeadLocalForward =
+			DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
+		HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
+
+		DirectX::XMStoreFloat3(&turretLocalForward, HeadLocalForward);
+	}
 
 	//skill_manager = std::make_unique<SkillManager>();
 	//UI 
@@ -113,6 +125,7 @@ void Boss::Render_f(float elapsedTime)
 			}
 			break;
 		}
+		LookAt_turret();
 		model->render(graphics.Get_DC().Get(), transform, blended_animated_nodes);
 	}
 	else
@@ -125,6 +138,7 @@ void Boss::Render_f(float elapsedTime)
 			else time = model->animations.at(bossAnimation).duration;
 		}
 		model->animate(bossAnimation, time, animated_nodes[bossAnimation], nowLoop);
+		LookAt_turret();
 		model->render(graphics.Get_DC().Get(), transform, animated_nodes[bossAnimation]);
 		bossAnimation_old = bossAnimation;
 
@@ -158,6 +172,90 @@ void Boss::ShotBullet(ATTACK_TYPE type)
 		type == ATTACK_TYPE::SHOT_S ? new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy)
 		: new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy);
 	bullet->Launch(dir, pos);
+
+}
+
+void Boss::LookAt_turret()
+{
+	gltf_model::node& turretBaseNode = model->find_nodes("Bone_Turret_Head_Main");
+	gltf_model::node& turretNode = model->find_nodes("Bone_MGun_Main");
+
+	// ワールド行列更新処理関数
+	//std::function<void(gltf_model::node&)> updateWorldTransforms = [&](gltf_model::node& node)
+	//{
+	//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
+	//	DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation));
+	//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z);
+	//	DirectX::XMMATRIX LocalTransform = S * R * T;
+	//	DirectX::XMMATRIX ParentGlobalTransform = node.parent != nullptr
+	//		? DirectX::XMLoadFloat4x4(&node.parent->globalTransform)
+	//		: DirectX::XMMatrixIdentity();
+	//	DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentGlobalTransform;
+	//	DirectX::XMMATRIX WorldTransform = GlobalTransform * DirectX::XMLoadFloat4x4(&worldTransform);
+	//	//DirectX::XMStoreFloat4x4(&node.localTransform, LocalTransform);
+	//	DirectX::XMStoreFloat4x4(&node.global_transform, GlobalTransform);
+	//	//DirectX::XMStoreFloat4x4(&node.worldTransform, WorldTransform);
+	//
+	//	for (gltf_model::node* child : node.children)
+	//	{
+	//		updateWorldTransforms(*child);
+	//	}
+	//};
+
+	//横回転から計算
+	{
+		DirectX::XMMATRIX HeadWorldTransform =
+			DirectX::XMLoadFloat4x4(&transform);
+		DirectX::XMMATRIX InverseWorldTransform =
+			DirectX::XMMatrixInverse(nullptr, HeadWorldTransform);
+
+		DirectX::XMVECTOR TargetVec = DirectX::XMLoadFloat3(&target_pos);
+		DirectX::XMVECTOR a = DirectX::XMVector3TransformCoord(TargetVec, InverseWorldTransform);
+		TargetVec = DirectX::XMVectorSubtract(a, DirectX::XMLoadFloat3(&turretBaseNode.translation));
+
+		DirectX::XMVECTOR TargetVecNormal{};
+		TargetVecNormal = DirectX::XMVector3Normalize(TargetVec);
+
+		DirectX::XMFLOAT3 targetVec{};
+		DirectX::XMStoreFloat3(&targetVec, TargetVecNormal);
+
+
+		DirectX::XMVECTOR HeadLocalForward = DirectX::XMLoadFloat3(&turretLocalForward);
+
+		DirectX::XMVECTOR Axis = DirectX::XMVector3Cross(HeadLocalForward, TargetVecNormal);
+
+		float dotProduct = DirectX::XMVectorGetX(
+			DirectX::XMVector3Dot(HeadLocalForward, TargetVecNormal));
+
+		float angle = DirectX::XMConvertToRadians(acosf(dotProduct));
+
+		DirectX::XMVECTOR RotationMatrix = DirectX::XMQuaternionRotationAxis(Axis, angle);
+
+		DirectX::XMVECTOR HR =
+			DirectX::XMQuaternionMultiply(DirectX::XMLoadFloat4(&turretBaseNode.rotation), RotationMatrix);
+		DirectX::XMStoreFloat4(&turretBaseNode.rotation, HR);
+
+
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(turretBaseNode.scale.x, turretBaseNode.scale.y, turretBaseNode.scale.z);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&turretBaseNode.rotation));
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(turretBaseNode.translation.x, turretBaseNode.translation.y, turretBaseNode.translation.z);
+
+		DirectX::XMMATRIX LocalTransform = S * R * T;
+
+		gltf_model::node parent_turretBaseNode = model->find_nodes("Bone_Turret_Base_Main");
+
+		DirectX::XMMATRIX ParentGlobalTransform =
+			DirectX::XMLoadFloat4x4(&parent_turretBaseNode.global_transform);
+
+		DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentGlobalTransform;
+		DirectX::XMMATRIX WorldTransform = GlobalTransform * DirectX::XMLoadFloat4x4(&transform);
+		//DirectX::XMStoreFloat4x4(&turretBaseNode.localTransform, LocalTransform);
+		DirectX::XMStoreFloat4x4(&turretBaseNode.global_transform, GlobalTransform);
+		//DirectX::XMStoreFloat4x4(&turretBaseNode.worldTransform, WorldTransform);
+		//model->nodes.at(42);
+		model->cumulate_transforms(model->nodes);
+	}
+
 
 }
 

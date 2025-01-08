@@ -85,7 +85,7 @@ void Boss::UpdateIdleState(float elapsedTime)
 		//}
 		//else
 		{
-			TransitionWalkState();
+			//TransitionWalkState();
 		}
 
 		stateTimer = 0;
@@ -222,7 +222,7 @@ void Boss::AttackRoutine(float elapsedTime)
 
 void Boss::SelectAttackTypeShort()
 {
-	int random = std::abs(static_cast<int>(Noise::instance().get_rnd())) % static_cast<int>(ATTACK_TYPE::MAX_COUNT);
+	int random = std::abs(static_cast<int>(Noise::Instance().get_rnd())) % static_cast<int>(ATTACK_TYPE::MAX_COUNT);
 	//ランダムで攻撃方法を選択
 	ATTACK_TYPE attack_type = static_cast<ATTACK_TYPE>(random);
 	switch (attack_type)
@@ -244,7 +244,7 @@ void Boss::SelectAttackTypeShort()
 
 void Boss::SelectAttackTypeLong()
 {
-	int random = std::abs(static_cast<int>(Noise::instance().get_rnd())) % static_cast<int>(ATTACK_TYPE::MAX_COUNT);
+	int random = std::abs(static_cast<int>(Noise::Instance().get_rnd())) % static_cast<int>(ATTACK_TYPE::MAX_COUNT);
 	//ランダムで攻撃方法を選択
 	ATTACK_TYPE attack_type = static_cast<ATTACK_TYPE>(random);
 	//通常攻撃は除外し、遠距離攻撃のみ選択

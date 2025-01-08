@@ -110,6 +110,7 @@ private:
 		IDLE,
 		MOVE,
 		JUMP,
+		BOOST,
 		WING,
 		SHOT,
 		NORMAL_ATTACK01,
@@ -173,7 +174,7 @@ private:
 	void TransitionIdleState();//待機
 	void TransitionMoveState();//走り
 	void TransitionWingState();//飛行
-	void TransitionAvoidanceState();//回避
+	//void TransitionAvoidanceState();//回避
 	void TransitionJumpState();//ジャンプ
 	void TransitionLandingState();//着地
 	void TransitionShotState();//射撃
@@ -188,7 +189,7 @@ private:
 	void UpdateIdleState(float elapsedTime);//待機
 	void UpdateMoveState(float elapsedTime);//走り
 	void UpdateWingState(float elapsedTime);//飛行
-	void UpdateAvoidanceState(float elapsedTime);//回避
+	//void UpdateAvoidanceState(float elapsedTime);//回避
 	void UpdateJumpState(float elapsedTime);//ジャンプ
 	void UpdateLandingState(float elapsedTime);//着地
 	void UpdateShotState(float elapsedTime);//射撃
@@ -284,6 +285,7 @@ private:
 	const int jump_limit = 1;
 
 	bool isHover = false;
+	bool isBoost = false;
 
 	bool displayPlayerImgui = false;
 

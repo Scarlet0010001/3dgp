@@ -8,7 +8,7 @@ private:
 	Noise() { mt.seed(rnd()); }
 
 public:
-	static Noise& instance()
+	static Noise& Instance()
 	{
 		static Noise instance;
 		return instance;

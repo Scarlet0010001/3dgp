@@ -57,15 +57,6 @@ gltf_model::gltf_model(ID3D11Device* device, const std::string& filename, bool e
 		meshes.at(0).primitives.at(0).vertex_buffer_views };
 
 	{
-		//for (auto& v : vertex_buffer_views)
-		//{
-		//	if (v.first == "JOINT_1" || v.first == "WEIGHTS_1"
-		//		|| v.first == "COLOR_0" || v.first == "TEXCOORD_1")
-		//	{
-		//		eight_bones = true;
-		//		break;
-		//	}
-		//}
 		if (eight_bones)
 		{
 			D3D11_INPUT_ELEMENT_DESC input_element_desc[]

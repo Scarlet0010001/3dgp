@@ -24,13 +24,13 @@ void Player::TransitionWingState()
 	isHover = false;
 }
 
-void Player::TransitionAvoidanceState()
-{
-	p_update = &Player::UpdateAvoidanceState;
-	playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
-	state = State::ROLL;
-	param.avoidanceTimer = 0;
-}
+//void Player::TransitionAvoidanceState()
+//{
+//	p_update = &Player::UpdateAvoidanceState;
+//	playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
+//	state = State::ROLL;
+//	param.avoidanceTimer = 0;
+//}
 
 void Player::TransitionJumpState()
 {
@@ -208,48 +208,48 @@ void Player::UpdateWingState(float elapsedTime)
 
 }
 
-void Player::UpdateAvoidanceState(float elapsedTime)
-{
-	//徐々に速度を落としていく
-	velocity.x /= 2.0f;
-	velocity.z /= 2.0f;
-
-	//速力処理更新
-	UpdateVelocity(elapsedTime, position);
-	//if (model->animations.anime_param.frame_index > 33 / 2)
-	if (param.avoidanceTimer > 30)
-	{
-		//地面に足がついたフレームからはさらに速度落とす
-		velocity.x /= 2.0f;
-		velocity.z /= 2.0f;
-	}
-	else
-	{
-		//向いている方向に速度を足す
-		velocity.x = (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).x;
-		velocity.z = (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).z;
-
-	}
-
-	//遷移処理
-	//if (model->anime_param.frame_index > 35 / 2)
-	if(param.avoidanceTimer > 30)
-	{
-		// MOVEステートへ移行
-		if (InputMove(elapsedTime))
-		{
-			TransitionMoveState();
-			return;
-		}
-	}
-
-	//if (model->is_end_animation())
-	if (param.avoidanceTimer > 40)
-	{
-		TransitionIdleState();
-	}
-	param.avoidanceTimer++;
-}
+//void Player::UpdateAvoidanceState(float elapsedTime)
+//{
+//	//徐々に速度を落としていく
+//	velocity.x /= 2.0f;
+//	velocity.z /= 2.0f;
+//
+//	//速力処理更新
+//	UpdateVelocity(elapsedTime, position);
+//	//if (model->animations.anime_param.frame_index > 33 / 2)
+//	if (param.avoidanceTimer > 30)
+//	{
+//		//地面に足がついたフレームからはさらに速度落とす
+//		velocity.x /= 2.0f;
+//		velocity.z /= 2.0f;
+//	}
+//	else
+//	{
+//		//向いている方向に速度を足す
+//		velocity.x = (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).x;
+//		velocity.z = (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).z;
+//
+//	}
+//
+//	//遷移処理
+//	//if (model->anime_param.frame_index > 35 / 2)
+//	if(param.avoidanceTimer > 30)
+//	{
+//		// MOVEステートへ移行
+//		if (InputMove(elapsedTime))
+//		{
+//			TransitionMoveState();
+//			return;
+//		}
+//	}
+//
+//	//if (model->is_end_animation())
+//	if (param.avoidanceTimer > 40)
+//	{
+//		TransitionIdleState();
+//	}
+//	param.avoidanceTimer++;
+//}
 
 void Player::UpdateJumpState(float elapsedTime)
 {

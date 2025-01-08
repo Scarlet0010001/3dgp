@@ -388,7 +388,7 @@ void Player::InputAvoidance()
 {
 	if (gamePad->GetButtonDown() & GamePad::BTN_B)
 	{
-		TransitionAvoidanceState();
+		//TransitionAvoidanceState();
 	}
 
 }

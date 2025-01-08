@@ -2,7 +2,6 @@
 #include "device.h"
 #include "camera.h"
 #include "character.h"
-//#include "gltf_model.h"
 
 #include "primitive.h"
 #include <cereal/cereal.hpp>
@@ -158,6 +157,8 @@ private:
 	//ŽËŒ‚
 	void ShotBullet(ATTACK_TYPE type);
 
+	void LookAt_turret();
+
 	void OnDead() override;
 	void OnDamaged(WINCE_TYPE type) override;
 
@@ -173,6 +174,8 @@ private:
 	//std::unique_ptr<BossUi> ui;
 
 	gltf_model::node arm;
+	gltf_model::node turretNode;
+	DirectX::XMFLOAT3  turretLocalForward = { 0, 0, 1 };
 	Capsule sickle_hand_colide;
 
 	float actionTime = 0;
