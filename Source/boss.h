@@ -26,7 +26,7 @@ private:
 		BOSS_DEAD,
 		BOSS_ANIME_COUNT,
 	};
-	enum class State
+	enum class STATE
 	{
 		IDLE,
 		WALK,
@@ -45,12 +45,6 @@ private:
 		SHOT_H,
 		MAX_COUNT
 	};
-	struct BodyCollision
-	{
-		Capsule capsule;
-		float height;
-	};
-
 
 	struct BossParam
 	{
@@ -66,6 +60,13 @@ private:
 				cereal::make_nvp("run_speed", run_speed)
 			);
 		}
+	};
+
+public:
+	struct BodyCollision
+	{
+		Capsule capsule;
+		float height;
 	};
 
 public:
@@ -106,7 +107,7 @@ public:
 	//攻撃対象の位置を取得
 	void SetLocationOfAttackTarget(DirectX::XMFLOAT3 target) { target_pos = target; }
 
-	//BodyCollision get_body_collision() { return boss_body_collision; }
+	BodyCollision GetBodyCollision() { return bossBodyCollision; }
 
 	//カメラがボスを見るときに注視するポイント
 	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 3), position.z); }
@@ -157,7 +158,7 @@ private:
 	//射撃
 	void ShotBullet(ATTACK_TYPE type);
 
-	void LookAt_turret();
+	void LookAt_turret(std::vector<gltf_model::node>& nodes);
 
 	void OnDead() override;
 	void OnDamaged(WINCE_TYPE type) override;
@@ -190,6 +191,7 @@ private:
 
 	//ブレンドアニメーション
 	std::vector<gltf_model::node> animated_nodes[BOSS_ANIME_COUNT];
+	std::vector<gltf_model::node>* lookAt_nodes;
 
 
 	//ステートのタイマー
@@ -203,11 +205,12 @@ private:
 	DirectX::XMFLOAT3 tackle_pos{};
 	DirectX::XMFLOAT3 shot_pos;
 
-	State state;
+	STATE state;
 
 	BossParam param;
-	AttackParam AttackParam;
+	AttackParam attackParam;
 	BodyCollision bossBodyCollision;
+	Camera::CameraShakeParam tackleCameraShake;//カメラシェイク
 
 #if _DEBUG
 	bool isUpdate = true;

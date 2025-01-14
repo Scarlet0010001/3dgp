@@ -174,6 +174,7 @@ void Camera::Update(float elapsedTime)
 		}
 	}
 
+
 	//カメラのパラメータ設定(全アップデート共通)
 	{
 		//世界の上方向
@@ -264,12 +265,21 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 	DirectX::XMVECTOR Forward = Math::get_posture_forward_vec(orientation);
 	DirectX::XMVECTOR Up = { 0.0f,1.0f,0.0f };
 	DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
+	DirectX::XMVECTOR Right = Math::get_posture_right_vec(orientation);
+
+	DirectX::XMFLOAT3 forward{};//forwardの値をfloat3に
+	DirectX::XMFLOAT3 up{};//forwardの値をfloat3に
+	DirectX::XMFLOAT3 d_vec{};//dの値をfloat3に
+	DirectX::XMStoreFloat3(&forward, Forward);
+	DirectX::XMStoreFloat3(&up, Up);
+	DirectX::XMStoreFloat3(&d_vec, TargetVecNorm);
 
 	DirectX::XMVECTOR Cross = DirectX::XMVector3Cross(DirectX::XMVector3Normalize(Forward), TargetVecNorm);
 	DirectX::XMVECTOR dot = DirectX::XMVector3Dot(Forward, TargetVecNorm);
 	DirectX::XMStoreFloat(&lockOnAngle, dot);
 	lockOnAngle = acosf(lockOnAngle);
 
+#if 1
 	//回転角度がこの値を超えたときのみ計算
 	const float extrapolated_angle = 0.5f;
 	if (fabsf(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
@@ -283,7 +293,86 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 		DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
 		orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, std::min(lockOnRate * elapsedTime, 1.0f));
 	}
+	//------------------------------------
+	//カメラが上か下を向きすぎたときに補正する
+	//------------------------------------
 
+	//向きすぎと判断する値
+	const float overdirection = 0.4f;
+	if (Math::get_posture_up(orientation).y < overdirection)
+	{
+		if (Math::get_posture_forward(orientation).y < 0.0f)
+		{
+			float correction_rate = -5.0f;
+			DirectX::XMVECTOR correct_angles_axis = DirectX::XMQuaternionRotationAxis(Right, DirectX::XMConvertToRadians(correction_rate));
+			orientationVec = DirectX::XMQuaternionMultiply(orientationVec, correct_angles_axis);
+		}
+		else
+		{
+			float correction_rate = 5.0f;
+			DirectX::XMVECTOR correct_angles_axis = DirectX::XMQuaternionRotationAxis(Right, DirectX::XMConvertToRadians(correction_rate));
+			orientationVec = DirectX::XMQuaternionMultiply(orientationVec, correct_angles_axis);
+		}
+	}
+#else
+	//横回転
+	{
+		//回転軸
+		DirectX::XMVECTOR axis = Up;
+		//回転角度がこの値を超えたときのみ計算
+		const float extrapolated_angle = 5.0f;
+		if (fabs(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
+		{
+			float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
+			//クオータニオンは回転の仕方(どの向きに)
+			if (cross < 0.0f)
+			{
+				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
+				//矢印を徐々に目標座標に向ける
+				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+			}
+			else
+			{
+				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
+				//矢印を徐々に目標座標に向ける
+				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+			}
+		}
+	}
+	//縦回転
+	{
+		//回転軸
+		DirectX::XMVECTOR axis = Right;
+		//回転角度がこの値を超えたときのみ計算
+		const float extrapolated_angle = 5.0f;
+		if (fabs(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
+		{
+			//float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
+			//クオータニオンは回転の仕方(どの向きに)
+			if (cross < 0.0f)
+			{
+				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
+				//矢印を徐々に目標座標に向ける
+				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+			}
+			else
+			{
+				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
+				//矢印を徐々に目標座標に向ける
+				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+			}
+		}
+	}
+
+#endif
 	// orientationVecからorientationを更新
 	DirectX::XMStoreFloat4(&orientation, orientationVec);
 }
@@ -405,15 +494,36 @@ void Camera::CameraShakeUpdate(float elapsedTime)
 	//カメラシェイク効果中でありプレイヤーやロックオンなどのによるカメラへの力が加わっていない場合のみ揺らす
 	if (isCameraShake && fabs(angle.x) <= 0 && fabs(angle.y) <= 0 && fabs(lockOnAngle) <= 0)
 	{
-		//時間更新
-		cameraShakeParam.time -= elapsedTime;
+		float Y_shake = cameraShakeParam.max_Y_shake;
+		float X_shake = cameraShakeParam.max_X_shake;
 
-		if (cameraShakeParam.time < 0.0f)
+		if (!cameraShakeParam.onDistanceShake)
 		{
-			isCameraShake = false;
-			cameraShakeParam.time = 0.0f;
-			XMStoreFloat4(&orientation, standard_orientationVec);
-			return;
+			//時間更新
+			cameraShakeParam.time -= elapsedTime;
+
+			if (cameraShakeParam.time < 0.0f)
+			{
+				isCameraShake = false;
+				cameraShakeParam.time = 0.0f;
+				XMStoreFloat4(&orientation, standard_orientationVec);
+				return;
+			}
+		}
+		else
+		{
+			if (!cameraShakeParam.onDistanceShake)
+			{
+				isCameraShake = false;
+				cameraShakeParam.time = 0.0f;
+				XMStoreFloat4(&orientation, standard_orientationVec);
+				return;
+			}
+			const float maxDistance = 30.0f;
+			if (shakeDistance >= maxDistance) return;
+			float factor = 1.0f - (shakeDistance / maxDistance);
+			Y_shake *= factor; // 距離に応じて強度を減少
+			X_shake *= factor; // 距離に応じて強度を減少
 		}
 
 		//揺らす処理
@@ -423,10 +533,10 @@ void Camera::CameraShakeUpdate(float elapsedTime)
 			DirectX::XMVECTOR right = Math::get_posture_right_vec(standardOrientation);
 
 			//縦回転
-			if (cameraShakeParam.max_Y_shake > 0)
+			if (Y_shake > 0)
 			{
 				//任意の揺れ幅の最大値最小値の間でのランダム生成
-				float shake = Noise::Instance().random_range(-cameraShakeParam.max_Y_shake, cameraShakeParam.max_Y_shake);
+				float shake = Noise::Instance().random_range(-Y_shake, Y_shake);
 				shake = DirectX::XMConvertToRadians(shake);
 				{
 					//回転軸
@@ -444,10 +554,10 @@ void Camera::CameraShakeUpdate(float elapsedTime)
 			}
 
 			//横揺れ
-			if (cameraShakeParam.max_X_shake > 0)
+			if (X_shake > 0)
 			{
 				//任意の揺れ幅の最大値最小値の間でのランダム生成
-				float shake = Noise::Instance().random_range(-cameraShakeParam.max_X_shake, cameraShakeParam.max_X_shake);
+				float shake = Noise::Instance().random_range(-X_shake, X_shake);
 				shake = DirectX::XMConvertToRadians(shake);
 				{
 					//回転軸

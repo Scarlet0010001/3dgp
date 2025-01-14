@@ -5,14 +5,14 @@
 void Boss::TransitionIdleState()
 {
 	act_update = &Boss::UpdateIdleState;
-	state = State::IDLE;
+	state = STATE::IDLE;
 	bossAnimation = BossAnimation::BOSS_IDLE;
 }
 
 void Boss::TransitionWalkState()
 {
 	act_update = &Boss::UpdateWalkState;
-	state = State::WALK;
+	state = STATE::WALK;
 	charaParam.moveSpeed = WALK_SPEED;
 	bossAnimation = BossAnimation::BOSS_WALK;
 
@@ -21,7 +21,7 @@ void Boss::TransitionWalkState()
 void Boss::TransitionRunState()
 {
 	act_update = &Boss::UpdateRunState;
-	state = State::RUN;
+	state = STATE::RUN;
 	charaParam.moveSpeed = RUN_SPEED;
 	//bossAnimation = BossAnimation::BOSS_IDLE;
 }
@@ -29,8 +29,9 @@ void Boss::TransitionRunState()
 void Boss::TransitionAttack_Tackle_State()
 {
 	act_update = &Boss::UpdateAttack_Tackle_State;
-	state = State::TACKLE;
-
+	state = STATE::TACKLE;
+	tackleCameraShake.onDistanceShake = true;
+	Camera::Instance().SetCameraShake(tackleCameraShake);
 	tackle_pos.x = target_pos.x;
 	tackle_pos.z = target_pos.z;
 
@@ -40,7 +41,7 @@ void Boss::TransitionAttack_Tackle_State()
 void Boss::TransitionAttack_ShotStraight_State()
 {
 	act_update = &Boss::UpdateAttack_ShotStraight_State;
-	state = State::SHOT_S;
+	state = STATE::SHOT_S;
 	//bossAnimation = BossAnimation::BOSS_IDLE;
 
 }
@@ -48,7 +49,7 @@ void Boss::TransitionAttack_ShotStraight_State()
 void Boss::TransitionAttack_ShotHoming_State()
 {
 	act_update = &Boss::UpdateAttack_ShotHoming_State;
-	state = State::SHOT_H;
+	state = STATE::SHOT_H;
 	bossAnimation = BossAnimation::BOSS_MISSILE;
 
 }
@@ -56,7 +57,7 @@ void Boss::TransitionAttack_ShotHoming_State()
 void Boss::TransitionDamageState()
 {
 	act_update = &Boss::UpdateDamageState;
-	state = State::DAMAGE;
+	state = STATE::DAMAGE;
 	bossAnimation = BossAnimation::BOSS_HIT;
 
 }
@@ -64,7 +65,7 @@ void Boss::TransitionDamageState()
 void Boss::TransitionDeadState()
 {
 	act_update = &Boss::UpdateDeadState;
-	state = State::DEAD;
+	state = STATE::DEAD;
 	bossAnimation = BossAnimation::BOSS_DEAD;
 
 }
@@ -85,7 +86,7 @@ void Boss::UpdateIdleState(float elapsedTime)
 		//}
 		//else
 		{
-			//TransitionWalkState();
+			TransitionWalkState();
 		}
 
 		stateTimer = 0;
@@ -135,19 +136,19 @@ void Boss::UpdateAttack_Tackle_State(float elapsedTime)
 	float vz = tackle_pos.z - position.z;
 	float distSq = vx * vx + vz * vz;
 
-	AttackParam.isAttack = true;
+	attackParam.isAttack = true;
 	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, tackle_pos);
 	Move(dir_target_vec.x, dir_target_vec.z, param.run_speed);
 	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);	
 
-	const float radius = 3.0f;
+	const float radius = 2.0f;
 	if (distSq < radius * radius)
 	{
 		TransitionIdleState();
 		state_duration = NORMAL_ATTACK_COOLTIME;
-		AttackParam.isAttack = false;
+		attackParam.isAttack = false;
 		stateTimer = 0;
-
+		Camera::Instance().SetOnDistanceShake(false);
 	}
 	//‘¬“xXV
 	UpdateVelocity(elapsedTime, position);

@@ -60,15 +60,14 @@ void SceneGame::Update(float elapsedTime)
     BulletManager& bulletManager = BulletManager::Instance();
 
     //**********カメラの更新**********//
-    camera->SetTrakkingTarget(player.get()->GetGazingPoint());
+    camera->SetTrakkingTarget(player->GetGazingPoint());
     camera->SetPlayerOrientation(player->GetOrientation());
-    camera->SetLockOnTarget(boss.get()->GetPosition());
+    camera->SetLockOnTarget(boss->GetPosition());
     camera->Update(elapsedTime);
     camera->CalcViewProjection(elapsedTime);
 
     //カメラの経過時間
     float cameraElapsedTime = camera->HitStopUpdate(elapsedTime);
-
     //**********プレイヤーの更新**********//
     player->Update(cameraElapsedTime);
 
@@ -76,12 +75,21 @@ void SceneGame::Update(float elapsedTime)
     boss->SetLocationOfAttackTarget(player->GetPosition());
     boss->Update(cameraElapsedTime);
 
+    camera->SetShakeDistance(
+        DirectX::XMVectorGetX(DirectX::XMVector3Length(
+            DirectX::XMVectorSubtract(
+                DirectX::XMLoadFloat3(&player->GetPosition()),
+                DirectX::XMLoadFloat3(&boss->GetPosition())))));
+
     //**********弾の更新**********//
-    bulletManager.Update(elapsedTime);
+    bulletManager.Update(cameraElapsedTime);
 
     //**********ステージの更新**********//
-    StageManager::Instance().Update(elapsedTime);
+    StageManager::Instance().Update(cameraElapsedTime);
 
+    //player->CalcAttack_vs_Enemy(boss->GetBodyCollision().capsule,
+    //    boss->GetBodyCollision().height,)
+    cameraElapsedTime_ = cameraElapsedTime;
 }
 
 void SceneGame::Render(float elapsedTime)
@@ -145,11 +153,11 @@ void SceneGame::Render(float elapsedTime)
         ST_BLEND::ALPHA,
         ST_RASTERIZER::CULL_NONE);
 
-    player->Render_f(elapsedTime);
+    player->Render_f(cameraElapsedTime_);
 
-    boss->Render_f(elapsedTime);
+    boss->Render_f(cameraElapsedTime_);
 
-    bulletManager.Render(elapsedTime);
+    bulletManager.Render(cameraElapsedTime_);
 
     //-------------------DebugPrimitive----------------------//
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::WIREFRAME_CULL_BACK);

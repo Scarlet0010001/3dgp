@@ -138,6 +138,7 @@ protected:
 
 	//ブレンドアニメーション
 	std::vector<gltf_model::node> blended_animated_nodes;
+	bool transitionToTransition = false;
 	float time{ 0 };
 	float factor{ 0 };
 	float transition_time{ 0.09f };

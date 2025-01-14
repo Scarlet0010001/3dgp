@@ -57,7 +57,7 @@ void Player::Initialize()
 	//体力初期化
 	health = charaParam.maxHealth;
 
-	jump_count = jump_limit;
+	jumpCount = jumpLimit;
 
 	position = { 0.0f,2.0f,0.0f };
 	scale.x = scale.y = scale.z = 2.0f;
@@ -68,7 +68,12 @@ void Player::Initialize()
 
 	damagedFunction = [=](int damage, float invincible, WINCE_TYPE type)->bool {return ApplyDamage(damage, invincible, type); };
 
+	attackParam.cameraShake.max_X_shake = 3.0f;
+	attackParam.cameraShake.max_Y_shake = 7.0f;
+	attackParam.cameraShake.time = 0.5f;
 
+	attackParam.hitStop.time = 0.005f;
+	attackParam.hitStop.stoppingStrength = 3.0f;
 }
 
 Player::~Player()
@@ -90,7 +95,7 @@ void Player::Update(float elapsedTime)
 	{
 		camera->SetLockOn();
 	}
-	if (state == State::WING || state == State::SHOT) orientation = camera->GetOrientation();
+	if (state == STATE::WING || state == STATE::SHOT) orientation = camera->GetOrientation();
 
 	//プレイヤーの正面情報を更新
 	forward = Math::get_posture_forward(orientation);
@@ -117,7 +122,12 @@ void Player::Render_f(float elapsedTime)
 	transform = Math::calc_world_matrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 	if (playerAnimation_transition != playerAnimation)
 	{
-		//playerAnimation_old = playerAnimation_transition;
+		if (transition_state != TransitionState::NONE)
+		{
+			playerAnimation_old = playerAnimation_transition;
+			animated_nodes[playerAnimation_old] = blended_animated_nodes;
+			transitionToTransition = true;
+		}
 		playerAnimation_transition = playerAnimation;
 		transition_state = TransitionState::START;
 	}
@@ -130,7 +140,8 @@ void Player::Render_f(float elapsedTime)
 		case TransitionState::NONE:
 			break;
 		case TransitionState::START:
-			model->animate(playerAnimation_old, time, animated_nodes[playerAnimation_old], FindLoopAnimation(playerAnimation_old));
+			if (!transitionToTransition)
+				model->animate(playerAnimation_old, time, animated_nodes[playerAnimation_old], FindLoopAnimation(playerAnimation_old));
 			model->animate(playerAnimation, 0.0f, animated_nodes[playerAnimation], isLoop);
 			transition_state = TransitionState::TRANSITION;
 			time = 0.0f;
@@ -143,6 +154,7 @@ void Player::Render_f(float elapsedTime)
 			if (factor > 1.0f)
 			{
 				 //End of transition
+				transitionToTransition = false;
 				transition_state = TransitionState::NONE;
 				time = 0;
 			}
@@ -184,9 +196,32 @@ void Player::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_hei
 
 }
 
-void Player::CalcAttack_vs_Enemy(Capsule collider, AddDamageFunc damaged_func)
+void Player::CalcAttack_vs_Enemy(Capsule collider, float collider_height, AddDamageFunc damaged_func)
 {
+	if (!attackParam.isAttack) return;
 
+	int side = 0;
+	if (state == STATE::LEFT_ATTACK) side = static_cast<int>(state);
+	else if (state == STATE::RIGHT_ATTACK) side = static_cast<int>(state);
+
+	if (Collision::SphereVsCylinder(attackCollision_position[side], 1.0f,
+		collider.start, collider.radius,collider_height))
+	{
+		//攻撃対象に与えるダメージ量と無敵時間
+		if (damaged_func(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::NONE))
+		{
+			//カメラシェイク
+			camera->SetCameraShake(attackParam.cameraShake);
+
+			//ヒットストップ
+			camera->SetHitStop(attackParam.hitStop);
+
+			//game_pad->set_vibration(attack_sword_param.hit_viberation.l_moter, attack_sword_param.hit_viberation.r_moter, attack_sword_param.hit_viberation.vibe_time);
+
+			//ヒットエフェクト再生
+
+		}
+	}
 }
 
 void Player::JudgeSkillCollision(Capsule object_colider, AddDamageFunc damaged_func)
@@ -217,7 +252,7 @@ void Player::Move(float vx, float vz, float speed)
 	moveVec_x = vx;
 	moveVec_z = vz;
 
-	if (state == State::WING)
+	if (state == STATE::WING)
 	{
 		charaParam.maxMoveSpeed = param.wingSpeed;
 	}
@@ -235,7 +270,7 @@ void Player::Move(float vx, float vy, float vz, float speed)
 	moveVec_y = vy;
 	moveVec_z = vz;
 
-	if (state == State::WING)
+	if (state == STATE::WING)
 	{
 		charaParam.maxMoveSpeed = param.wingSpeed;
 	}
@@ -261,9 +296,9 @@ void Player::BoostUpdate(float elapsedTime)
 		TransitionJumpState();
 	}
 
-	if (state != State::WING
-		&& state != State::DAMAGE
-		&& state != State::DIE
+	if (state != STATE::WING
+		&& state != STATE::DAMAGE
+		&& state != STATE::DIE
 		)
 	{
 		if (!isGround
@@ -371,7 +406,7 @@ void Player::InputJump()
 		|| gamePad->GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER
 		) //スペースを押したらジャンプ
 	{
-		if (jump_count < jump_limit)
+		if (jumpCount < jumpLimit)
 		{
 			{
 				TransitionJumpState();
@@ -379,7 +414,7 @@ void Player::InputJump()
 			}
 			isGround = false;//ジャンプしても地面についているというありえない状況を回避するため
 
-			++jump_count;
+			++jumpCount;
 		}
 	}
 }
@@ -425,7 +460,7 @@ void Player::InputShot()
 
 void Player::OnLanding()
 {
-	jump_count = 0;
+	jumpCount = 0;
 	//transition_landing_state();
 	if (velocity.y < gravity * 30.0f)// 坂道歩いているときは遷移しない程度に調整
 	{
@@ -544,36 +579,22 @@ void Player::DebugPrimitiveUpdate()
 
 				return Math::calc_designated_point(Arm, direction, length * 0.5f);
 		} };
-		/*
-		std::function<DirectX::XMFLOAT3(DirectX::XMFLOAT4X4&, DirectX::XMFLOAT4X4&)> saber_position{
-			[](DirectX::XMFLOAT4X4& arm, DirectX::XMFLOAT4X4& saber)->DirectX::XMFLOAT3 {
+		attackCollision_position[LR::LEFT] = saber_position(lowerArm_position[LR::LEFT], beamSaber_position[LR::LEFT]);
+		attackCollision_position[LR::RIGHT] = saber_position(lowerArm_position[LR::RIGHT], beamSaber_position[LR::RIGHT]);
 
-				DirectX::XMFLOAT3 Arm{arm._41,arm._42,arm._43};
-				DirectX::XMFLOAT3 Saber{ saber._41,saber._42,saber._43};
-
-				DirectX::XMFLOAT3 direction = Math::calc_vector_AtoB_normalize(Arm, Saber);
-				float length = Math::calc_vector_AtoB_length(Arm, Saber);
-
-				return Math::calc_designated_point(Arm, direction, length * 0.5f);
-		} };
-		//beamSaber
-		//lowerArm
 		debugRender->CreateSphere(
-			saber_position(lowerArm[LR::LEFT].global_transform, beamSaber[LR::LEFT].global_transform),
+			attackCollision_position[LR::LEFT],
 			1.0f, { 1.0f,0.0f,0.0f,1.0f });
 		debugRender->CreateSphere(
-			saber_position(lowerArm[LR::RIGHT].global_transform, beamSaber[LR::RIGHT].global_transform),
-			1.0f, { 1.0f,0.0f,0.0f,1.0f });
-		*/
-
-		debugRender->CreateSphere(
-			saber_position(lowerArm_position[LR::LEFT], beamSaber_position[LR::LEFT]),
-			1.0f, { 1.0f,0.0f,0.0f,1.0f });
-		debugRender->CreateSphere(
-			saber_position(lowerArm_position[LR::RIGHT], beamSaber_position[LR::RIGHT]),
+			attackCollision_position[LR::RIGHT],
 			1.0f, { 1.0f,0.0f,0.0f,1.0f });
 	}
 
+	//自分の当たり判定
+	debugRender->CreateCylinder(collider.start,
+		collider.radius,
+		charaParam.height,
+		{ 0.0f,1.0f,0.0f,1.0f });
 }
 
 void Player::DebugGUI()
@@ -602,7 +623,7 @@ void Player::DebugGUI()
 				ImGui::DragFloat3("forward", &forward.x);
 				ImGui::DragFloat4("ori", &orientation.x);
 				std::string state_name;
-				state_name = magic_enum::enum_name<State>(state);
+				state_name = magic_enum::enum_name<STATE>(state);
 				ImGui::Text(state_name.c_str());
 				ImGui::DragFloat3("velocity:", &velocity.x);
 			}

@@ -45,6 +45,7 @@ public:
         float max_Y_shake = 0.0f;//縦揺れ最大値　※入力はDegree値で
         float time = 0.0f;//揺れる時間
         float shakeSmoothness = 1.0f;//揺れ方の滑らかさ
+        bool onDistanceShake = false;
 
         // シリアライズ
         template<class Archive>
@@ -100,6 +101,8 @@ public:
     //--------<getter/setter>--------//
 // 対象との距離
     void SetRange(float r) { range = r; }
+
+    void SetShakeDistance(float r) { shakeDistance = r; }
 
     // 見る対象
     void SetLockOnTarget(const DirectX::XMFLOAT3& t) { lockOnTarget = t; }
@@ -160,6 +163,7 @@ public:
 
     //カメラシェイク
     void SetCameraShake(CameraShakeParam param);
+    void SetOnDistanceShake(bool onDistance) { cameraShakeParam.onDistanceShake = onDistance; }
 
     void SetHitStop(HitStopParam param);
 
@@ -189,8 +193,6 @@ private:
     DirectX::XMFLOAT4 orientation = { 0,0,0,1 };
     DirectX::XMFLOAT4 standardOrientation = { 0,0,0,1 };
     DirectX::XMFLOAT4 playerOrientation = { 0,0,0,1 };
-
-    
 
     float lockOnRate = 6.0f;
     float sensitivityRate = 0.7f;
@@ -234,6 +236,7 @@ private:
     //------カメラシェイク-------//
     bool isCameraShake = false;//カメラシェイク中
     CameraShakeParam cameraShakeParam;
+    float shakeDistance = 0.0f;
 
     //------ヒットストップ-------//
     bool isHitStop = false;//ヒットストップ中

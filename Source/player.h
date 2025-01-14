@@ -40,7 +40,7 @@ public:
 	void CalcCollision_vs_Enemy(Capsule capsule_collider, float colider_height);
 
 	//プレイヤーの攻撃と敵の当たり判定
-	void CalcAttack_vs_Enemy(Capsule collider, AddDamageFunc damaged_func);
+	void CalcAttack_vs_Enemy(Capsule collider, float colider_height, AddDamageFunc damaged_func);
 
 	//スキルと敵の当たり判定
 	void JudgeSkillCollision(Capsule object_colider, AddDamageFunc damaged_func);
@@ -77,35 +77,20 @@ private:
 		PLAYER_POWER_L,//強攻撃左
 		PLAYER_POWER_R,//強攻撃右
 
-
-		//PLAYER_ROLL,//回避
-		//PLAYER_DAMAGE_FRONT,//前から被ダメ
-		//PLAYER_ATK_SPRING_SLASH,//前回転切り
-		//PLAYER_PULL_SLASH,//敵を引き付けて斬る
-		//PLAYER_ATK_GROUND,//地面に手を付けて口寄せみたいな
-		//PLAYER_MAGIC_BUFF,//バフ
-		//PLAYER_MAGIC_SLASH_UP,//空中に巻き上げ斬る
-		//PLAYER_MAGIC_BULLET,//小さい魔法弾打つような
-		//PLAYER_ATK_FORWARD_SLASH,//前進斬り
-		//PLAYER_ATK_AIR,//ジャンプして地面に魔法うつ
-		//PLAYER_ATK_COMBO1,//コンボ2-1
-		//PLAYER_ATK_COMBO2,//コンボ2-2
-		//PLAYER_ATK_COMBO3,//コンボ2-3
-		//PLAYER_ATK_DODGE_BACK,//後方に回避しながら魔法
 		PLAYER_ANIME_COUNT,
 	};
 	PlayerAnimation playerAnimation = PLAYER_IDLE;
 	PlayerAnimation playerAnimation_transition = PLAYER_IDLE;
 	PlayerAnimation playerAnimation_old = PLAYER_IDLE;
 
-	//ループアニメーションの検索
-	bool FindLoopAnimation(PlayerAnimation playerAnimation);
-
 	//ブレンドアニメーション
 	std::vector<gltf_model::node> animated_nodes[PLAYER_ANIME_COUNT];
 
+	//ループアニメーションの検索
+	bool FindLoopAnimation(PlayerAnimation playerAnimation);
+
 	//ステート
-	enum class State
+	enum class STATE
 	{
 		IDLE,
 		MOVE,
@@ -113,7 +98,8 @@ private:
 		BOOST,
 		WING,
 		SHOT,
-		NORMAL_ATTACK01,
+		LEFT_ATTACK,
+		RIGHT_ATTACK,
 		DAMAGE,
 		DIE,
 		ROLL,
@@ -257,7 +243,7 @@ private:
 	ActUpdate p_update = &Player::UpdateIdleState;
 
 	PlayerParam param;
-	State state;
+	STATE state;
 
 	GamePad* gamePad;
 	Mouse* mouse;
@@ -276,13 +262,14 @@ private:
 	gltf_model::node lowerArm[LR::COUNT];
 	DirectX::XMFLOAT3 beamSaber_position[LR::COUNT]{};
 	DirectX::XMFLOAT3 lowerArm_position[LR::COUNT]{};
+	DirectX::XMFLOAT3 attackCollision_position[LR::COUNT]{};
 
 	//float anime_time = 0.0f;
 
 	//現何回ジャンプしてるか
-	int jump_count = 0;
+	int jumpCount = 0;
 	//ジャンプ可能回数
-	const int jump_limit = 1;
+	const int jumpLimit = 1;
 
 	bool isHover = false;
 	bool isBoost = false;

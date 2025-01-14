@@ -72,5 +72,6 @@ private:
     //タイトルに戻る　※テスト用
     bool displayImgui = false;
 
+    float cameraElapsedTime_ = 0.0f;
 };
 

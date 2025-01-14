@@ -5,14 +5,14 @@
 void Player::TransitionIdleState()
 {
 	p_update = &Player::UpdateIdleState;
-	state = State::IDLE;
+	state = STATE::IDLE;
 	playerAnimation = PlayerAnimation::PLAYER_IDLE;
 }
 
 void Player::TransitionMoveState()
 {
 	p_update = &Player::UpdateMoveState;
-	state = State::MOVE;
+	state = STATE::MOVE;
 
 }
 
@@ -20,7 +20,7 @@ void Player::TransitionWingState()
 {
 	p_update = &Player::UpdateWingState;
 	playerAnimation = PlayerAnimation::PLAYER_WING_START;
-	state = State::WING;
+	state = STATE::WING;
 	isHover = false;
 }
 
@@ -36,7 +36,7 @@ void Player::TransitionJumpState()
 {
 	p_update = &Player::UpdateJumpState;
 	playerAnimation = PlayerAnimation::PLAYER_JUMP_START;
-	state = State::JUMP;
+	state = STATE::JUMP;
 
 }
 
@@ -44,7 +44,7 @@ void Player::TransitionLandingState()
 {
 	p_update = &Player::UpdateLandingState;
 	playerAnimation = PlayerAnimation::PLAYER_JUMP_END;
-	state = State::JUMP;
+	state = STATE::JUMP;
 
 }
 
@@ -52,7 +52,7 @@ void Player::TransitionShotState()
 {
 	p_update = &Player::UpdateShotState;
 	playerAnimation = PlayerAnimation::PLAYER_SHOT_IDLE;
-	state = State::SHOT;
+	state = STATE::SHOT;
 
 }
 
@@ -60,7 +60,7 @@ void Player::TransitionCombo_01_01_State()
 {
 	p_update = &Player::UpdateCombo_01_01_State;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_01;
-	state = State::NORMAL_ATTACK01;
+	state = STATE::RIGHT_ATTACK;
 	nextCombo = false;
 }
 
@@ -68,7 +68,7 @@ void Player::TransitionCombo_01_02_State()
 {
 	p_update = &Player::UpdateCombo_01_02_State;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_02;
-	state = State::NORMAL_ATTACK01;
+	state = STATE::LEFT_ATTACK;
 	nextCombo = false;
 
 }
@@ -77,7 +77,7 @@ void Player::TransitionCombo_01_03_State()
 {
 	p_update = &Player::UpdateCombo_01_03_State;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_03;
-	state = State::NORMAL_ATTACK01;
+	state = STATE::RIGHT_ATTACK;
 	nextCombo = false;
 
 }
@@ -86,7 +86,7 @@ void Player::TransitionCombo_PowerL_State()
 {
 	p_update = &Player::UpdateCombo_PowerL_State;
 	playerAnimation = PlayerAnimation::PLAYER_POWER_L;
-	state = State::NORMAL_ATTACK01;
+	state = STATE::LEFT_ATTACK;
 	nextCombo = false;
 
 }
@@ -95,7 +95,7 @@ void Player::TransitionCombo_PowerR_State()
 {
 	p_update = &Player::UpdateCombo_PowerR_State;
 	playerAnimation = PlayerAnimation::PLAYER_POWER_R;
-	state = State::NORMAL_ATTACK01;
+	state = STATE::RIGHT_ATTACK;
 	nextCombo = false;
 
 }
@@ -330,14 +330,23 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 		nextCombo = true;
 	}
 
-	if (0.23f < time && nextCombo)
+	if (0.023f < time && !attackParam.isAttack)
+	{
+		camera->SetCameraShake(attackParam.cameraShake);
+		//camera->SetHitStop(attackParam.hitStop);
+		attackParam.isAttack = true;
+	}
+	if (0.023f < time && nextCombo)
 	{
 		TransitionCombo_01_02_State();
+		attackParam.isAttack = false;
 	}
 
 	if (model->GetIsEndAnimation())
 	{
 		TransitionIdleState();
+		attackParam.isAttack = false;
+
 	}
 }
 
@@ -346,14 +355,26 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
 		nextCombo = true;
+
 	}
 
-	if (0.3f < time && nextCombo)
+	if (0.03f < time && !attackParam.isAttack)
+	{
+		camera->SetCameraShake(attackParam.cameraShake);
+		//camera->SetHitStop(attackParam.hitStop);
+		attackParam.isAttack = true;
+	}
+	if (0.03f < time && nextCombo)
 	{
 		TransitionCombo_01_03_State();
+		attackParam.isAttack = false;
+
 	}
+
 	if (model->GetIsEndAnimation())
 	{
+		attackParam.isAttack = false;
+
 		TransitionIdleState();
 	}
 }
@@ -364,14 +385,24 @@ void Player::UpdateCombo_01_03_State(float elapsedTime)
 	{
 		nextCombo = true;
 	}
+	if (0.03f < time && !attackParam.isAttack)
+	{
+		camera->SetCameraShake(attackParam.cameraShake);
+		//camera->SetHitStop(attackParam.hitStop);
+		attackParam.isAttack = true;
+	}
 
 	if (0.48f < time && nextCombo)
 	{
 		TransitionCombo_01_03_State();
+		attackParam.isAttack = false;
+
 	}
 	if (model->GetIsEndAnimation())
 	{
 		TransitionIdleState();
+		attackParam.isAttack = false;
+
 	}
 }
 
