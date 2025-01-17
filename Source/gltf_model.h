@@ -38,8 +38,10 @@ public:
 		DirectX::XMFLOAT4 rotation{ 0,0,0,1 };
 		DirectX::XMFLOAT3 scale{ 1,1,1 };
 		DirectX::XMFLOAT3 translation{ 0,0,0 };
-
+		
+		DirectX::XMFLOAT4X4 local_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 		DirectX::XMFLOAT4X4 global_transform{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+		DirectX::XMFLOAT4X4 world_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	};
 	std::vector<node> nodes;
 
@@ -202,7 +204,7 @@ public: //関数
 	// glTFノードの情報を取得
 	void fetch_nodes(const tinygltf::Model& gltf_model);
 	// ノードのグローバル変換行列を累積する関数
-	void cumulate_transforms(std::vector<node>& nodes);
+	void cumulate_transforms(std::vector<node>& nodes, DirectX::XMFLOAT4X4 world_transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 });
 	// glTFアクセッサからバッファビューを作成
 	buffer_view make_buffer_view(const tinygltf::Accessor& accessor);
 	// glTFメッシュ情報を取得

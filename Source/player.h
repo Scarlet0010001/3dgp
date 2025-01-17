@@ -83,9 +83,6 @@ private:
 	PlayerAnimation playerAnimation_transition = PLAYER_IDLE;
 	PlayerAnimation playerAnimation_old = PLAYER_IDLE;
 
-	//ブレンドアニメーション
-	std::vector<gltf_model::node> animated_nodes[PLAYER_ANIME_COUNT];
-
 	//ループアニメーションの検索
 	bool FindLoopAnimation(PlayerAnimation playerAnimation);
 

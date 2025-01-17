@@ -137,12 +137,20 @@ protected:
 	int32_t health;
 
 	//ブレンドアニメーション
+	enum ANIME_NODE
+	{
+		NOW_ANIMATION = 0,
+		OLD_ANIMATION,
+
+		NODE_COUNT
+	};
+	std::vector<gltf_model::node> animated_nodes[NODE_COUNT];
 	std::vector<gltf_model::node> blended_animated_nodes;
 	bool transitionToTransition = false;
 	float time{ 0 };
 	float factor{ 0 };
 	float transition_time{ 0.09f };
-	enum TransitionState
+	enum TRANSITION_STATE
 	{
 		NONE,
 		START,

@@ -21,6 +21,8 @@ Player::Player()
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
 		"Resources/Character/Player/glb/white_crow.glb", true);
+	
+	model->cumulate_transforms(model->nodes, transform);
 	for (auto& node : animated_nodes)
 	{
 		node = model->nodes;
@@ -122,14 +124,14 @@ void Player::Render_f(float elapsedTime)
 	transform = Math::calc_world_matrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 	if (playerAnimation_transition != playerAnimation)
 	{
-		if (transition_state != TransitionState::NONE)
+		if (transition_state != TRANSITION_STATE::NONE)
 		{
 			playerAnimation_old = playerAnimation_transition;
-			animated_nodes[playerAnimation_old] = blended_animated_nodes;
+			animated_nodes[ANIME_NODE::OLD_ANIMATION] = blended_animated_nodes;
 			transitionToTransition = true;
 		}
 		playerAnimation_transition = playerAnimation;
-		transition_state = TransitionState::START;
+		transition_state = TRANSITION_STATE::START;
 	}
 	bool isLoop = FindLoopAnimation(playerAnimation);
 	//ブレンドアニメーション
@@ -137,25 +139,25 @@ void Player::Render_f(float elapsedTime)
 	{
 		switch (transition_state)
 		{
-		case TransitionState::NONE:
+		case TRANSITION_STATE::NONE:
 			break;
-		case TransitionState::START:
+		case TRANSITION_STATE::START:
 			if (!transitionToTransition)
-				model->animate(playerAnimation_old, time, animated_nodes[playerAnimation_old], FindLoopAnimation(playerAnimation_old));
-			model->animate(playerAnimation, 0.0f, animated_nodes[playerAnimation], isLoop);
-			transition_state = TransitionState::TRANSITION;
+				model->animate(playerAnimation_old, time, animated_nodes[ANIME_NODE::OLD_ANIMATION], FindLoopAnimation(playerAnimation_old));
+			model->animate(playerAnimation, 0.0f, animated_nodes[ANIME_NODE::NOW_ANIMATION], isLoop);
+			transition_state = TRANSITION_STATE::TRANSITION;
 			time = 0.0f;
 			factor = 0.0f;
 
-		case TransitionState::TRANSITION:
+		case TRANSITION_STATE::TRANSITION:
 			factor = time / transition_time;
-			model->blend_animations(animated_nodes[playerAnimation_old], animated_nodes[playerAnimation], factor, blended_animated_nodes);
+			model->blend_animations(animated_nodes[ANIME_NODE::OLD_ANIMATION], animated_nodes[ANIME_NODE::NOW_ANIMATION], factor, blended_animated_nodes);
 			time += elapsedTime;
 			if (factor > 1.0f)
 			{
 				 //End of transition
 				transitionToTransition = false;
-				transition_state = TransitionState::NONE;
+				transition_state = TRANSITION_STATE::NONE;
 				time = 0;
 			}
 			break;
@@ -171,8 +173,8 @@ void Player::Render_f(float elapsedTime)
 				time = 0;
 			else time = model->animations.at(playerAnimation).duration;
 		}
-		model->animate(playerAnimation, time, animated_nodes[playerAnimation], isLoop);
-		model->render(graphics.Get_DC().Get(), transform, animated_nodes[playerAnimation]);
+		model->animate(playerAnimation, time, animated_nodes[ANIME_NODE::NOW_ANIMATION], isLoop);
+		model->render(graphics.Get_DC().Get(), transform, animated_nodes[ANIME_NODE::NOW_ANIMATION]);
 		playerAnimation_old = playerAnimation;
 
 	}

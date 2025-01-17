@@ -175,7 +175,8 @@ private:
 	//std::unique_ptr<BossUi> ui;
 
 	gltf_model::node arm;
-	gltf_model::node turretNode;
+	//gltf_model::node turretNode;
+	//gltf_model::node turretHeadNode;
 	DirectX::XMFLOAT3  turretLocalForward = { 0, 0, 1 };
 	Capsule sickle_hand_colide;
 
@@ -189,9 +190,8 @@ private:
 	//ループアニメーションの検索
 	bool FindLoopAnimation(BossAnimation BA);
 
-	//ブレンドアニメーション
-	std::vector<gltf_model::node> animated_nodes[BOSS_ANIME_COUNT];
-	std::vector<gltf_model::node>* lookAt_nodes;
+
+	std::vector<gltf_model::node> lookAt_nodes;
 
 
 	//ステートのタイマー

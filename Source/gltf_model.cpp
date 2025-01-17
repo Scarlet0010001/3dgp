@@ -161,12 +161,48 @@ void gltf_model::fetch_nodes(const tinygltf::Model& Model)
 	cumulate_transforms(nodes);
 }
 
-void gltf_model::cumulate_transforms(std::vector<node>& nodes)
+void gltf_model::cumulate_transforms(std::vector<node>& nodes, DirectX::XMFLOAT4X4 world_transform)
 {
 	using namespace DirectX;
-
+#if 1
 	std::stack<XMFLOAT4X4> parent_global_transforms;
+	DirectX::XMMATRIX parent_world_transform = DirectX::XMLoadFloat4x4(&world_transform);
+
 	std::function<void(int)> traverse{ [&](int node_index)->void
+		{
+			node& node{ nodes.at(node_index) };
+			XMMATRIX S{ XMMatrixScaling(node.scale.x,node.scale.y,node.scale.z) };
+			XMMATRIX R{ XMMatrixRotationQuaternion(
+				XMVectorSet(node.rotation.x,node.rotation.y,node.rotation.z,node.rotation.w)) };
+			XMMATRIX T{ XMMatrixTranslation(node.translation.x,node.translation.y,node.translation.z) };
+			DirectX::XMMATRIX LocalTransform = S * R * T;
+			DirectX::XMMATRIX GlobalTransform = LocalTransform * DirectX::XMLoadFloat4x4(&parent_global_transforms.top());
+	
+			// ワールド行列算出
+			DirectX::XMMATRIX WorldTransform = GlobalTransform * parent_world_transform;
+
+			// 計算結果を格納
+			DirectX::XMStoreFloat4x4(&node.local_transform, LocalTransform);
+			DirectX::XMStoreFloat4x4(&node.global_transform, GlobalTransform);
+			DirectX::XMStoreFloat4x4(&node.world_transform, WorldTransform);
+			//XMStoreFloat4x4(&node.global_transform, S * R * T * XMLoadFloat4x4(&parent_global_transforms.top()));
+			for (int child_index : node.children)
+			{
+				parent_global_transforms.push(node.global_transform);
+				traverse(child_index);
+				parent_global_transforms.pop();
+			}
+		}};
+	for (std::vector<int>::value_type node_index : scenes.at(0).nodes)
+	{
+		parent_global_transforms.push({ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 });
+		traverse(node_index);
+		parent_global_transforms.pop();
+	}
+	/*
+		std::stack<XMFLOAT4X4> parent_global_transforms;
+
+		std::function<void(int)> traverse{ [&](int node_index)->void
 		{
 			node& node{ nodes.at(node_index) };
 			XMMATRIX S{ XMMatrixScaling(node.scale.x,node.scale.y,node.scale.z) };
@@ -187,6 +223,44 @@ void gltf_model::cumulate_transforms(std::vector<node>& nodes)
 		traverse(node_index);
 		parent_global_transforms.pop();
 	}
+
+	*/
+#else
+	DirectX::XMMATRIX ParentWorldTransform = DirectX::XMLoadFloat4x4(&world_transform);
+	
+	DirectX::XMMATRIX ParentGlobalTransform = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX PriParentGlobalTransform = DirectX::XMMatrixIdentity();
+	
+	for (node& node : nodes)
+	{
+		// ローカル行列算出
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation));
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z);
+		DirectX::XMMATRIX LocalTransform = S * R * T;
+
+		// グローバル行列算出
+		ParentGlobalTransform = PriParentGlobalTransform;
+		
+		//if (node.parent != nullptr)
+		//{
+		//	ParentGlobalTransform = DirectX::XMLoadFloat4x4(&node.parent->globalTransform);
+		//}
+		//else
+		//{
+		//	ParentGlobalTransform = DirectX::XMMatrixIdentity();
+		//}
+		DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentGlobalTransform;
+		PriParentGlobalTransform = GlobalTransform;
+		// ワールド行列算出
+		DirectX::XMMATRIX WorldTransform = GlobalTransform * ParentWorldTransform;
+
+		// 計算結果を格納
+		DirectX::XMStoreFloat4x4(&node.local_transform, LocalTransform);
+		DirectX::XMStoreFloat4x4(&node.global_transform, GlobalTransform);
+		DirectX::XMStoreFloat4x4(&node.world_transform, WorldTransform);
+	}
+#endif
 }
 
 gltf_model::buffer_view gltf_model::make_buffer_view(const tinygltf::Accessor& accessor)
