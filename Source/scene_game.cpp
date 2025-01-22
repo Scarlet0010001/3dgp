@@ -86,9 +86,12 @@ void SceneGame::Update(float elapsedTime)
 
     //**********ステージの更新**********//
     StageManager::Instance().Update(cameraElapsedTime);
-
+    
     //player->CalcAttack_vs_Enemy(boss->GetBodyCollision().capsule,
-    //    boss->GetBodyCollision().height,)
+    //    boss->GetBodyCollision().height, boss->damagedFunction);
+
+    JudgeCollision();
+
     cameraElapsedTime_ = cameraElapsedTime;
 }
 
@@ -189,6 +192,16 @@ void SceneGame::Render(float elapsedTime)
     }
 #endif
 
+}
+
+void SceneGame::JudgeCollision()
+{
+    player->CalcCollision_vs_Enemy(boss->GetBodyCollision().capsule,
+        boss->GetBodyCollision().height);
+    player->CalcAttack_vs_Enemy(boss->GetBodyCollision().capsule,
+        boss->GetBodyCollision().height, boss->damagedFunction);
+
+    //boss->CalcAttack_vs_Player();
 }
 
 void SceneGame::DebugGui()

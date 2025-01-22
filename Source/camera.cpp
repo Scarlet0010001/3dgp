@@ -276,10 +276,11 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 
 	DirectX::XMVECTOR Cross = DirectX::XMVector3Cross(DirectX::XMVector3Normalize(Forward), TargetVecNorm);
 	DirectX::XMVECTOR dot = DirectX::XMVector3Dot(Forward, TargetVecNorm);
+	
 	DirectX::XMStoreFloat(&lockOnAngle, dot);
 	lockOnAngle = acosf(lockOnAngle);
 
-#if 1
+#if 0
 	//回転角度がこの値を超えたときのみ計算
 	const float extrapolated_angle = 0.5f;
 	if (fabsf(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
@@ -320,7 +321,7 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 		//回転軸
 		DirectX::XMVECTOR axis = Up;
 		//回転角度がこの値を超えたときのみ計算
-		const float extrapolated_angle = 5.0f;
+		const float extrapolated_angle = 1.0f;
 		if (fabs(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
 		{
 			float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
@@ -344,33 +345,44 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 		}
 	}
 	//縦回転
-	{
-		//回転軸
-		DirectX::XMVECTOR axis = Right;
-		//回転角度がこの値を超えたときのみ計算
-		const float extrapolated_angle = 5.0f;
-		if (fabs(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
-		{
-			//float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
-			//クオータニオンは回転の仕方(どの向きに)
-			if (cross < 0.0f)
-			{
-				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
-				//矢印を徐々に目標座標に向ける
-				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
-			}
-			else
-			{
-				//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-				DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
-				//矢印を徐々に目標座標に向ける
-				DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-				orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
-			}
-		}
-	}
+	//{
+	//	//回転軸
+	//	DirectX::XMVECTOR axis = Right;
+	//	//回転角度がこの値を超えたときのみ計算
+	//	const float extrapolated_angle = 1.0f;
+	//	if (fabs(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
+	//	{
+	//		//float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
+	//		//DirectX::XMVector3Cross(Forward, TargetVecNorm);
+	//		DirectX::XMVECTOR Projected = 
+	//			DirectX::XMVectorSubtract(
+	//				TargetVecNorm, DirectX::XMVectorMultiply(
+	//					DirectX::XMVector3Dot(TargetVecNorm, Right), Right));
+	//		Projected = DirectX::XMVector3Normalize(Projected);
+	//
+	//		DirectX::XMVECTOR Cross = DirectX::XMVector3Cross(Forward, Projected);
+	//		
+	//		float angle = DirectX::XMVectorGetX(DirectX::XMVector3Dot(Cross, Right));
+	//
+	//		//クオータニオンは回転の仕方(どの向きに)
+	//		if (angle < 0.0f)
+	//		{
+	//			//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+	//			DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
+	//			//矢印を徐々に目標座標に向ける
+	//			DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+	//			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+	//		}
+	//		else
+	//		{
+	//			//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+	//			DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
+	//			//矢印を徐々に目標座標に向ける
+	//			DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+	//			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
+	//		}
+	//	}
+	//}
 
 #endif
 	// orientationVecからorientationを更新
@@ -512,13 +524,6 @@ void Camera::CameraShakeUpdate(float elapsedTime)
 		}
 		else
 		{
-			if (!cameraShakeParam.onDistanceShake)
-			{
-				isCameraShake = false;
-				cameraShakeParam.time = 0.0f;
-				XMStoreFloat4(&orientation, standard_orientationVec);
-				return;
-			}
 			const float maxDistance = 30.0f;
 			if (shakeDistance >= maxDistance) return;
 			float factor = 1.0f - (shakeDistance / maxDistance);

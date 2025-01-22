@@ -37,11 +37,13 @@ Boss::Boss()
 		DirectX::XMMATRIX InverseWorldTransform =
 			DirectX::XMMatrixInverse(nullptr, WorldTransform);
 		DirectX::XMVECTOR HeadWorldForward = DirectX::XMLoadFloat3(&Math::get_posture_forward(worldTransform));
-		DirectX::XMVECTOR HeadLocalForward =
-			DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
-		HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
+		HeadWorldForward = DirectX::XMVector3Normalize(HeadWorldForward);
+		//DirectX::XMVECTOR HeadLocalForward =
+		//	DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
+		//HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
 
-		DirectX::XMStoreFloat3(&turretLocalForward, HeadLocalForward);
+		//DirectX::XMStoreFloat3(&turretLocalForward, HeadLocalForward);
+		DirectX::XMStoreFloat3(&turretWorldForward, HeadWorldForward);
 	}
 
 	//skill_manager = std::make_unique<SkillManager>();
@@ -57,12 +59,12 @@ Boss::Boss()
 void Boss::Initialize()
 {
 	//パラメーター初期化
-	position = { 0.0f, 0.0f, 10.0f };
+	position = { 0.0f, 15.0f, 10.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
 	scale.x = scale.y = scale.z = 10.0f;
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.chara_init_param;
-
+	charaParam.maxHealth = 2000.0f;
 	TransitionIdleState();
 
 	//体力初期化
@@ -98,11 +100,13 @@ void Boss::Update(float elapsedTime)
 		DirectX::XMMATRIX InverseWorldTransform =
 			DirectX::XMMatrixInverse(nullptr, WorldTransform);
 		DirectX::XMVECTOR HeadWorldForward = DirectX::XMLoadFloat3(&Math::get_posture_forward(worldTransform));
-		DirectX::XMVECTOR HeadLocalForward =
-			DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
-		HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
+		HeadWorldForward = DirectX::XMVector3Normalize(HeadWorldForward);
+		//DirectX::XMVECTOR HeadLocalForward =
+		//	DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
+		//HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
 		
-		DirectX::XMStoreFloat3(&turretLocalForward, HeadLocalForward);
+		//DirectX::XMStoreFloat3(&turretLocalForward, HeadLocalForward);
+		DirectX::XMStoreFloat3(&turretWorldForward, HeadWorldForward);
 	}
 
 
@@ -111,6 +115,8 @@ void Boss::Update(float elapsedTime)
 	bossBodyCollision.capsule.start = position;
 	bossBodyCollision.capsule.end = bossBodyCollision.capsule.start;
 	bossBodyCollision.capsule.end.y = bossBodyCollision.capsule.start.y + bossBodyCollision.height;
+
+	stateTimer += elapsedTime;
 
 	DebugPrimitiveUpdate();
 }
@@ -161,8 +167,8 @@ void Boss::Render_f(float elapsedTime)
 			break;
 		}
 		//lookAt_nodes = &LookAt_turret(blended_animated_nodes);
-		//model->render(graphics.Get_DC().Get(), transform, blended_animated_nodes);
-		model->render(graphics.Get_DC().Get(), transform, lookAt_nodes);
+		model->render(graphics.Get_DC().Get(), transform, blended_animated_nodes);
+		//model->render(graphics.Get_DC().Get(), transform, lookAt_nodes);
 	}
 	else
 	{
@@ -175,9 +181,9 @@ void Boss::Render_f(float elapsedTime)
 		}
 		model->animate(bossAnimation, time, animated_nodes[ANIME_NODE::NOW_ANIMATION], nowLoop);
 		lookAt_nodes = animated_nodes[ANIME_NODE::NOW_ANIMATION];
-		LookAt_turret(lookAt_nodes);
-		//model->render(graphics.Get_DC().Get(), transform, animated_nodes[ANIME_NODE::NOW_ANIMATION]);
-		model->render(graphics.Get_DC().Get(), transform, lookAt_nodes);
+		//LookAt_turret(lookAt_nodes);
+		model->render(graphics.Get_DC().Get(), transform, animated_nodes[ANIME_NODE::NOW_ANIMATION]);
+		//model->render(graphics.Get_DC().Get(), transform, lookAt_nodes);
 		bossAnimation_old = bossAnimation;
 		//model->nodes;
 	}
@@ -222,20 +228,7 @@ void Boss::LookAt_turret(std::vector<gltf_model::node>& nodes)
 	// ワールド行列更新処理関数
 	std::stack<DirectX::XMFLOAT4X4> parent_global_transforms;
 	std::function<void(gltf_model::node&)> updateWorldTransforms = [&](gltf_model::node& node)
-	{
-		//DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.scale.x, node.scale.y, node.scale.z);
-		//DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node.rotation));
-		//DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.translation.x, node.translation.y, node.translation.z);
-		//DirectX::XMMATRIX LocalTransform = S * R * T;
-		//DirectX::XMMATRIX ParentGlobalTransform = node.parent != nullptr
-		//	? DirectX::XMLoadFloat4x4(&node.parent->globalTransform)
-		//	: DirectX::XMMatrixIdentity();
-		//DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentGlobalTransform;
-		//DirectX::XMMATRIX WorldTransform = GlobalTransform * DirectX::XMLoadFloat4x4(&worldTransform);
-		////DirectX::XMStoreFloat4x4(&node.localTransform, LocalTransform);
-		//DirectX::XMStoreFloat4x4(&node.global_transform, GlobalTransform);
-		////DirectX::XMStoreFloat4x4(&node.worldTransform, WorldTransform);
-	
+	{	
 		//node& node{ nodes.at(node_index) };
 		DirectX::XMMATRIX S{ DirectX::XMMatrixScaling(node.scale.x,node.scale.y,node.scale.z) };
 		DirectX::XMMATRIX R{ DirectX::XMMatrixRotationQuaternion(
@@ -260,8 +253,11 @@ void Boss::LookAt_turret(std::vector<gltf_model::node>& nodes)
 			DirectX::XMMatrixInverse(nullptr, HeadWorldTransform);
 
 		DirectX::XMVECTOR TargetVec = DirectX::XMLoadFloat3(&target_pos);//ワールドで計算
-		DirectX::XMVECTOR a = DirectX::XMVector3TransformCoord(TargetVec, InverseWorldTransform);
-		TargetVec = DirectX::XMVectorSubtract(a, DirectX::XMLoadFloat3(&turretBaseNode.translation));
+		//DirectX::XMVECTOR a = DirectX::XMVector3TransformCoord(TargetVec, InverseWorldTransform);
+		//TargetVec = DirectX::XMVectorSubtract(a, DirectX::XMLoadFloat3(&turretBaseNode.translation));
+		DirectX::XMVECTOR WorldTranslation = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&turretBaseNode.translation), HeadWorldTransform);
+		//ワールドのTargetVec
+		TargetVec = DirectX::XMVectorSubtract(TargetVec, WorldTranslation);
 
 		DirectX::XMVECTOR TargetVecNormal{};
 		TargetVecNormal = DirectX::XMVector3Normalize(TargetVec);
@@ -270,7 +266,7 @@ void Boss::LookAt_turret(std::vector<gltf_model::node>& nodes)
 		DirectX::XMStoreFloat3(&targetVec, TargetVecNormal);
 
 		//ワールドに変換と更新
-		DirectX::XMVECTOR HeadLocalForward = DirectX::XMLoadFloat3(&turretLocalForward);
+		DirectX::XMVECTOR HeadLocalForward = DirectX::XMLoadFloat3(&turretWorldForward);
 
 		//DirectX::XMVECTOR Axis = DirectX::XMVector3Cross(HeadLocalForward, TargetVecNormal);
 		DirectX::XMVECTOR Axis = DirectX::XMVectorSet(0.0f,1.0f,0.0f,1.0f);
@@ -278,15 +274,17 @@ void Boss::LookAt_turret(std::vector<gltf_model::node>& nodes)
 		float dotProduct = DirectX::XMVectorGetX(
 			DirectX::XMVector3Dot(HeadLocalForward, TargetVecNormal));
 
-		float angle = DirectX::XMConvertToRadians(acosf(dotProduct));
+		float angle = 0.5f;// DirectX::XMConvertToRadians(acosf(dotProduct));
 
 		DirectX::XMVECTOR RotationMatrix = DirectX::XMQuaternionRotationAxis(Axis, angle);
+
+		RotationMatrix = DirectX::XMVector3TransformCoord(RotationMatrix, InverseWorldTransform);
 
 		DirectX::XMVECTOR HR =
 			DirectX::XMQuaternionMultiply(DirectX::XMLoadFloat4(&turretBaseNode.rotation), RotationMatrix);
 		DirectX::XMStoreFloat4(&turretBaseNode.rotation, HR);
 		//turretBaseNode.rotation.y = DirectX::XMConvertToRadians(170.0f);
-		//turretBaseNode.rotation.z = DirectX::XMConvertToRadians(170.0f);
+		//turretBaseNode.rotation.x = DirectX::XMConvertToRadians(170.0f);
 
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(turretBaseNode.scale.x, turretBaseNode.scale.y, turretBaseNode.scale.z);
 		DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMQuaternionNormalize(DirectX::XMLoadFloat4(&turretBaseNode.rotation)));
@@ -313,12 +311,17 @@ void Boss::LookAt_turret(std::vector<gltf_model::node>& nodes)
 		//}
 		//model->nodes.at(42);
 		model->cumulate_transforms(nodes, transform);
-		//return nodes;
 	}
 }
 
 void Boss::CalcAttack_vs_Player(DirectX::XMFLOAT3 capsule_start, DirectX::XMFLOAT3 capsule_end, float colider_radius, AddDamageFunc damaged_func)
 {
+}
+
+float Boss::CalcMoveSpeed(DirectX::XMFLOAT3 target, float time)
+{
+	float direction = Math::calc_vector_AtoB_length(position, target);
+	return direction / time;
 }
 
 void Boss::OnDead()
@@ -368,12 +371,12 @@ void Boss::DebugDUI()
 			//}
 			//if (ImGui::Button("load"))
 			//{
-			//	load_data_file();
+			//	LoadDataFile();
 			//}
 			//ImGui::Separator();
 			//if (ImGui::Button("save"))
 			//{
-			//	save_data_file();
+			//	SaveDataFile();
 			//}
 			//トランスフォーム
 			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
@@ -410,6 +413,28 @@ void Boss::DebugDUI()
 				ImGui::DragFloat("radius", &bossBodyCollision.capsule.radius);
 				ImGui::DragFloat("height", &bossBodyCollision.height);
 			}
+			if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				const char* anime_item[] = {
+					"BOSS_IDLE",
+					"BOSS_WALK",
+					"BOSS_RUN",
+					"BOSS_JUMP",
+					"BOSS_MISSILE",
+					"BOSS_HIT",
+					"BOSS_DEAD",
+				};
+				static int item_current = 0;
+				static bool loop = false;
+				ImGui::Combo("anime", &item_current, anime_item, IM_ARRAYSIZE(anime_item)); ImGui::Checkbox("is_loop", &loop);
+				if (ImGui::Button("play", { 80,20 }))
+				{
+					bossAnimation = static_cast<BossAnimation>(item_current);
+				}
+				ImGui::SliderFloat("transition_time", &transition_time, 0.0f, 5.0f);
+
+			}
+
 			std::string state_name;
 			state_name = magic_enum::enum_name<STATE>(state);
 			ImGui::Text(state_name.c_str());
@@ -421,6 +446,7 @@ void Boss::DebugDUI()
 			ImGui::DragFloat("boss_collision.radius", &bossBodyCollision.capsule.radius, 0.1f);
 			ImGui::DragFloat("boss_collision.height", &bossBodyCollision.height, 0.1f);
 			ImGui::DragFloat("sickle_.radius", &sickle_hand_colide.radius, 1);
+		
 		}
 		ImGui::End();
 	}

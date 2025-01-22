@@ -61,6 +61,7 @@ void Player::TransitionCombo_01_01_State()
 	p_update = &Player::UpdateCombo_01_01_State;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_01;
 	state = STATE::RIGHT_ATTACK;
+	attackParam = param.combo_1;
 	nextCombo = false;
 }
 
@@ -69,6 +70,7 @@ void Player::TransitionCombo_01_02_State()
 	p_update = &Player::UpdateCombo_01_02_State;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_02;
 	state = STATE::LEFT_ATTACK;
+	attackParam = param.combo_2;
 	nextCombo = false;
 
 }
@@ -78,6 +80,7 @@ void Player::TransitionCombo_01_03_State()
 	p_update = &Player::UpdateCombo_01_03_State;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_03;
 	state = STATE::RIGHT_ATTACK;
+	attackParam = param.combo_3;
 	nextCombo = false;
 
 }
@@ -135,7 +138,8 @@ void Player::UpdateMoveState(float elapsedTime)
 	float ay = gamePad->GetAxis_LY();
 
 	if (ax > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_RIGHT;
-	else if (ax < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_LEFT;
+	else if (ax < 0)
+		playerAnimation = PlayerAnimation::PLAYER_MOVE_LEFT;
 	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
 	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
 
@@ -332,7 +336,7 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 
 	if (0.023f < time && !attackParam.isAttack)
 	{
-		camera->SetCameraShake(attackParam.cameraShake);
+		//camera->SetCameraShake(attackParam.cameraShake);
 		//camera->SetHitStop(attackParam.hitStop);
 		attackParam.isAttack = true;
 	}
@@ -341,6 +345,8 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 		TransitionCombo_01_02_State();
 		attackParam.isAttack = false;
 	}
+	if (0.15f < time)
+		attackParam.isAttack = false;
 
 	if (model->GetIsEndAnimation())
 	{
@@ -360,7 +366,7 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 
 	if (0.03f < time && !attackParam.isAttack)
 	{
-		camera->SetCameraShake(attackParam.cameraShake);
+		//camera->SetCameraShake(attackParam.cameraShake);
 		//camera->SetHitStop(attackParam.hitStop);
 		attackParam.isAttack = true;
 	}
@@ -370,6 +376,8 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 		attackParam.isAttack = false;
 
 	}
+	if (0.175f < time)
+		attackParam.isAttack = false;
 
 	if (model->GetIsEndAnimation())
 	{
@@ -387,10 +395,12 @@ void Player::UpdateCombo_01_03_State(float elapsedTime)
 	}
 	if (0.03f < time && !attackParam.isAttack)
 	{
-		camera->SetCameraShake(attackParam.cameraShake);
+		//camera->SetCameraShake(attackParam.cameraShake);
 		//camera->SetHitStop(attackParam.hitStop);
 		attackParam.isAttack = true;
 	}
+	if (0.65f < time)
+		attackParam.isAttack = false;
 
 	if (0.48f < time && nextCombo)
 	{

@@ -6,14 +6,14 @@ StageMain::StageMain()
     Graphics& graphics = Graphics::Instance();
     model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
 		//"Resources/Stage/testStage.gltf");
-		"Resources/Stage/ExampleStage.gltf");
+		"Resources/Stage/low_poly_hole_in_the_road.glb");
 	model->collisionMesh = std::make_unique<CollisionMesh>(
 		graphics.GetDevice().Get(),
 		//"Resources/Stage//testStage.gltf");
-		"Resources/Stage/ExampleStage.gltf");
+		"Resources/Stage/low_poly_hole_in_the_road.glb");
 		//"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf");
 	//modelCollision = std::make_unique<gltf_model>(graphics.GetDevice().Get(), ".\\resources\\Model\\Stage\\stage_hall_collision.fbx", 1);
-    scale = { 2.0f, 2.0f, 2.0f };
+    scale = { 10.0f, 10.0f, 10.0f };
     
     animeTimer = 0.0f;
     animated_nodes = model->nodes;

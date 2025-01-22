@@ -104,30 +104,29 @@ void BulletManager::Clear()
 
 void BulletManager::CollisionBulletVsBullet()
 {
-    /*
-    size_t projectileCount = projectiles.size();
-    for (int i = 0; i < projectileCount; i++)
-    {
-        Projectile* projectileA = projectiles.at(i);
-        for (int j = 1 + i; j < projectileCount; j++)
-        {
-            Projectile* projectileB = projectiles.at(j);
-            DirectX::XMFLOAT3 outPosition;
-            if (Collision::IntersectSphereVsSphere(
-                projectileA->GetPosition(),
-                projectileA->GetRadius(),
-                projectileB->GetPosition(),
-                projectileB->GetRadius(),
-                outPosition))
-            {
-                miniexplosion->Play(projectileA->GetPosition());
-                projectileA->Destroy();
-                projectileB->Destroy();
-            }
-        }
-    }
-    */
-
+    
+    //size_t bulletCount = bullets.size();
+    //for (int i = 0; i < bulletCount; i++)
+    //{
+    //    Projectile* projectileA = bullets.at(i);
+    //    for (int j = 1 + i; j < bulletCount; j++)
+    //    {
+    //        Projectile* projectileB = projectiles.at(j);
+    //        DirectX::XMFLOAT3 outPosition;
+    //        if (Collision::IntersectSphereVsSphere(
+    //            projectileA->GetPosition(),
+    //            projectileA->GetRadius(),
+    //            projectileB->GetPosition(),
+    //            projectileB->GetRadius(),
+    //            outPosition))
+    //        {
+    //            //miniexplosion->Play(projectileA->GetPosition());
+    //            projectileA->Destroy();
+    //            projectileB->Destroy();
+    //        }
+    //    }
+    //}
+    
 }
 
 void BulletManager::DebugGUI()

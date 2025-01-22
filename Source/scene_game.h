@@ -26,6 +26,9 @@ public:
     //シーン描画
     void Render(float elapsedTime) override;
 
+    //キャラクターの当たり判定
+    void JudgeCollision();
+
     //クリ時の更新
     //void clear_update(float elapsedTime);
 

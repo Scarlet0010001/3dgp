@@ -34,8 +34,8 @@ public:
 		void serialize(Archive& archive)
 		{
 			archive(
-				cereal::make_nvp("r_moter", r_moter),
-				cereal::make_nvp("l_moter", L_moter),
+				cereal::make_nvp("r_moter", R_moter),
+				cereal::make_nvp("l_moter", R_moter),
 				cereal::make_nvp("vibe_time", VibeTime)
 			);
 		}

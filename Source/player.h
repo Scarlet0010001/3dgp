@@ -36,11 +36,12 @@ public:
 	//カメラがプレイヤーを見るときに注視するポイント
 	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 1.5f), position.z); }
 
+
 	//プレイヤーのコリジョンと敵の当たり判定
 	void CalcCollision_vs_Enemy(Capsule capsule_collider, float colider_height);
 
 	//プレイヤーの攻撃と敵の当たり判定
-	void CalcAttack_vs_Enemy(Capsule collider, float colider_height, AddDamageFunc damaged_func);
+	void CalcAttack_vs_Enemy(Capsule capsule_collider, float colider_height, AddDamageFunc damaged_func);
 
 	//スキルと敵の当たり判定
 	void JudgeSkillCollision(Capsule object_colider, AddDamageFunc damaged_func);
@@ -201,7 +202,8 @@ private:
 	
 	bool InputMove(float elapsedTime, float move_speed);
 	
-	const DirectX::XMFLOAT3 GetMoveVec(Camera* camera) const;
+	const DirectX::XMFLOAT3 GetMoveVec(Camera* camera, bool wing = false) const;
+
 	//ジャンプ入力処理
 	void InputJump();
 	//回避入力
@@ -233,6 +235,11 @@ private:
 
 	//垂直速力更新処理
 	 void UpdateVerticalVelocity(float elapsed_frame)override;
+
+	 //----------<ファイル>------------//
+	 void LoadDataFile();
+	 void SaveDataFile();
+	 const char* filePath = "Resources/Character/Player/player_param.json";
 
 private:
 	//--------------------変数--------------------------

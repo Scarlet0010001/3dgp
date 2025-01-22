@@ -149,7 +149,7 @@ protected:
 	bool transitionToTransition = false;
 	float time{ 0 };
 	float factor{ 0 };
-	float transition_time{ 0.09f };
+	float transition_time{ 0.11f };
 	enum TRANSITION_STATE
 	{
 		NONE,

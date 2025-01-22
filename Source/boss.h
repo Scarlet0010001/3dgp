@@ -40,7 +40,8 @@ private:
 	};
 	enum class ATTACK_TYPE
 	{
-		NORMAL,
+		TACKLE,
+		JUMP,
 		SHOT_S,
 		SHOT_H,
 		MAX_COUNT
@@ -104,6 +105,9 @@ public:
 	//プレイヤーの攻撃との当たり判定
 	void CalcAttack_vs_Player(DirectX::XMFLOAT3 capsule_start, DirectX::XMFLOAT3 capsule_end, float colider_radius, AddDamageFunc damaged_func);
 
+	//距離と時間で速度を計算する
+	float CalcMoveSpeed(DirectX::XMFLOAT3 target, float time);
+
 	//攻撃対象の位置を取得
 	void SetLocationOfAttackTarget(DirectX::XMFLOAT3 target) { target_pos = target; }
 
@@ -123,6 +127,7 @@ private:
 
 	//			攻撃系				//
 	void TransitionAttack_Tackle_State();//近接攻撃
+	void TransitionAttack_Jump_State();//ジャンプ攻撃
 	void TransitionAttack_ShotStraight_State();//射撃
 	void TransitionAttack_ShotHoming_State();//ホーミングミサイル
 	//void TransitionSkill_1_State();
@@ -131,6 +136,9 @@ private:
 	void TransitionDamageState();
 	void TransitionDeadState();
 	void TransitionDownState();
+
+	//			チャージ系			//
+	//void TransitionChargeState(float time);
 
 	/*---------------状態更新------------------------*/
 
@@ -141,6 +149,7 @@ private:
 
 	//			攻撃系				//
 	void UpdateAttack_Tackle_State(float elapsedTime);//近接攻撃
+	void UpdateAttack_Jump_State(float elapsedTime);//ジャンプ攻撃
 	void UpdateAttack_ShotStraight_State(float elapsedTime);//射撃
 	void UpdateAttack_ShotHoming_State(float elapsedTime);//ホーミングミサイル
 
@@ -164,11 +173,11 @@ private:
 	void OnDamaged(WINCE_TYPE type) override;
 
 	//データファイル
-	//void load_data_file();
-	//void save_data_file();
-	//const char* file_path = "./resources/Data/boss_param.json";
+	void LoadDataFile();
+	void SaveDataFile();
+	const char* filePath = "./resources/Data/boss_param.json";
 
-	// 変数
+	//---------------------------変数---------------------------//
 	typedef void (Boss::* ActUpdate)(float elapsedTime);
 	ActUpdate act_update = &Boss::UpdateIdleState;
 	std::unique_ptr<gltf_model> model;
@@ -177,7 +186,9 @@ private:
 	gltf_model::node arm;
 	//gltf_model::node turretNode;
 	//gltf_model::node turretHeadNode;
-	DirectX::XMFLOAT3  turretLocalForward = { 0, 0, 1 };
+	
+	//テストでworld行列にしている
+	DirectX::XMFLOAT3  turretWorldForward = { 0, 0, 1 };
 	Capsule sickle_hand_colide;
 
 	float actionTime = 0;
@@ -190,19 +201,17 @@ private:
 	//ループアニメーションの検索
 	bool FindLoopAnimation(BossAnimation BA);
 
-
 	std::vector<gltf_model::node> lookAt_nodes;
-
 
 	//ステートのタイマー
 	float stateTimer;
-	//アイドル状態のままでいる時間
+	//次のステート移行時間
 	float state_duration;
 	//攻撃までの猶予時間
 	float attackResponderTimer;
 	//攻撃対象
 	DirectX::XMFLOAT3 target_pos;
-	DirectX::XMFLOAT3 tackle_pos{};
+	DirectX::XMFLOAT3 targetPoint_pos{};
 	DirectX::XMFLOAT3 shot_pos;
 
 	STATE state;
@@ -223,17 +232,20 @@ private:
 	//==============================================================
 
 	//歩くスピード
-	float WALK_SPEED = 5;
+	const float WALK_SPEED = 5;
 	//走るスピード
-	float RUN_SPEED = 12;
+	const float RUN_SPEED = 12;
+	//加速スピード
+	const float ACCELERATION_NORMAL_SPEED = 1.5f;
+	const float ACCELERATION_JUMP_SPEED = 25.0f;
 	//通常攻撃の射程
-	float ATTACK_ACTION_LENGTH = 17;
+	const float ATTACK_ACTION_LENGTH = 17;
 	//通常攻撃のクールタイム
-	float NORMAL_ATTACK_COOLTIME = 1;
+	const float NORMAL_ATTACK_COOLTIME = 1;
 
-	float ATTACK_RESPONDER_TIME = 3.0f;
+	const float ATTACK_RESPONDER_TIME = 3.0f;
 	//ダメージを受けたときのスタン時間
-	float DAMAGE_STUN_DURATION = 0.7f;
+	const float DAMAGE_STUN_DURATION = 0.7f;
 
 	public:
 		AddDamageFunc damagedFunction;

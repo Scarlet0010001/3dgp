@@ -120,6 +120,8 @@ bool Collision::SphereVsCylinder(const DirectX::XMFLOAT3& sphere_position, float
     XMFLOAT3 out_c_position;
     XMStoreFloat3(&out_c_position, out_c_position_vec);
 
+    if (out_cylinder_position == nullptr)return true;
+
     out_cylinder_position->x = out_c_position.x;
     out_cylinder_position->y = cylinder_position.y;
     out_cylinder_position->z = out_c_position.z;

@@ -9,11 +9,9 @@
 #include "Graphics.h"
 #include "magic_enum/include/magic_enum.hpp"
 
-/*
 #include <filesystem>
 #include <fstream>
-*/
-
+#include <cereal/archives/json.hpp>
 
 Player::Player()
 {
@@ -50,8 +48,11 @@ Player::Player()
 
 void Player::Initialize()
 {
+	//パラメーターロード
+	LoadDataFile();
+
 	//パラメーター初期化
-	position = { 0.0f, 0.0f, 0.0f };
+	position = { 0.0f, 15.0f, 0.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.charaInitParam;
@@ -101,7 +102,7 @@ void Player::Update(float elapsedTime)
 
 	//プレイヤーの正面情報を更新
 	forward = Math::get_posture_forward(orientation);
-
+	
 	//無敵時間の更新
 	UpdateInvicibleTimer(elapsedTime);
 
@@ -194,20 +195,22 @@ void Player::RenderUI(float elapsed_time)
 
 void Player::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_height)
 {
-	Collision::CylinderVsCylinder(collider.start, collider.radius, collider_height, position, charaParam.radius, charaParam.height, &position);
+	Collision::CylinderVsCylinder(
+		capsule_collider.start, capsule_collider.radius, collider_height,
+		position, charaParam.radius, charaParam.height, &position);
 
 }
 
-void Player::CalcAttack_vs_Enemy(Capsule collider, float collider_height, AddDamageFunc damaged_func)
+void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height, AddDamageFunc damaged_func)
 {
 	if (!attackParam.isAttack) return;
 
 	int side = 0;
-	if (state == STATE::LEFT_ATTACK) side = static_cast<int>(state);
-	else if (state == STATE::RIGHT_ATTACK) side = static_cast<int>(state);
+	if (state == STATE::LEFT_ATTACK) side = LR::LEFT;
+	else if (state == STATE::RIGHT_ATTACK) side = LR::RIGHT;
 
 	if (Collision::SphereVsCylinder(attackCollision_position[side], 1.0f,
-		collider.start, collider.radius,collider_height))
+		capsule_collider.start, capsule_collider.radius,collider_height))
 	{
 		//攻撃対象に与えるダメージ量と無敵時間
 		if (damaged_func(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::NONE))
@@ -359,7 +362,7 @@ bool Player::InputMoveWing(float elapsedTime)
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
 
-const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera) const
+const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
 {
 	//入力情報を取得
 	float ax = gamePad->GetAxis_LX();
@@ -372,8 +375,9 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera) const
 	if (fabs(ay) < 0.3f)  ay = 0.0f;
 	//カメラ右方向ベクトルをXZ単位ベクトルに変換
 	float camera_forward_x = camera->GetForward().x;
-	float camera_forward_y = camera->GetForward().y;
+	float camera_forward_y = wing ? camera->GetForward().y : 0.0f;
 	float camera_forward_z = camera->GetForward().z;
+
 	float camera_forward_lengh = sqrtf(camera_forward_x * camera_forward_x + camera_forward_y * camera_forward_y + camera_forward_z * camera_forward_z);
 	if (camera_forward_lengh > 0.0f)
 	{
@@ -383,7 +387,7 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera) const
 	}
 
 	float camera_right_x = camera->GetRight().x;
-	float camera_right_y = camera->GetRight().y;
+	float camera_right_y = wing ? camera->GetRight().y : 0.0f;
 	float camera_right_z = camera->GetRight().z;
 	float camera_right_lengh = sqrtf(camera_right_x * camera_right_x + camera_right_y * camera_right_y + camera_right_z * camera_right_z);
 
@@ -398,7 +402,9 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera) const
 	vec.x = (camera_forward_x * ay) + (camera_right_x * ax);
 	vec.y = (camera_forward_y * ay) + (camera_right_y * ax);
 	vec.z = (camera_forward_z * ay) + (camera_right_z * ax);
-
+	
+	//vec.x = 0.5f;
+	//vec.z = 0.5f;
 	return vec;
 }
 
@@ -559,6 +565,40 @@ void Player::UpdateVerticalVelocity(float elapsed_frame)
 		velocity.y += (gravity * 0.2f) * elapsed_frame;
 }
 
+void Player::LoadDataFile()
+{
+	// Jsonファイルから値を取得
+	std::filesystem::path path = filePath;
+	path.replace_extension(".json");
+	if (std::filesystem::exists(path.c_str()))
+	{
+		std::ifstream ifs;
+		ifs.open(path);
+		if (ifs)
+		{
+			cereal::JSONInputArchive o_archive(ifs);
+			o_archive(param);
+		}
+	}
+}
+
+void Player::SaveDataFile()
+{
+	//ベースクラスの初期化パラメーター情報を更新
+	param.charaInitParam = charaParam;
+	// Jsonファイルから値を取得
+	std::filesystem::path path = filePath;
+	path.replace_extension(".json");
+	std::ofstream ifs;
+	ifs.open(path);
+	if (ifs)
+	{
+		cereal::JSONOutputArchive o_archive(ifs);
+		o_archive(param);
+	}
+
+}
+
 void Player::DebugPrimitiveUpdate()
 {
 	DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
@@ -584,12 +624,12 @@ void Player::DebugPrimitiveUpdate()
 		attackCollision_position[LR::LEFT] = saber_position(lowerArm_position[LR::LEFT], beamSaber_position[LR::LEFT]);
 		attackCollision_position[LR::RIGHT] = saber_position(lowerArm_position[LR::RIGHT], beamSaber_position[LR::RIGHT]);
 
-		debugRender->CreateSphere(
-			attackCollision_position[LR::LEFT],
-			1.0f, { 1.0f,0.0f,0.0f,1.0f });
-		debugRender->CreateSphere(
-			attackCollision_position[LR::RIGHT],
-			1.0f, { 1.0f,0.0f,0.0f,1.0f });
+		//debugRender->CreateSphere(
+		//	attackCollision_position[LR::LEFT],
+		//	1.0f, { 1.0f,0.0f,0.0f,1.0f });
+		//debugRender->CreateSphere(
+		//	attackCollision_position[LR::RIGHT],
+		//	1.0f, { 1.0f,0.0f,0.0f,1.0f });
 	}
 
 	//自分の当たり判定
@@ -661,73 +701,73 @@ void Player::DebugGUI()
 			//		gamePad->SetVibration(1, 1, 0.5);
 			//
 			//	}
-			//	if (ImGui::Button("load"))
-			//	{
-			//		load_data_file();
-			//	}
-			//	ImGui::Separator();
-			//	if (ImGui::Button("save"))
-			//	{
-			//		save_data_file();
-			//	}
-			//	ImGui::Text("attack_pparam");
-			//	if (ImGui::CollapsingHeader("combo1"))
-			//	{
-			//		ImGui::DragInt("combo1_power", &param.combo_1.power, 0.1f);
-			//		ImGui::DragFloat("combo1_invinsible_time", &param.combo_1.invinsible_time, 0.1f);
-			//
-			//		ImGui::Text("combo1_camera_shake");
-			//		ImGui::DragFloat("combo1_shake_x", &param.combo_1.camera_shake.max_x_shake, 0.1f);
-			//		ImGui::DragFloat("combo1_shake_y", &param.combo_1.camera_shake.max_y_shake, 0.1f);
-			//		ImGui::DragFloat("combo1_time", &param.combo_1.camera_shake.time, 0.1f);
-			//		ImGui::DragFloat("combo1_smmoth", &param.combo_1.camera_shake.shake_smoothness, 0.1f, 0.1f, 1.0f);
-			//
-			//		ImGui::Text("hit_stop");
-			//		ImGui::DragFloat("combo1_stop_time", &param.combo_1.hit_stop.time, 0.1f);
-			//		ImGui::DragFloat("combo1_stopping_strength", &param.combo_1.hit_stop.stopping_strength, 0.1f);
-			//		ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hit_viberation.l_moter, 0.1f);
-			//		ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hit_viberation.r_moter, 0.1f);
-			//		ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hit_viberation.vibe_time, 0.1f);
-			//	}
-			//	if (ImGui::CollapsingHeader("combo2"))
-			//	{
-			//		ImGui::DragInt("combo2_power", &param.combo_2.power, 0.1f);
-			//		ImGui::DragFloat("combo2_invinsible_time", &param.combo_2.invinsible_time, 0.1f);
-			//
-			//		ImGui::Text("combo2_camera_shake");
-			//		ImGui::DragFloat("combo2_shake_x", &param.combo_2.camera_shake.max_x_shake, 0.1f);
-			//		ImGui::DragFloat("combo2_shake_y", &param.combo_2.camera_shake.max_y_shake, 0.1f);
-			//		ImGui::DragFloat("combo2_time", &param.combo_2.camera_shake.time, 0.1f);
-			//		ImGui::DragFloat("combo2_smmoth", &param.combo_2.camera_shake.shake_smoothness, 0.1f, 0.1f, 1.0f);
-			//		ImGui::Text("hit_stop");
-			//		ImGui::DragFloat("combo2_stop_time", &param.combo_2.hit_stop.time, 0.1f);
-			//		ImGui::DragFloat("combo2_stopping_strengthy", &param.combo_2.hit_stop.stopping_strength, 0.1f);
-			//		ImGui::DragFloat("combo2_hit_viberation.l_moter", &param.combo_2.hit_viberation.l_moter, 0.1f);
-			//		ImGui::DragFloat("combo2_hit_viberation.r_moter", &param.combo_2.hit_viberation.r_moter, 0.1f);
-			//		ImGui::DragFloat("combo2_vibe_time", &param.combo_2.hit_viberation.vibe_time, 0.1f);
-			//	}
-			//
-			//	if (ImGui::CollapsingHeader("combo3"))
-			//	{
-			//		ImGui::DragInt("combo3_power", &param.combo_3.power, 0.1f);
-			//		ImGui::DragFloat("combo3_invinsible_time", &param.combo_3.invinsible_time, 0.1f);
-			//
-			//		ImGui::Text("combo3_camera_shake");
-			//		ImGui::DragFloat("combo3_shake_x", &param.combo_3.camera_shake.max_x_shake, 0.1f);
-			//		ImGui::DragFloat("combo3_shake_y", &param.combo_3.camera_shake.max_y_shake, 0.1f);
-			//		ImGui::DragFloat("combo3_time", &param.combo_3.camera_shake.time, 0.1f);
-			//		ImGui::DragFloat("combo3_smmoth", &param.combo_3.camera_shake.shake_smoothness, 0.1f, 0.1f, 1.0f);
-			//		ImGui::Text("hit_stop");
-			//		ImGui::DragFloat("combo3_stop_time", &param.combo_3.hit_stop.time, 0.1f);
-			//		ImGui::DragFloat("combo3_stopping_strength", &param.combo_3.hit_stop.stopping_strength, 0.1f);
-			//		ImGui::DragFloat("combo3_hit_viberation.l_moter", &param.combo_3.hit_viberation.l_moter, 0.1f);
-			//		ImGui::DragFloat("combo3_hit_viberation.r_moter", &param.combo_3.hit_viberation.r_moter, 0.1f);
-			//		ImGui::DragFloat("combo3_vibe_time", &param.combo_3.hit_viberation.vibe_time, 0.1f);
-			//	}
-			//}
+			if (ImGui::Button("load"))
+			{
+				LoadDataFile();
+			}
+			ImGui::Separator();
+			if (ImGui::Button("save"))
+			{
+				SaveDataFile();
+			}
+			ImGui::Text("attack_param");
+			if (ImGui::CollapsingHeader("combo1"))
+			{
+				ImGui::DragInt("combo1_power", &param.combo_1.power, 0.1f);
+				ImGui::DragFloat("combo1_invinsible_time", &param.combo_1.invinsibleTime, 0.1f);
+
+				ImGui::Text("combo1_camera_shake");
+				ImGui::DragFloat("combo1_shake_x", &param.combo_1.cameraShake.max_X_shake, 0.1f);
+				ImGui::DragFloat("combo1_shake_y", &param.combo_1.cameraShake.max_Y_shake, 0.1f);
+				ImGui::DragFloat("combo1_time", &param.combo_1.cameraShake.time, 0.1f);
+				ImGui::DragFloat("combo1_smmoth", &param.combo_1.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
+
+				ImGui::Text("hit_stop");
+				ImGui::DragFloat("combo1_stop_time", &param.combo_1.hitStop.time, 0.1f);
+				ImGui::DragFloat("combo1_stopping_strength", &param.combo_1.hitStop.stoppingStrength, 0.1f);
+				//ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
+				//ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
+				//ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
+			}
+			if (ImGui::CollapsingHeader("combo2"))
+			{
+				ImGui::DragInt("combo2_power", &param.combo_2.power, 0.1f);
+				ImGui::DragFloat("combo2_invinsible_time", &param.combo_2.invinsibleTime, 0.1f);
+
+				ImGui::Text("combo2_camera_shake");
+				ImGui::DragFloat("combo2_shake_x", &param.combo_2.cameraShake.max_X_shake, 0.1f);
+				ImGui::DragFloat("combo2_shake_y", &param.combo_2.cameraShake.max_Y_shake, 0.1f);
+				ImGui::DragFloat("combo2_time", &param.combo_2.cameraShake.time, 0.1f);
+				ImGui::DragFloat("combo2_smmoth", &param.combo_2.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
+				ImGui::Text("hit_stop");
+				ImGui::DragFloat("combo2_stop_time", &param.combo_2.hitStop.time, 0.1f);
+				ImGui::DragFloat("combo2_stopping_strengthy", &param.combo_2.hitStop.stoppingStrength, 0.1f);
+				//ImGui::DragFloat("combo2_hit_viberation.l_moter", &param.combo_2.hitViberation.L_moter, 0.1f);
+				//ImGui::DragFloat("combo2_hit_viberation.r_moter", &param.combo_2.hitViberation.R_moter, 0.1f);
+				//ImGui::DragFloat("combo2_vibe_time", &param.combo_2.hitViberation.VibeTime, 0.1f);
+			}
+
+			if (ImGui::CollapsingHeader("combo3"))
+			{
+				ImGui::DragInt("combo3_power", &param.combo_3.power, 0.1f);
+				ImGui::DragFloat("combo3_invinsible_time", &param.combo_3.invinsibleTime, 0.1f);
+
+				ImGui::Text("combo3_camera_shake");
+				ImGui::DragFloat("combo3_shake_x", &param.combo_3.cameraShake.max_X_shake, 0.1f);
+				ImGui::DragFloat("combo3_shake_y", &param.combo_3.cameraShake.max_Y_shake, 0.1f);
+				ImGui::DragFloat("combo3_time", &param.combo_3.cameraShake.time, 0.1f);
+				ImGui::DragFloat("combo3_smmoth", &param.combo_3.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
+				ImGui::Text("hit_stop");
+				ImGui::DragFloat("combo3_stop_time", &param.combo_3.hitStop.time, 0.1f);
+				ImGui::DragFloat("combo3_stopping_strength", &param.combo_3.hitStop.stoppingStrength, 0.1f);
+				//ImGui::DragFloat("combo3_hit_viberation.l_moter", &param.combo_3.hitViberation.L_moter, 0.1f);
+				//ImGui::DragFloat("combo3_hit_viberation.r_moter", &param.combo_3.hitViberation.R_moter, 0.1f);
+				//ImGui::DragFloat("combo3_vibe_time", &param.combo_3.hitViberation.VibeTime, 0.1f);
+			}
+
 			if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				const char* anime_item[] = { 
+				const char* anime_item[] = {
 					"PLAYER_IDLE",
 					"PLAYER_MOVE_FORWARD",
 					"PLAYER_MOVE_LEFT",
