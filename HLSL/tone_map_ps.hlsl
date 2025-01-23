@@ -71,6 +71,16 @@ float3 uncharted2_tonemapping(float3 color, float exposure)
     return color;
 }
 
+float3 ACESFilm(float3 color)
+{
+    float a = 2.51;
+    float b = 0.03;
+    float c = 2.43;
+    float d = 0.59;
+    float e = 0.14;
+    return saturate((color * (a * color + b)) / (color * (c * color + d) + e));
+}
+
 float4 main(VS_OUT pin) : SV_TARGET
 {
     float4 sampled_color = texture_map.Sample(sampler_states[POINT], pin.texcoord);
@@ -81,9 +91,9 @@ float4 main(VS_OUT pin) : SV_TARGET
 	// Apply tone mapping.
 	//fragment_color = 1 - exp(-fragment_color * exposure);
 	//fragment_color = filmic_tonemapping(fragment_color);
-	fragment_color = uncharted2_tonemapping(fragment_color, exposure);
+	//fragment_color = uncharted2_tonemapping(fragment_color, exposure);
 	//fragment_color = white_preserving_lumabased_reinhard_tonemapping(fragment_color);
-   
+    fragment_color = ACESFilm(fragment_color);
 #endif
     
 #if 0

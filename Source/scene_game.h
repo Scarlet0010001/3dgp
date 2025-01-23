@@ -55,6 +55,15 @@ private:
     std::shared_ptr<DirLight> dirLight = nullptr;
     //ディファードレンダー
     std::unique_ptr<DeferredRenderer> deferred = nullptr;
+
+    struct IBL_constants
+    {
+        DirectX::XMFLOAT4 lightRoti = { 3.0f,3.0f,3.0f,0.0f }; //光の輝き
+        DirectX::XMFLOAT4 iblIntencity = { 2.0f,0.0f,0.0f,0.0f };
+    };
+    std::unique_ptr<Constants<IBL_constants>> IBL_constant{};
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> toneMapPixelShader;
+
     /*
     //スカイボックス
     std::unique_ptr<SkyBox> skybox = nullptr;
@@ -74,6 +83,7 @@ private:
 
     //タイトルに戻る　※テスト用
     bool displayImgui = false;
+    bool IBLImgui = false;
 
     float cameraElapsedTime_ = 0.0f;
 };

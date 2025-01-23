@@ -138,7 +138,8 @@ float4 main(VS_OUT pin) : SV_TARGET
 
     // ライトごとのシェーディング処理のループ
     float3 L = normalize(-light_direction.xyz);
-    float3 Li = float3(1.0, 1.0, 1.0) * 3.0; // 光の輝き
+    //float3 Li = float3(1.0, 1.0, 1.0) * 3.0; // 光の輝き
+    float3 Li = light_roti.xyz; // 光の輝き
     const float NoL = max(0.0, dot(N, L));
     const float NoV = max(0.0, dot(N, V));
     if (NoL > 0.0 || NoV > 0.0)
@@ -149,9 +150,9 @@ float4 main(VS_OUT pin) : SV_TARGET
         const float NoH = max(0.0, dot(N, H));
         const float HoV = max(0.0, dot(H, V));
 
-        diffuse += Li * NoL * brdf_lambertian(f0, f90, c_diff, HoV);
+        diffuse += Li * NoL * brdf_lambertian(f0, f90, c_diff, HoV) * ibl_intencity.x;//明るさ帰る
         specular += Li * NoL * brdf_specular_ggx(
-            f0, f90, alpha_roughness, HoV, NoL, NoV, NoH);
+            f0, f90, alpha_roughness, HoV, NoL, NoV, NoH) * ibl_intencity.x;
     }
 
     diffuse += idl_radiance_lambertian(N, V, roughness_factor, c_diff, f0);

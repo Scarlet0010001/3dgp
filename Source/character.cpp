@@ -207,6 +207,9 @@ void Character::UpdateVerticalMove(float elapsedTime, DirectX::XMFLOAT3& positio
 	// キャラクターの下方向の移動量
 	float my = velocity.y * elapsedTime;
 
+	slopeRate = 0.0f;
+
+	DirectX::XMFLOAT3 normal = { 0,1,0 };
 
 	// キャラクターのY軸方向となる法線ベクトル
 	slopeNormal = { 0, 1, 0 };
@@ -227,7 +230,14 @@ void Character::UpdateVerticalMove(float elapsedTime, DirectX::XMFLOAT3& positio
 
 			//angle.y += hit.rotation.y;
 			// 法線ベクトル取得
-			//normal = hit.normal;
+			normal = hit.normal;
+
+			//傾斜率の計算
+			float normalLengthXZ =
+				sqrtf(hit.normal.x * hit.normal.x +
+					hit.normal.z * hit.normal.z);
+			slopeRate = 1.0f - (hit.normal.y / (normalLengthXZ + hit.normal.y));
+
 			//着地した
 			if (!isGround)
 			{
@@ -298,8 +308,14 @@ void Character::UpdateHorizontalVelocity(float elapsed_frame)
 		//摩擦による横方向の減速処理
 		if (length > friction)
 		{
-			(velocity.x < 0.0f) ? velocity.x += friction : velocity.x -= friction;
-			(velocity.z < 0.0f) ? velocity.z += friction : velocity.z -= friction;
+			//(velocity.x < 0.0f) ? velocity.x += friction : velocity.x -= friction;
+			//(velocity.z < 0.0f) ? velocity.z += friction : velocity.z -= friction;
+			// 単位ベクトル化
+			float vx = velocity.x / length;
+			float vz = velocity.z / length;
+
+			velocity.x -= vx * friction;
+			velocity.z -= vz * friction;
 		}
 		else
 		{
@@ -334,6 +350,13 @@ void Character::UpdateHorizontalVelocity(float elapsed_frame)
 				velocity.x = vx * charaParam.maxMoveSpeed;
 				velocity.z = vz * charaParam.maxMoveSpeed;
 			}
+
+			//下り坂でがたがたしないようにする
+			if (isGround && slopeRate > 0.0f)
+			{
+				velocity.y -= length * slopeRate * elapsed_frame;
+			}
+
 		}
 	}
 	else

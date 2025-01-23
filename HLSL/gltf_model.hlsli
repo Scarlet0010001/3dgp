@@ -42,3 +42,4 @@ cbuffer PRIMITIVE_JOINT_CONSTANTS : register(b2)
 {
     row_major float4x4 joint_matrices[PRIMITIVE_MAX_JOINTS];
 };
+

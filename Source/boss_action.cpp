@@ -161,11 +161,13 @@ void Boss::UpdateAttack_Tackle_State(float elapsedTime)
 	float distSq = vx * vx + vz * vz;
 
 	attackParam.isAttack = true;
-	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, targetPoint_pos);
+	DirectX::XMFLOAT3 pos = { position.x ,0.0f,position.z };
+	DirectX::XMFLOAT3 pointPos = { targetPoint_pos.x ,0.0f,targetPoint_pos.z };
+	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(pos, pointPos);
 	Move(dir_target_vec.x, dir_target_vec.z, param.run_speed);
 	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);	
 
-	const float radius = 2.0f;
+	const float radius = 3.5f;
 	if (distSq < radius * radius)
 	{
 		TransitionIdleState();
@@ -190,6 +192,12 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 		return;
 	}
 	else bossAnimation = BossAnimation::BOSS_JUMP;
+	//float length = targetPoint_pos.y - position.y;
+	//if (!isJump && length > 0 && time > 0.1f)
+	//{
+	//	isJump = true;
+	//	velocity.y = 10.0f;
+	//}
 
 	//–Ú•W’n“_‚Ü‚ÅXZ•½–Ê‚Å‚Ì‹——£”»’è
 	float vx = targetPoint_pos.x - position.x;
@@ -208,14 +216,15 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 			charaParam.moveSpeed = WALK_SPEED;
 			//charaParam.maxMoveSpeed = WALK_SPEED;
 			charaParam.acceleration = ACCELERATION_NORMAL_SPEED;
-
+			isJump = false;
 		}
 		else
 		{
 			state_duration = NORMAL_ATTACK_COOLTIME;
 			attackParam.isAttack = false;
 			charaParam.moveSpeed = 0;
-			velocity = {};
+			velocity.x = 0.0f;
+			velocity.z = 0.0f;
 			charaParam.acceleration = 0.0f;
 			//position = targetPoint_pos;
 		}

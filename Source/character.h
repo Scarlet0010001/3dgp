@@ -127,6 +127,7 @@ protected:
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };
 	//’n–Ê‚É“–‚½‚Á‚Ä‚¢‚é‚©
 	bool isGround = false;
+	float slopeRate = 1.0f;
 
 	float invincibleTimer = 0.0f;
 	float moveVec_x = 0.0f;

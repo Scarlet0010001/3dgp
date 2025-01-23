@@ -118,6 +118,14 @@ cbuffer BLUR_CONSTANTS : register(b10)
     float bloom_intensity;
 }
 
+cbuffer IBL_CONSTANTS : register(b11)
+{
+    float4 light_roti;//Œõ‚Ì‹P‚«
+    float4 ibl_intencity;
+
+}
+
+
 cbuffer CASCADE_SHADOW_MAP_CONSTANTS : register(b13)
 {
     cascade_shadow_map csm_data;

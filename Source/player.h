@@ -78,6 +78,9 @@ private:
 		PLAYER_POWER_L,//ã≠çUåÇç∂
 		PLAYER_POWER_R,//ã≠çUåÇâE
 
+		PLAYER_DAMAGE,
+		PLAYER_DEAD,
+
 		PLAYER_ANIME_COUNT,
 	};
 	PlayerAnimation playerAnimation = PLAYER_IDLE;
@@ -99,7 +102,7 @@ private:
 		LEFT_ATTACK,
 		RIGHT_ATTACK,
 		DAMAGE,
-		DIE,
+		DEAD,
 		ROLL,
 		SKILL,
 

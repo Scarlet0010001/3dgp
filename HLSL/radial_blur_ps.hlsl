@@ -43,13 +43,8 @@ float4 main(VS_OUT pin) : SV_TARGET
 	}
 	color /= float(samples);
 
-
-
-
-
-
-
 #if 0
+	
 	// Tone mapping : HDR -> SDR
 	const float exposure = 1.2;
 	color = 1 - exp(-color * exposure);
@@ -57,6 +52,7 @@ float4 main(VS_OUT pin) : SV_TARGET
 	// Gamma process
 	const float gamma = 2.2;
 	color = pow(color, 1.0 / gamma);
+	
 #endif
 
 	return float4(color, 1);

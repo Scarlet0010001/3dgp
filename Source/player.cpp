@@ -52,7 +52,7 @@ void Player::Initialize()
 	LoadDataFile();
 
 	//パラメーター初期化
-	position = { 0.0f, 15.0f, 0.0f };
+	position = { 0.0f, 5.0f, 0.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.charaInitParam;
@@ -62,7 +62,6 @@ void Player::Initialize()
 
 	jumpCount = jumpLimit;
 
-	position = { 0.0f,2.0f,0.0f };
 	scale.x = scale.y = scale.z = 2.0f;
 
 	charaParam.moveSpeed = 15.0f;
@@ -303,7 +302,7 @@ void Player::BoostUpdate(float elapsedTime)
 
 	if (state != STATE::WING
 		&& state != STATE::DAMAGE
-		&& state != STATE::DIE
+		&& state != STATE::DEAD
 		)
 	{
 		if (!isGround
@@ -318,6 +317,8 @@ bool Player::InputMove(float elapsedTime)
 {
 	//進行ベクトル取得
 	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
+	//move_vec.x = 0.5f;
+	//move_vec.z = 0.5f;
 	//移動処理
 	Move(move_vec.x, move_vec.z, charaParam.moveSpeed);
 	Turn(elapsedTime, camera->GetForward(), charaParam.turnSpeed, orientation);
@@ -345,7 +346,7 @@ bool Player::InputMove(float elapsedTime, float move_speed)
 
 	//移動処理
 	Move(move_vec.x, move_vec.z, move_speed);
-	Turn(elapsedTime, move_vec, charaParam.turnSpeed, orientation);
+	Turn(elapsedTime, camera->GetForward(), charaParam.turnSpeed, orientation);
 
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
@@ -402,9 +403,8 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
 	vec.x = (camera_forward_x * ay) + (camera_right_x * ax);
 	vec.y = (camera_forward_y * ay) + (camera_right_y * ax);
 	vec.z = (camera_forward_z * ay) + (camera_right_z * ax);
-	
-	//vec.x = 0.5f;
-	//vec.z = 0.5f;
+	DirectX::XMVECTOR v = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&vec));
+	DirectX::XMStoreFloat3(&vec, v);
 	return vec;
 }
 
@@ -624,12 +624,15 @@ void Player::DebugPrimitiveUpdate()
 		attackCollision_position[LR::LEFT] = saber_position(lowerArm_position[LR::LEFT], beamSaber_position[LR::LEFT]);
 		attackCollision_position[LR::RIGHT] = saber_position(lowerArm_position[LR::RIGHT], beamSaber_position[LR::RIGHT]);
 
-		//debugRender->CreateSphere(
-		//	attackCollision_position[LR::LEFT],
-		//	1.0f, { 1.0f,0.0f,0.0f,1.0f });
-		//debugRender->CreateSphere(
-		//	attackCollision_position[LR::RIGHT],
-		//	1.0f, { 1.0f,0.0f,0.0f,1.0f });
+		if (attackParam.isAttack)
+		{
+			debugRender->CreateSphere(
+				attackCollision_position[LR::LEFT],
+				1.0f, { 1.0f,0.0f,0.0f,1.0f });
+			debugRender->CreateSphere(
+				attackCollision_position[LR::RIGHT],
+				1.0f, { 1.0f,0.0f,0.0f,1.0f });
+		}
 	}
 
 	//自分の当たり判定
@@ -668,6 +671,9 @@ void Player::DebugGUI()
 				state_name = magic_enum::enum_name<STATE>(state);
 				ImGui::Text(state_name.c_str());
 				ImGui::DragFloat3("velocity:", &velocity.x);
+				ImGui::DragFloat("moveVec_x:", &moveVec_x);
+				ImGui::DragFloat("moveVec_y:", &moveVec_y);
+				ImGui::DragFloat("moveVec_z:", &moveVec_z);
 			}
 			if (ImGui::CollapsingHeader("Param", ImGuiTreeNodeFlags_DefaultOpen))
 			{

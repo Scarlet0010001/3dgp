@@ -142,7 +142,11 @@ void Player::UpdateMoveState(float elapsedTime)
 		playerAnimation = PlayerAnimation::PLAYER_MOVE_LEFT;
 	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
 	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
-
+	
+	if (gamePad->GetButton() & gamePad->BTN_LEFT_THUMB)
+	{
+		int i = 0;
+	}
 	if (!InputMove(elapsedTime) /*&& isGround*/)
 	{
 		TransitionIdleState();

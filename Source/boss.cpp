@@ -93,21 +93,21 @@ void Boss::Update(float elapsedTime)
 
 	(this->*act_update)(elapsedTime);
 
-	{//テスト
-		DirectX::XMFLOAT4X4 worldTransform = animated_nodes[ANIME_NODE::NOW_ANIMATION].at(42).world_transform;
-		DirectX::XMMATRIX WorldTransform =
-			DirectX::XMLoadFloat4x4(&worldTransform);
-		DirectX::XMMATRIX InverseWorldTransform =
-			DirectX::XMMatrixInverse(nullptr, WorldTransform);
-		DirectX::XMVECTOR HeadWorldForward = DirectX::XMLoadFloat3(&Math::get_posture_forward(worldTransform));
-		HeadWorldForward = DirectX::XMVector3Normalize(HeadWorldForward);
-		//DirectX::XMVECTOR HeadLocalForward =
-		//	DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
-		//HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
-		
-		//DirectX::XMStoreFloat3(&turretLocalForward, HeadLocalForward);
-		DirectX::XMStoreFloat3(&turretWorldForward, HeadWorldForward);
-	}
+	//{//テスト
+	//	DirectX::XMFLOAT4X4 worldTransform = animated_nodes[ANIME_NODE::NOW_ANIMATION].at(42).world_transform;
+	//	DirectX::XMMATRIX WorldTransform =
+	//		DirectX::XMLoadFloat4x4(&worldTransform);
+	//	DirectX::XMMATRIX InverseWorldTransform =
+	//		DirectX::XMMatrixInverse(nullptr, WorldTransform);
+	//	DirectX::XMVECTOR HeadWorldForward = DirectX::XMLoadFloat3(&Math::get_posture_forward(worldTransform));
+	//	HeadWorldForward = DirectX::XMVector3Normalize(HeadWorldForward);
+	//	//DirectX::XMVECTOR HeadLocalForward =
+	//	//	DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
+	//	//HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
+	//	
+	//	//DirectX::XMStoreFloat3(&turretLocalForward, HeadLocalForward);
+	//	DirectX::XMStoreFloat3(&turretWorldForward, HeadWorldForward);
+	//}
 
 
 	UpdateInvicibleTimer(elapsedTime);
@@ -329,6 +329,14 @@ void Boss::OnDead()
 }
 
 void Boss::OnDamaged(WINCE_TYPE type)
+{
+}
+
+void Boss::LoadDataFile()
+{
+}
+
+void Boss::SaveDataFile()
 {
 }
 

@@ -115,7 +115,7 @@ endloop
 itof r0.x, r0.x
 div r0.xyz, r2.xyzx, r0.xxxx  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z
 
-#line 62
+#line 58
 itof o0.w, l(1)
 mov o0.xyz, r0.xyzx
 ret 

@@ -24,6 +24,7 @@ private:
 		BOSS_MISSILE,
 		BOSS_HIT,
 		BOSS_DEAD,
+		BOSS_WAKEUP,
 		BOSS_ANIME_COUNT,
 	};
 	enum class STATE
@@ -37,6 +38,7 @@ private:
 		SHOT_H,
 		DAMAGE,
 		DEAD,
+		WAKEUP,
 	};
 	enum class ATTACK_TYPE
 	{
@@ -213,6 +215,7 @@ private:
 	DirectX::XMFLOAT3 target_pos;
 	DirectX::XMFLOAT3 targetPoint_pos{};
 	DirectX::XMFLOAT3 shot_pos;
+	bool isJump = false;
 
 	STATE state;
 

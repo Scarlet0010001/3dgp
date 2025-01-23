@@ -11,7 +11,7 @@ private:
 	struct radial_blur_constants
 	{
 		DirectX::XMFLOAT2 blur_center = { 0.5, 0.5 }; // center point where the blur is applied
-		float blur_strength = 1.0f; // blurring strength
+		float blur_strength = 0.0f; // blurring strength
 		float blur_radius = 0.5f; // blurred radiu
 		float blur_decay = 0.2f; // ratio of distance to decay to radius
 		float pads[3];

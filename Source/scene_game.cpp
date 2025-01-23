@@ -44,6 +44,9 @@ void SceneGame::Initialize()
     skymap = std::make_unique<SkyMap>(graphics.GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/skybox.dds");
 
     radialBlur = std::make_unique<RadialBlur>(graphics.GetDevice().Get());
+    IBL_constant = std::make_unique<Constants<IBL_constants>>(Graphics::Instance().GetDevice().Get());
+    create_ps_from_cso(graphics.GetDevice().Get(), "Shader/tone_map_ps.cso", toneMapPixelShader.GetAddressOf());
+
 }
 
 void SceneGame::Finalize()
@@ -126,7 +129,7 @@ void SceneGame::Render(float elapsedTime)
 
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthOFF_WriteOFF, ST_BLEND::ALPHA, ST_RASTERIZER::CULL_NONE);
     skymap->blit(graphics.Get_DC().Get(), view_pro);
-
+    IBL_constant->Bind(Graphics::Instance().Get_DC().Get(), 11, CB_FLAG::ALL);
     //***************************************************************//
     ///						ディファ―ドレンダリング				  ///
     //***************************************************************//
@@ -172,14 +175,19 @@ void SceneGame::Render(float elapsedTime)
     { framebuffers[0]->get_color_map().Get()/*, framebuffers[0]->depth_map().Get() */};
     
     bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1);
+    
+    graphics.SetGraphicStatePriset(ST_DEPTH::DepthOFF_WriteOFF, ST_BLEND::NORMAL, ST_RASTERIZER::CULL_NONE);
+    bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1, toneMapPixelShader.Get());
+
+    radialBlur->blit(graphics.Get_DC().Get(), shader_resource_views);
     LightManager::Instance().Draw(shader_resource_views, 1);
     LightManager::Instance().DebugGUI();
-    radialBlur->blit(graphics.Get_DC().Get(), shader_resource_views);
 
 #if USE_IMGUI
     camera->DebugGui();
     radialBlur->DebugGUI();
     imguiMenuBar("Game", "game_menu", displayImgui);
+
     if (displayImgui)
     {
         if (ImGui::Button("back_title"))
@@ -188,7 +196,17 @@ void SceneGame::Render(float elapsedTime)
             SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle()));
             return;
         };
+    }
 
+    imguiMenuBar("Game", "IBL", IBLImgui);
+    if (IBLImgui)
+    {
+        if (ImGui::Begin("IBL", nullptr, ImGuiWindowFlags_None))
+        {
+            ImGui::DragFloat4("lightRoti", &IBL_constant->data.lightRoti.x);
+            ImGui::DragFloat4("iblIntencity", &IBL_constant->data.iblIntencity.x);
+        }
+        ImGui::End();
     }
 #endif
 
