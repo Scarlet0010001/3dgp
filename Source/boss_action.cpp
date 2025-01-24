@@ -38,7 +38,7 @@ void Boss::TransitionAttack_Tackle_State()
 	state = STATE::TACKLE;
 	tackleCameraShake.onDistanceShake = true;
 	Camera::Instance().SetCameraShake(tackleCameraShake);
-
+	attackParam = param.tackleParam;
 	bossAnimation = BossAnimation::BOSS_RUN;
 	stateTimer = 0;
 	state_duration = 1.0f;
@@ -50,6 +50,7 @@ void Boss::TransitionAttack_Jump_State()
 	state = STATE::JUMP;
 	//charaParam.moveSpeed = CalcMoveSpeed(target_pos, 0.6f);
 	charaParam.acceleration = ACCELERATION_JUMP_SPEED;
+	attackParam = param.stompParam;
 	bossAnimation = BossAnimation::BOSS_HIT;
 	stateTimer = 0;
 	state_duration = 2.5f;
@@ -192,12 +193,13 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 		return;
 	}
 	else bossAnimation = BossAnimation::BOSS_JUMP;
-	//float length = targetPoint_pos.y - position.y;
-	//if (!isJump && length > 0 && time > 0.1f)
-	//{
-	//	isJump = true;
-	//	velocity.y = 10.0f;
-	//}
+
+	float length = targetPoint_pos.y - position.y;
+	if (!isJump && length < 0 && time > 0.1f)
+	{
+		isJump = true;
+		velocity.y = 20.0f;
+	}
 
 	//–Ú•W’n“_‚Ü‚ÅXZ•½–Ê‚Å‚Ì‹——£”»’è
 	float vx = targetPoint_pos.x - position.x;
@@ -207,12 +209,13 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	DirectX::XMFLOAT3 dir_target_vec{};
 	attackParam.isAttack = true;
 
-	const float radius = 4.0f;
+	const float radius = 2.0f;
 	if (distSq < radius * radius)
 	{
 		if (model->GetIsEndAnimation())
 		{
 			TransitionIdleState();
+			attackParam.isAttack = false;
 			charaParam.moveSpeed = WALK_SPEED;
 			//charaParam.maxMoveSpeed = WALK_SPEED;
 			charaParam.acceleration = ACCELERATION_NORMAL_SPEED;
@@ -221,7 +224,6 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 		else
 		{
 			state_duration = NORMAL_ATTACK_COOLTIME;
-			attackParam.isAttack = false;
 			charaParam.moveSpeed = 0;
 			velocity.x = 0.0f;
 			velocity.z = 0.0f;

@@ -13,6 +13,7 @@ void Player::TransitionMoveState()
 {
 	p_update = &Player::UpdateMoveState;
 	state = STATE::MOVE;
+	charaParam.acceleration = accelerationState[ACCELERATION_STATE::MOVE];
 
 }
 
@@ -21,21 +22,29 @@ void Player::TransitionWingState()
 	p_update = &Player::UpdateWingState;
 	playerAnimation = PlayerAnimation::PLAYER_WING_START;
 	state = STATE::WING;
+	charaParam.acceleration = accelerationState[ACCELERATION_STATE::WING];
 	isHover = false;
 }
 
-//void Player::TransitionAvoidanceState()
-//{
-//	p_update = &Player::UpdateAvoidanceState;
-//	playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
-//	state = State::ROLL;
-//	param.avoidanceTimer = 0;
-//}
+void Player::TransitionAvoidanceState()
+{
+	p_update = &Player::UpdateAvoidanceState;
+	playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
+	state = STATE::ROLL;
+	charaParam.maxMoveSpeed = param.avoidanceSpeed;
+	charaParam.acceleration = accelerationState[ACCELERATION_STATE::AVOIDANCE];
+
+	param.avoidanceTimer = 0;
+}
 
 void Player::TransitionJumpState()
 {
 	p_update = &Player::UpdateJumpState;
-	playerAnimation = PlayerAnimation::PLAYER_JUMP_START;
+	if(isGround)
+		playerAnimation = PlayerAnimation::PLAYER_JUMP_START;
+	else
+		playerAnimation = PlayerAnimation::PLAYER_JUMP;
+	charaParam.acceleration = accelerationState[ACCELERATION_STATE::MOVE];
 	state = STATE::JUMP;
 
 }
@@ -116,13 +125,14 @@ void Player::UpdateIdleState(float elapsedTime)
 	//飛行入力
 	InputWing();
 	//攻撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X
+		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		)
 	{
 		TransitionCombo_01_01_State();
 	}
 	//射撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
-		|| mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
+	if (mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
 	{
 		TransitionShotState();
 	}
@@ -143,10 +153,6 @@ void Player::UpdateMoveState(float elapsedTime)
 	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
 	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
 	
-	if (gamePad->GetButton() & gamePad->BTN_LEFT_THUMB)
-	{
-		int i = 0;
-	}
 	if (!InputMove(elapsedTime) /*&& isGround*/)
 	{
 		TransitionIdleState();
@@ -159,13 +165,14 @@ void Player::UpdateMoveState(float elapsedTime)
 	//飛行入力
 	InputWing();
 	//攻撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X
+		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		)
 	{
 		TransitionCombo_01_01_State();
 	}
 	//射撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
-		|| mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
+	if (mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
 	{
 		TransitionShotState();
 	}
@@ -192,7 +199,7 @@ void Player::UpdateWingState(float elapsedTime)
 
 		InputMoveWing(elapsedTime);
 	}
-	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)
+	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)//Q
 	{
 		playerAnimation = PlayerAnimation::PLAYER_WING_END;
 	}
@@ -207,8 +214,9 @@ void Player::UpdateWingState(float elapsedTime)
 	//InputAvoidance();
 
 	//攻撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	if (mouse->GetButton() & mouse->BTN_RIGHT_CLICK)
 	{
+
 	}
 
 	//速力処理更新
@@ -216,48 +224,44 @@ void Player::UpdateWingState(float elapsedTime)
 
 }
 
-//void Player::UpdateAvoidanceState(float elapsedTime)
-//{
-//	//徐々に速度を落としていく
-//	velocity.x /= 2.0f;
-//	velocity.z /= 2.0f;
-//
-//	//速力処理更新
-//	UpdateVelocity(elapsedTime, position);
-//	//if (model->animations.anime_param.frame_index > 33 / 2)
-//	if (param.avoidanceTimer > 30)
-//	{
-//		//地面に足がついたフレームからはさらに速度落とす
-//		velocity.x /= 2.0f;
-//		velocity.z /= 2.0f;
-//	}
-//	else
-//	{
-//		//向いている方向に速度を足す
-//		velocity.x = (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).x;
-//		velocity.z = (Math::get_posture_forward(orientation) * (param.avoidanceSpeed)).z;
-//
-//	}
-//
-//	//遷移処理
-//	//if (model->anime_param.frame_index > 35 / 2)
-//	if(param.avoidanceTimer > 30)
-//	{
-//		// MOVEステートへ移行
-//		if (InputMove(elapsedTime))
-//		{
-//			TransitionMoveState();
-//			return;
-//		}
-//	}
-//
-//	//if (model->is_end_animation())
-//	if (param.avoidanceTimer > 40)
-//	{
-//		TransitionIdleState();
-//	}
-//	param.avoidanceTimer++;
-//}
+void Player::UpdateAvoidanceState(float elapsedTime)
+{	
+	//進行ベクトル取得
+	const DirectX::XMFLOAT3 moveVec = GetMoveVec(camera);
+	//if(moveVec.x ==0.0f && moveVec.z == 0.0f)
+
+	//徐々に速度を落としていく
+	velocity.x /= 2.0f;
+	velocity.z /= 2.0f;
+	//速力処理更新
+	UpdateVelocity(elapsedTime, position);
+
+	//if (param.avoidanceTimer < 0.1f)
+	//{
+	//	//向いている方向に速度を足す
+	//	//velocity.x += moveVec.x * param.avoidanceSpeed;
+	//	//velocity.z += moveVec.z * param.avoidanceSpeed;
+	//	charaParam.acceleration = accelerationState[ACCELERATION_STATE::AVOIDANCE];
+	//}
+	if (param.avoidanceTimer > 0.1f)
+	{
+		charaParam.maxMoveSpeed = charaParam.moveSpeed;
+
+		// MOVEステートへ移行
+		if (InputMove(elapsedTime))
+		{
+			TransitionMoveState();
+			return;
+		}
+		else
+		{
+			TransitionIdleState();
+			return;
+		}
+	}
+
+	param.avoidanceTimer += elapsedTime;
+}
 
 void Player::UpdateJumpState(float elapsedTime)
 {
@@ -277,8 +281,11 @@ void Player::UpdateJumpState(float elapsedTime)
 	//飛行入力
 	InputWing();
 	//攻撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X
+		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		)
 	{
+		TransitionCombo_01_01_State();
 	}
 
 	//速力処理更新
@@ -295,8 +302,7 @@ void Player::UpdateLandingState(float elapsedTime)
 
 void Player::UpdateShotState(float elapsedTime)
 {
-	if (gamePad->GetButtonUp() & gamePad->BTN_RIGHT_TRIGGER
-		|| mouse->GetButtonUp() & mouse->BTN_RIGHT_CLICK)
+	if (mouse->GetButtonUp() & mouse->BTN_RIGHT_CLICK)
 	{
 		TransitionIdleState();
 	}
@@ -321,7 +327,9 @@ void Player::UpdateShotState(float elapsedTime)
 	//飛行入力
 	InputWing();
 	//攻撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X
+		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		)
 	{
 		TransitionCombo_01_01_State();
 	}
@@ -333,7 +341,9 @@ void Player::UpdateShotState(float elapsedTime)
 
 void Player::UpdateCombo_01_01_State(float elapsedTime)
 {
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X
+		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		)
 	{
 		nextCombo = true;
 	}
@@ -362,7 +372,9 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 
 void Player::UpdateCombo_01_02_State(float elapsedTime)
 {
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X
+		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		)
 	{
 		nextCombo = true;
 
@@ -393,7 +405,9 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 
 void Player::UpdateCombo_01_03_State(float elapsedTime)
 {
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X
+		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		)
 	{
 		nextCombo = true;
 	}
@@ -424,7 +438,9 @@ void Player::UpdateCombo_PowerL_State(float elapsedTime)
 {
 	if (0.6f < time)
 	{
-		if (gamePad->GetButtonDown() & gamePad->BTN_X)
+		if (gamePad->GetButtonDown() & gamePad->BTN_X
+			//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+			)
 		{
 			TransitionCombo_01_03_State();
 		}

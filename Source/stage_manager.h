@@ -19,6 +19,7 @@ public:
 	void Update(float elapsedTime);
 	//•`‰æˆ—
 	void Render(float elapsedTime);
+	void DebugGUI();
 	//void Render(float elapsedTime, Camera* camera);
 	//void shadow_render(float elapsedTime);
 	//ƒXƒe[ƒW“o˜^

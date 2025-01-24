@@ -21,6 +21,7 @@ void SceneGame::Initialize()
     Graphics& graphics = Graphics::Instance();
     
     framebuffers[0] = std::make_unique<framebuffer>(graphics.GetDevice().Get(), SCREEN_WIDTH, SCREEN_HEIGHT);
+    framebuffers[1] = std::make_unique<framebuffer>(graphics.GetDevice().Get(), SCREEN_WIDTH, SCREEN_HEIGHT);
     bit_block_transfer = std::make_unique<fullscreen_quad>(graphics.GetDevice().Get());
 
     //camera = std::make_unique<Camera>();
@@ -106,6 +107,8 @@ void SceneGame::Render(float elapsedTime)
 
     framebuffers[0]->clear(graphics.Get_DC().Get(),
         FB_FLAG::COLOR_DEPTH_STENCIL);
+    framebuffers[1]->clear(graphics.Get_DC().Get(),
+        FB_FLAG::COLOR_DEPTH_STENCIL);
     framebuffers[0]->activate(graphics.Get_DC().Get(),
         FB_FLAG::COLOR_DEPTH_STENCIL);
     //***************************************************************//
@@ -174,18 +177,25 @@ void SceneGame::Render(float elapsedTime)
     ID3D11ShaderResourceView* shader_resource_views[2]
     { framebuffers[0]->get_color_map().Get()/*, framebuffers[0]->depth_map().Get() */};
     
-    bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1);
-    
-    graphics.SetGraphicStatePriset(ST_DEPTH::DepthOFF_WriteOFF, ST_BLEND::NORMAL, ST_RASTERIZER::CULL_NONE);
-    bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1, toneMapPixelShader.Get());
-
-    radialBlur->blit(graphics.Get_DC().Get(), shader_resource_views);
+    framebuffers[1]->activate(graphics.Get_DC().Get());
     LightManager::Instance().Draw(shader_resource_views, 1);
-    LightManager::Instance().DebugGUI();
+    bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1);
+    framebuffers[1]->deactivate(graphics.Get_DC().Get());
+    
+    //graphics.SetGraphicStatePriset(ST_DEPTH::DepthOFF_WriteOFF, ST_BLEND::NORMAL, ST_RASTERIZER::CULL_NONE);
+    //bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1, toneMapPixelShader.Get());
+
+    radialBlur->blit(graphics.Get_DC().Get(), framebuffers[1]->get_color_map().GetAddressOf());
 
 #if USE_IMGUI
+    stageManager.DebugGUI();
     camera->DebugGui();
+    player->DebugGUI();
+    boss->DebugDUI();
+
+    bulletManager.DebugGUI();
     radialBlur->DebugGUI();
+    LightManager::Instance().DebugGUI();
     imguiMenuBar("Game", "game_menu", displayImgui);
 
     if (displayImgui)
@@ -214,12 +224,13 @@ void SceneGame::Render(float elapsedTime)
 
 void SceneGame::JudgeCollision()
 {
+    boss->CalcAttack_vs_Player(player->collider, player->GetHeight(), 
+        player->damagedFunction);
+
     player->CalcCollision_vs_Enemy(boss->GetBodyCollision().capsule,
         boss->GetBodyCollision().height);
     player->CalcAttack_vs_Enemy(boss->GetBodyCollision().capsule,
         boss->GetBodyCollision().height, boss->damagedFunction);
-
-    //boss->CalcAttack_vs_Player();
 }
 
 void SceneGame::DebugGui()

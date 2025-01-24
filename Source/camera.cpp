@@ -100,7 +100,7 @@ void Camera::Update(float elapsedTime)
 				//ƒJƒƒ‰c‘€ì
 				if (ay > 0.1f || ay < 0.1f)
 				{
-					angle.x = ay * DirectX::XMConvertToRadians(rollSpeed) * elapsedTime;
+					angle.x = -ay * DirectX::XMConvertToRadians(rollSpeed) * elapsedTime;
 				}
 				//ƒJƒƒ‰‰¡‘€ì
 				if (ax > 0.1f || ax < 0.1f)
@@ -199,8 +199,8 @@ void Camera::Update(float elapsedTime)
 		{
 			DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
 			
-			debugRender->CreateSphere(
-				trakkingTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
+			//debugRender->CreateSphere(
+			//	trakkingTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
 			//debugRender->CreateSphere(
 			//	lockOnTarget, 1.0f, { 1.0f,1.0f,0.0f,1.0f });
 		}

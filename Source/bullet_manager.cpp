@@ -49,7 +49,6 @@ void BulletManager::Render(float elapsedTime)
     {
         bullet->Render(elapsedTime);
     }
-    DebugGUI();
 }
 
 void BulletManager::DrawDebugPrimitive()

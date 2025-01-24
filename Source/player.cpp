@@ -54,15 +54,14 @@ void Player::Initialize()
 	//パラメーター初期化
 	position = { 0.0f, 5.0f, 0.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
+	scale.x = scale.y = scale.z = 2.0f;
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.charaInitParam;
 
 	//体力初期化
 	health = charaParam.maxHealth;
-
+	stepOffset = 2.0f;
 	jumpCount = jumpLimit;
-
-	scale.x = scale.y = scale.z = 2.0f;
 
 	charaParam.moveSpeed = 15.0f;
 
@@ -93,7 +92,7 @@ void Player::Update(float elapsedTime)
 	//更新処理
 	(this->*p_update)(elapsedTime);
 
-	if (gamePad->GetButtonDown() & GamePad::BTN_Y)
+	if (gamePad->GetButtonDown() & GamePad::BTN_Y)//V
 	{
 		camera->SetLockOn();
 	}
@@ -178,9 +177,6 @@ void Player::Render_f(float elapsedTime)
 		playerAnimation_old = playerAnimation;
 
 	}
-
-	//デバッグGUI描画
-	DebugGUI();
 
 }
 
@@ -293,7 +289,7 @@ void Player::BoostUpdate(float elapsedTime)
 		param.boostTimer -= elapsedTime;
 	if (param.boostTimer >= MAX_BOOST_TIMER)
 		param.boostTimer = MAX_BOOST_TIMER;
-
+	
 	if (param.boostTimer < 0 && isHover)
 	{
 		isHover = false;
@@ -316,14 +312,13 @@ void Player::BoostUpdate(float elapsedTime)
 bool Player::InputMove(float elapsedTime)
 {
 	//進行ベクトル取得
-	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
-	//move_vec.x = 0.5f;
-	//move_vec.z = 0.5f;
+	const DirectX::XMFLOAT3 moveVec = GetMoveVec(camera);
+
 	//移動処理
-	Move(move_vec.x, move_vec.z, charaParam.moveSpeed);
+	Move(moveVec.x, moveVec.z, charaParam.moveSpeed);
 	Turn(elapsedTime, camera->GetForward(), charaParam.turnSpeed, orientation);
 
-	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
+	return moveVec.x != 0.0f || moveVec.y != 0.0f || moveVec.z != 0.0f;
 }
 
 bool Player::InputMove(float elapsedTime, float restrictionMove, float restrictionTurn)
@@ -410,8 +405,8 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
 
 void Player::InputJump()
 {
-	if (gamePad->GetButtonDown() & GamePad::BTN_A 
-		|| gamePad->GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER
+	if (gamePad->GetButtonDown() & GamePad::BTN_A ||
+		gamePad->GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER
 		) //スペースを押したらジャンプ
 	{
 		if (jumpCount < jumpLimit)
@@ -431,14 +426,14 @@ void Player::InputAvoidance()
 {
 	if (gamePad->GetButtonDown() & GamePad::BTN_B)
 	{
-		//TransitionAvoidanceState();
+		TransitionAvoidanceState();
 	}
 
 }
 
 void Player::InputWing()
 {
-	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)
+	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)//Q
 	{
 		TransitionWingState();
 	}

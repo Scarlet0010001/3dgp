@@ -336,7 +336,8 @@ void Character::UpdateHorizontalVelocity(float elapsed_frame)
 			//‰Á‘¬—Í
 			float acceleration = charaParam.acceleration * elapsed_frame;
 			//‹ó’†‚É‚¢‚é‚Æ‚«‚Í‰Á‘¬—Í‚ğŒ¸‚ç‚·
-			if (GetIsGround()) acceleration += charaParam.airControl;
+			if (GetIsGround()) 
+				acceleration += charaParam.airControl;
 			//ˆÚ“®ƒxƒNƒgƒ‹‚É‚æ‚é‰Á‘¬ˆ—
 			velocity.x += moveVec_x * acceleration;
 			velocity.z += moveVec_z * acceleration;

@@ -9,6 +9,10 @@
 #include "Graphics.h"
 #include "magic_enum/include/magic_enum.hpp"
 
+#include <filesystem>
+#include <fstream>
+#include <cereal/archives/json.hpp>
+
 #include <stack>
 
 Boss::Boss()
@@ -70,6 +74,8 @@ void Boss::Initialize()
 	//体力初期化
 	health = charaParam.maxHealth;
 
+	stepOffset = 2.0f;
+
 	tackleCameraShake.max_X_shake = 8.0f;
 	tackleCameraShake.max_Y_shake = 12.0f;
 
@@ -81,7 +87,9 @@ void Boss::Initialize()
 	bossBodyCollision.height = 10;
 	bossBodyCollision.capsule.end = bossBodyCollision.capsule.start;
 	bossBodyCollision.capsule.end.y = bossBodyCollision.capsule.start.y + bossBodyCollision.height;
-
+	bossBodyCollision.attackRadius = 5.2f;
+	bossBodyCollision.attackHeight = 10;
+	
 	damagedFunction = [=](int damage, float invincible, WINCE_TYPE type)->bool {return ApplyDamage(damage, invincible, type); };
 }
 
@@ -185,11 +193,8 @@ void Boss::Render_f(float elapsedTime)
 		model->render(graphics.Get_DC().Get(), transform, animated_nodes[ANIME_NODE::NOW_ANIMATION]);
 		//model->render(graphics.Get_DC().Get(), transform, lookAt_nodes);
 		bossAnimation_old = bossAnimation;
-		//model->nodes;
 	}
 
-	//デバッグGUI描画
-	DebugDUI();
 }
 
 void Boss::Render_ui(float elapsedTime)
@@ -314,8 +319,28 @@ void Boss::LookAt_turret(std::vector<gltf_model::node>& nodes)
 	}
 }
 
-void Boss::CalcAttack_vs_Player(DirectX::XMFLOAT3 capsule_start, DirectX::XMFLOAT3 capsule_end, float colider_radius, AddDamageFunc damaged_func)
+void Boss::CalcAttack_vs_Player(Capsule capsule_collider, float collider_height, AddDamageFunc damaged_func)
 {
+	if (!attackParam.isAttack)
+		return;
+
+	Camera &camera = Camera::Instance();
+
+	if (Collision::CylinderVsCylinder(
+		bossBodyCollision.capsule.start, bossBodyCollision.attackRadius, bossBodyCollision.attackHeight,
+		capsule_collider.start, capsule_collider.radius, collider_height))
+	{
+		//攻撃対象に与えるダメージ量と無敵時間
+		if (damaged_func(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::NONE))
+		{
+			//カメラシェイク
+			camera.SetCameraShake(attackParam.cameraShake);
+
+			//ヒットストップ
+			camera.SetHitStop(attackParam.hitStop);
+		}
+	}
+
 }
 
 float Boss::CalcMoveSpeed(DirectX::XMFLOAT3 target, float time)
@@ -334,10 +359,36 @@ void Boss::OnDamaged(WINCE_TYPE type)
 
 void Boss::LoadDataFile()
 {
+	// Jsonファイルから値を取得
+	std::filesystem::path path = filePath;
+	path.replace_extension(".json");
+	if (std::filesystem::exists(path.c_str()))
+	{
+		std::ifstream ifs;
+		ifs.open(path);
+		if (ifs)
+		{
+			cereal::JSONInputArchive o_archive(ifs);
+			o_archive(param);
+		}
+	}
+
 }
 
 void Boss::SaveDataFile()
 {
+	//ベースクラスの初期化パラメーター情報を更新
+	// Jsonファイルから値を取得
+	std::filesystem::path path = filePath;
+	path.replace_extension(".json");
+	std::ofstream ifs;
+	ifs.open(path);
+	if (ifs)
+	{
+		cereal::JSONOutputArchive o_archive(ifs);
+		o_archive(param);
+	}
+
 }
 
 bool Boss::FindLoopAnimation(BossAnimation BA)
@@ -397,22 +448,85 @@ void Boss::DebugDUI()
 				ImGui::DragFloat3("velocity:", &velocity.x);
 			}
 			//トランスフォーム
-			if (ImGui::CollapsingHeader("Turret_Head_Transform", ImGuiTreeNodeFlags_DefaultOpen))
+			//if (ImGui::CollapsingHeader("Turret_Head_Transform", ImGuiTreeNodeFlags_DefaultOpen))
+			//{
+			//	//回転
+			//	ImGui::DragFloat4("Rotation", &lookAt_nodes.at(42).rotation.x);
+			//	//回転				
+			//	ImGui::DragFloat4("global_transform0:", &lookAt_nodes.at(42).global_transform._11);
+			//	ImGui::DragFloat4("global_transform1:", &lookAt_nodes.at(42).global_transform._21);
+			//	ImGui::DragFloat4("global_transform2:", &lookAt_nodes.at(42).global_transform._31);
+			//	ImGui::DragFloat4("global_transform3:", &lookAt_nodes.at(42).global_transform._41);
+			//	//回転
+			//	ImGui::DragFloat4("Rotation", &model->nodes.at(42).rotation.x);
+			//	//回転				
+			//	ImGui::DragFloat4("global_transform0:", &model->nodes.at(42).global_transform._11);
+			//	ImGui::DragFloat4("global_transform1:", &model->nodes.at(42).global_transform._21);
+			//	ImGui::DragFloat4("global_transform2:", &model->nodes.at(42).global_transform._31);
+			//	ImGui::DragFloat4("global_transform3:", &model->nodes.at(42).global_transform._41);
+			//}
+			if (ImGui::CollapsingHeader("Param", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				//回転
-				ImGui::DragFloat4("Rotation", &lookAt_nodes.at(42).rotation.x);
-				//回転				
-				ImGui::DragFloat4("global_transform0:", &lookAt_nodes.at(42).global_transform._11);
-				ImGui::DragFloat4("global_transform1:", &lookAt_nodes.at(42).global_transform._21);
-				ImGui::DragFloat4("global_transform2:", &lookAt_nodes.at(42).global_transform._31);
-				ImGui::DragFloat4("global_transform3:", &lookAt_nodes.at(42).global_transform._41);
-				//回転
-				ImGui::DragFloat4("Rotation", &model->nodes.at(42).rotation.x);
-				//回転				
-				ImGui::DragFloat4("global_transform0:", &model->nodes.at(42).global_transform._11);
-				ImGui::DragFloat4("global_transform1:", &model->nodes.at(42).global_transform._21);
-				ImGui::DragFloat4("global_transform2:", &model->nodes.at(42).global_transform._31);
-				ImGui::DragFloat4("global_transform3:", &model->nodes.at(42).global_transform._41);
+				std::string state_name;
+				state_name = magic_enum::enum_name<STATE>(state);
+				ImGui::Text(state_name.c_str());
+
+				ImGui::DragInt("max_health", &charaParam.maxHealth);
+				ImGui::DragInt("hp", &health);
+				ImGui::DragFloat("height", &charaParam.height);
+				ImGui::DragFloat("radius", &charaParam.radius);
+				ImGui::DragFloat("moveSpeed", &charaParam.moveSpeed, 0.1f);
+				ImGui::DragFloat("turnspeed", &charaParam.turnSpeed, 0.1f);
+				ImGui::DragFloat("invinsible_timer", &invincibleTimer);
+				ImGui::DragFloat("friction", &charaParam.friction);
+				ImGui::DragFloat("acceleration", &charaParam.acceleration);
+				ImGui::Checkbox("is_ground", &isGround);
+
+				if (ImGui::Button("load"))
+				{
+					LoadDataFile();
+				}
+				ImGui::Separator();
+				if (ImGui::Button("save"))
+				{
+					SaveDataFile();
+				}
+				ImGui::Text("attack_param");
+				if (ImGui::CollapsingHeader("tackle"))
+				{
+					ImGui::DragInt("tackle_power", &param.tackleParam.power, 0.1f);
+					ImGui::DragFloat("tackle_invinsible_time", &param.tackleParam.invinsibleTime, 0.1f);
+
+					ImGui::Text("tackle_camera_shake");
+					ImGui::DragFloat("tackle_shake_x", &param.tackleParam.cameraShake.max_X_shake, 0.1f);
+					ImGui::DragFloat("tackle_shake_y", &param.tackleParam.cameraShake.max_Y_shake, 0.1f);
+					ImGui::DragFloat("tackle_time", &param.tackleParam.cameraShake.time, 0.1f);
+					ImGui::DragFloat("tackle_smmoth", &param.tackleParam.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
+
+					ImGui::Text("hit_stop");
+					ImGui::DragFloat("tackle_stop_time", &param.tackleParam.hitStop.time, 0.1f);
+					ImGui::DragFloat("tackle_stopping_strength", &param.tackleParam.hitStop.stoppingStrength, 0.1f);
+					//ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
+					//ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
+					//ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
+				}
+				if (ImGui::CollapsingHeader("stomp"))
+				{
+					ImGui::DragInt("stomp_power", &param.stompParam.power, 0.1f);
+					ImGui::DragFloat("stomp_invinsible_time", &param.stompParam.invinsibleTime, 0.1f);
+
+					ImGui::Text("stomp_camera_shake");
+					ImGui::DragFloat("stomp_shake_x", &param.stompParam.cameraShake.max_X_shake, 0.1f);
+					ImGui::DragFloat("stomp_shake_y", &param.stompParam.cameraShake.max_Y_shake, 0.1f);
+					ImGui::DragFloat("stomp_time", &param.stompParam.cameraShake.time, 0.1f);
+					ImGui::DragFloat("stomp_smmoth", &param.stompParam.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
+					ImGui::Text("hit_stop");
+					ImGui::DragFloat("stomp_stop_time", &param.stompParam.hitStop.time, 0.1f);
+					ImGui::DragFloat("stomp_stopping_strengthy", &param.stompParam.hitStop.stoppingStrength, 0.1f);
+					//ImGui::DragFloat("combo2_hit_viberation.l_moter", &param.combo_2.hitViberation.L_moter, 0.1f);
+					//ImGui::DragFloat("combo2_hit_viberation.r_moter", &param.combo_2.hitViberation.R_moter, 0.1f);
+					//ImGui::DragFloat("combo2_vibe_time", &param.combo_2.hitViberation.VibeTime, 0.1f);
+				}
 			}
 			if (ImGui::CollapsingHeader("bossBodyCollision", ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -420,6 +534,8 @@ void Boss::DebugDUI()
 				ImGui::DragFloat3("end", &bossBodyCollision.capsule.end.x);
 				ImGui::DragFloat("radius", &bossBodyCollision.capsule.radius);
 				ImGui::DragFloat("height", &bossBodyCollision.height);
+				ImGui::DragFloat("attackRadius", &bossBodyCollision.attackRadius);
+				ImGui::DragFloat("attackHeight", &bossBodyCollision.attackHeight);
 			}
 			if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -441,20 +557,7 @@ void Boss::DebugDUI()
 				}
 				ImGui::SliderFloat("transition_time", &transition_time, 0.0f, 5.0f);
 
-			}
-
-			std::string state_name;
-			state_name = magic_enum::enum_name<STATE>(state);
-			ImGui::Text(state_name.c_str());
-
-			ImGui::DragInt("hp", &health);
-			ImGui::DragFloat("height", &charaParam.height);
-			ImGui::DragFloat("moveSpeed", &charaParam.moveSpeed, 0.1f);
-			ImGui::DragFloat("turnspeed", &charaParam.turnSpeed, 0.1f);
-			ImGui::DragFloat("boss_collision.radius", &bossBodyCollision.capsule.radius, 0.1f);
-			ImGui::DragFloat("boss_collision.height", &bossBodyCollision.height, 0.1f);
-			ImGui::DragFloat("sickle_.radius", &sickle_hand_colide.radius, 1);
-		
+			}		
 		}
 		ImGui::End();
 	}
@@ -476,5 +579,13 @@ void Boss::DebugPrimitiveUpdate()
 		bossBodyCollision.height,
 		{ 0.0f,1.0f,0.0f,1.0f });
 
+	if (attackParam.isAttack)
+	{
+		debugRender->CreateCylinder(
+			bossBodyCollision.capsule.start,
+			bossBodyCollision.attackRadius,
+			bossBodyCollision.attackHeight,
+			{ 1.0f,0.0f,0.0f,1.0f });
+	}
 }
 

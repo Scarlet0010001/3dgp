@@ -55,12 +55,19 @@ private:
 		CharacterParam chara_init_param;
 		float run_speed;
 
+		//タックル攻撃のパラメーター
+		AttackParam tackleParam;
+		//踏みつけ攻撃のパラメーター
+		AttackParam stompParam;
+
 		template<class Archive>
 		void serialize(Archive& archive)
 		{
 			archive(
 				cereal::make_nvp("chara_param", chara_init_param),
-				cereal::make_nvp("run_speed", run_speed)
+				cereal::make_nvp("run_speed", run_speed),
+				cereal::make_nvp("tackleParam", tackleParam),
+				cereal::make_nvp("stompParam", stompParam)
 			);
 		}
 	};
@@ -70,6 +77,9 @@ public:
 	{
 		Capsule capsule;
 		float height;
+
+		float attackRadius;
+		float attackHeight;
 	};
 
 public:
@@ -105,7 +115,7 @@ public:
 	void DebugPrimitiveUpdate();
 
 	//プレイヤーの攻撃との当たり判定
-	void CalcAttack_vs_Player(DirectX::XMFLOAT3 capsule_start, DirectX::XMFLOAT3 capsule_end, float colider_radius, AddDamageFunc damaged_func);
+	void CalcAttack_vs_Player(Capsule capsule_collider, float collider_height, AddDamageFunc damaged_func);
 
 	//距離と時間で速度を計算する
 	float CalcMoveSpeed(DirectX::XMFLOAT3 target, float time);
@@ -177,7 +187,7 @@ private:
 	//データファイル
 	void LoadDataFile();
 	void SaveDataFile();
-	const char* filePath = "./resources/Data/boss_param.json";
+	const char* filePath = "Resources/Character/Boss/boss_param.json";
 
 	//---------------------------変数---------------------------//
 	typedef void (Boss::* ActUpdate)(float elapsedTime);
@@ -191,7 +201,6 @@ private:
 	
 	//テストでworld行列にしている
 	DirectX::XMFLOAT3  turretWorldForward = { 0, 0, 1 };
-	Capsule sickle_hand_colide;
 
 	float actionTime = 0;
 	bool displayImgui = false;

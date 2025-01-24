@@ -17,6 +17,14 @@ void StageManager::Render(float elapsedTime)
     }
 }
 
+void StageManager::DebugGUI()
+{
+    for (Stage* stage : stages)
+    {
+        stage->DebugDUI();
+    }
+}
+
 void StageManager::Register(Stage* stage)
 {
     stages.emplace_back(stage);

@@ -39,7 +39,11 @@ void StageMain::Render(float elapsedTime)
     //モデル描画
     model->animate(0, animeTimer += elapsedTime, animated_nodes);
     model->render(graphics.Get_DC().Get(), transform, animated_nodes);
+	elapsedTime_ = elapsedTime;
+}
 
+void StageMain::DebugDUI()
+{
 #if USE_IMGUI
 	imguiMenuBar("Stage", "stage_main", displayImgui);
 	if (displayImgui)
@@ -58,7 +62,7 @@ void StageMain::Render(float elapsedTime)
 		//ImGui::DragFloat3("bounding_max", &max.x);
 		ImGui::End();
 	}
-
+#endif
 	// フレーム表示
 	{
 		ImGui::Begin("##frame stage_rate");
@@ -69,11 +73,11 @@ void StageMain::Render(float elapsedTime)
 		static float refresh_time = 0.0f;
 		static const float PLOT_SENSE = 0.2f;
 
-		refresh_time += elapsedTime;
+		refresh_time += elapsedTime_;
 		if (static_cast<int>(refresh_time / PLOT_SENSE) >= 1)
 		{
 			values_offset = values_offset >= IM_ARRAYSIZE(values) ? 0 : values_offset;
-			values[values_offset] = temp_value = elapsedTime * 1000.0f;
+			values[values_offset] = temp_value = elapsedTime_ * 1000.0f;
 
 			++values_offset;
 			refresh_time = 0;
@@ -85,7 +89,6 @@ void StageMain::Render(float elapsedTime)
 
 		ImGui::End();
 	}
-#endif
 
 }
 

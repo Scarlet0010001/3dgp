@@ -20,6 +20,7 @@ public:
 
 	//描画処理
 	void Render(float elapsedTime)override;
+	void DebugDUI()override;
 	//void  shadow_render(float elapsedTime)override;
 	// レイキャスト
 	bool RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit) override;
@@ -34,6 +35,7 @@ private:
 	DirectX::XMFLOAT4X4 transform{};
 
 	float animeTimer = 0.0f;
+	float elapsedTime_ = 0.0f;
 	std::vector<gltf_model::node> animated_nodes{};
 
 	bool flustm_flag = false;

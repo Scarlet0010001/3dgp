@@ -77,6 +77,8 @@ bool Collision::CylinderVsCylinder(const DirectX::XMFLOAT3& position_a, float ra
     XMVECTOR out_position_add = XMVectorScale(norm_sq_vec, range);
     XMVECTOR out_position_b_vec = XMVectorAdd(position_a_vec, out_position_add);
 
+    if (out_position_b == nullptr)return true;
+
     XMFLOAT3 out_positionB;
     XMStoreFloat3(&out_positionB, out_position_b_vec);
 
@@ -117,10 +119,10 @@ bool Collision::SphereVsCylinder(const DirectX::XMFLOAT3& sphere_position, float
     XMVECTOR out_position_add = XMVectorScale(norm_sq_vec, range);
     XMVECTOR out_c_position_vec = XMVectorAdd(s_position_vec, out_position_add);
 
+    if (out_cylinder_position == nullptr)return true;
+
     XMFLOAT3 out_c_position;
     XMStoreFloat3(&out_c_position, out_c_position_vec);
-
-    if (out_cylinder_position == nullptr)return true;
 
     out_cylinder_position->x = out_c_position.x;
     out_cylinder_position->y = cylinder_position.y;
