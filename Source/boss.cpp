@@ -199,6 +199,7 @@ void Boss::Render_f(float elapsedTime)
 
 void Boss::Render_ui(float elapsedTime)
 {
+
 }
 
 void Boss::ShotBullet(ATTACK_TYPE type)

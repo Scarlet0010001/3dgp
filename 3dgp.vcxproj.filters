@@ -115,6 +115,9 @@
     <Filter Include="Sources\User">
       <UniqueIdentifier>{65b026b9-f5f4-4b5e-9a6a-51a7b480c1b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\UI">
+      <UniqueIdentifier>{9152fc60-01f7-4e89-80c3-7265916b2975}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\resource_manager.cpp">
@@ -287,6 +290,12 @@
     </ClCompile>
     <ClCompile Include="Source\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\gauge_UI.cpp">
+      <Filter>Sources\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\player_UI.cpp">
+      <Filter>Sources\Character\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -490,6 +499,15 @@
     </ClInclude>
     <ClInclude Include="Source\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI.h">
+      <Filter>Sources\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\gauge_UI.h">
+      <Filter>Sources\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\player_UI.h">
+      <Filter>Sources\Character\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -217,6 +217,7 @@
     <ClCompile Include="Source\framework.cpp" />
     <ClCompile Include="Source\fullscreen_quad.cpp" />
     <ClCompile Include="Source\game_pad.cpp" />
+    <ClCompile Include="Source\gauge_UI.cpp" />
     <ClCompile Include="Source\geometric_primitive.cpp" />
     <ClCompile Include="Source\gltf_model.cpp" />
     <ClCompile Include="Source\graphics.cpp" />
@@ -244,6 +245,7 @@
     <ClCompile Include="Source\noise.cpp" />
     <ClCompile Include="Source\player.cpp" />
     <ClCompile Include="Source\player_action.cpp" />
+    <ClCompile Include="Source\player_UI.cpp" />
     <ClCompile Include="Source\radial_blur.cpp" />
     <ClCompile Include="Source\resource_manager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -290,6 +292,7 @@
     <ClInclude Include="Source\framework.h" />
     <ClInclude Include="Source\fullscreen_quad.h" />
     <ClInclude Include="Source\game_pad.h" />
+    <ClInclude Include="Source\gauge_UI.h" />
     <ClInclude Include="Source\geometric_primitive.h" />
     <ClInclude Include="Source\gltf_model.h" />
     <ClInclude Include="Source\graphics.h" />
@@ -322,6 +325,7 @@
     <ClInclude Include="Source\operators.h" />
     <ClInclude Include="Source\par_shapes.h" />
     <ClInclude Include="Source\player.h" />
+    <ClInclude Include="Source\player_UI.h" />
     <ClInclude Include="Source\primitive.h" />
     <ClInclude Include="Source\radial_blur.h" />
     <ClInclude Include="Source\resource_manager.h">
@@ -346,6 +350,7 @@
     <ClInclude Include="Source\stage_manager.h" />
     <ClInclude Include="Source\static_mesh.h" />
     <ClInclude Include="Source\texture.h" />
+    <ClInclude Include="Source\UI.h" />
     <ClInclude Include="Source\user.h" />
   </ItemGroup>
   <ItemGroup>

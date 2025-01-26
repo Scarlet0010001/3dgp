@@ -31,7 +31,7 @@ Player::Player()
 	//キャラが持つ剣
 	//sword = std::make_unique<Sword>();
 	//UI
-	//ui = std::make_unique<PlayerUI>();
+	ui = std::make_unique<PlayerUI>();
 
 	beamSaber[LR::LEFT] = model->find_nodes("Left_wep1");
 	beamSaber[LR::RIGHT] = model->find_nodes("Right_wep1");
@@ -109,6 +109,9 @@ void Player::Update(float elapsedTime)
 	collider.start = position;
 	collider.end = { position.x,position.y + charaParam.height, position.z };
 	collider.radius = 1.0f;
+
+	ui->SetHPPercent(GetHpPercent());
+	ui->Update(elapsedTime);
 }
 
 void Player::Render_d(float elapsedTime)
@@ -186,6 +189,9 @@ void Player::Render_s(float elapsedTime)
 
 void Player::RenderUI(float elapsed_time)
 {
+	//プレイヤーのUI
+	ui->Render();
+
 }
 
 void Player::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_height)

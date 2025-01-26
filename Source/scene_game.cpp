@@ -169,6 +169,9 @@ void SceneGame::Render(float elapsedTime)
 
     bulletManager.Render(cameraElapsedTime_);
 
+    //---------------------------UI----------------------------//
+    player->RenderUI(cameraElapsedTime_);
+
     //-------------------DebugPrimitive----------------------//
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::WIREFRAME_CULL_BACK);
     graphics.GetDebugRenderer()->RenderAlFigures(graphics.Get_DC().Get());

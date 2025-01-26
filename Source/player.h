@@ -2,6 +2,7 @@
 #include "device.h"
 #include "camera.h"
 #include "character.h"
+#include "player_UI.h"
 //#include "gltf_model.h"
 
 #include "primitive.h"
@@ -255,6 +256,9 @@ private:
 	GamePad* gamePad;
 	Mouse* mouse;
 	Camera* camera;
+
+	//UI
+	std::unique_ptr<PlayerUI> ui;
 
 	std::unique_ptr <gltf_model> model;
 

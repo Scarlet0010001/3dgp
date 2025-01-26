@@ -68,7 +68,7 @@ void SceneTitle::Render(float elapsedTime)
 	Graphics& graphics = Graphics::Instance();
 
 	graphics.SetGraphicStatePriset(
-		ST_DEPTH::DepthON_WriteON,
+		ST_DEPTH::DepthOFF_WriteOFF,
 		ST_BLEND::ALPHA,
 		ST_RASTERIZER::CULL_NONE
 	);

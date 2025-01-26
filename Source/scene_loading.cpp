@@ -7,7 +7,12 @@
 void SceneLoading::Initialize()
 {
 	//スプライト初期化
-	sprite = std::make_unique<SpriteBatch>(Graphics::Instance().GetDevice().Get(), L"Resources/Sprite/Loading/LoadingBack.png", 1);
+	spriteBack = std::make_unique<SpriteBatch>(
+		Graphics::Instance().GetDevice().Get(), 
+		L"Resources/Sprite/Loading/LoadingBack.png", 1);
+	spriteIcon = std::make_unique<SpriteBatch>(
+		Graphics::Instance().GetDevice().Get(),
+		L"Resources/Sprite/Loading/LoadingIcon.png", 1);
 
 	//スレッド開始
 	std::thread thread(LoadingThread, this);
@@ -18,7 +23,8 @@ void SceneLoading::Initialize()
 
 void SceneLoading::Finalize()
 {
-	sprite.reset();
+	spriteBack.reset();
+	spriteIcon.reset();
 
 }
 
@@ -45,9 +51,18 @@ void SceneLoading::Render(float elapsedTime)
 		ST_BLEND::ALPHA,
 		ST_RASTERIZER::CULL_NONE
 	);
-	sprite->begin(graphics.Get_DC().Get());
-	sprite->render(graphics.Get_DC().Get(), { 0, 0 }, { 1, 1 });
-	sprite->end(graphics.Get_DC().Get());
+	spriteBack->begin(graphics.Get_DC().Get());
+	spriteBack->render(graphics.Get_DC().Get(), { 0, 0 }, { 1, 1 });
+	spriteBack->end(graphics.Get_DC().Get());
+
+	float textureWidth = static_cast<float>(256);
+	float textureHeight = static_cast<float>(256);
+	float positionX = SCREEN_WIDTH - textureWidth;
+	float positionY = SCREEN_HEIGHT - textureHeight;
+
+	spriteIcon->begin(graphics.Get_DC().Get());
+	spriteIcon->render(graphics.Get_DC().Get(), { positionX, positionY }, { 1, 1 }, { 1,1,1,1 }, angle);
+	spriteIcon->end(graphics.Get_DC().Get());
 
 }
 

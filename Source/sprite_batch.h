@@ -47,6 +47,10 @@ public:
     void begin(ID3D11DeviceContext* immediate_context);
     void end(ID3D11DeviceContext* immediate_context);
 
+    D3D11_TEXTURE2D_DESC GetTexture2dDesc()const { return texture2d_desc; }
+    float GetTexWidth()const { return static_cast<float>(texture2d_desc.Width); }
+    float GetTexHeight()const { return static_cast<float>(texture2d_desc.Height); }
+
 private:
     ID3D11VertexShader* vertex_shader;
     ID3D11PixelShader* pixel_shader;
