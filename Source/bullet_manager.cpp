@@ -16,6 +16,18 @@ BulletManager::~BulletManager()
     Clear();
 }
 
+void BulletManager::Initialize()
+{
+    P_param.attackParam.power = 10.0f;
+    P_param.attackParam.invinsibleTime = 0.4f;
+
+    E_param.attackParam.power = 10.0f;
+    E_param.attackParam.invinsibleTime = 0.3f;
+    E_param.attackParam.cameraShake.max_X_shake = 7.0f;
+    E_param.attackParam.cameraShake.max_Y_shake = 10.0f;
+    E_param.attackParam.cameraShake.time = 0.5f;
+}
+
 void BulletManager::Update(float elapsedTime)
 {
     //更新処理
@@ -78,7 +90,7 @@ void BulletManager::Setting()
         setting->SetLifeTime(P_param.lifeTimer);
         setting->SetRadius(P_param.radius);
         setting->SetTarget(P_param.target);
-        setting->SetTurnSpeed(P_param.turnSpeed);
+        setting->SetTurnSpeed(P_param.turnSpeed);        
     }
     else
     {
@@ -140,7 +152,7 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
         {
             AttackParam attackParam = E_param.attackParam;
             //攻撃対象に与えるダメージ量と無敵時間
-            if (player->damagedFunction(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::NONE))
+            if (player->damagedFunction(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::SMALL))
             {
                 //カメラシェイク
                 camera.SetCameraShake(attackParam.cameraShake);

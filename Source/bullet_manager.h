@@ -17,7 +17,7 @@ public:
         static BulletManager instance;
         return instance;
     }
-
+    void Initialize();
     //XVˆ—
     void Update(float elapsedTime);
 

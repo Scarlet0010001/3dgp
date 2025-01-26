@@ -85,6 +85,8 @@ public:
 	float GetHpPercent() const { return health <= 0 ? 0.0f : static_cast<float>(health) / static_cast<float>(charaParam.maxHealth); }
 	// 地面判定
 	bool GetIsGround() const { return isGround; }
+	// 地面判定
+	bool GetIsDead() const { return isDead; }
 	//高さ取得
 	float GetHeight() const { return charaParam.height; }
 	//トランスフォームのゲッター
@@ -127,6 +129,7 @@ protected:
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };
 	//地面に当たっているか
 	bool isGround = false;
+	bool isDead = false;
 	float slopeRate = 1.0f;
 
 	float invincibleTimer = 0.0f;

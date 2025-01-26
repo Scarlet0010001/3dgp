@@ -195,10 +195,10 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	else bossAnimation = BossAnimation::BOSS_JUMP;
 
 	float length = targetPoint_pos.y - position.y;
-	if (!isJump && length < 0 && time > 0.1f)
+	if (!isJump && length < 10.0f && time > 0.1f)
 	{
 		isJump = true;
-		//velocity.y = 20.0f;
+		velocity.y = 40.0f;
 	}
 
 	//–Ú•W’n“_‚Ü‚ÅXZ•½–Ê‚Å‚Ì‹——£”»’è

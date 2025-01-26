@@ -171,6 +171,8 @@ private:
 	void TransitionCombo_01_03_State();//近接コンボ３
 	void TransitionCombo_PowerL_State();//強攻撃左
 	void TransitionCombo_PowerR_State();//強攻撃右
+	void TransitionDamage_State();//ダメージ
+	void TransitionDead_State();//死亡
 
 
 	//--------各ステートのアップデート--------//r_はルートモーション付き
@@ -186,6 +188,8 @@ private:
 	void UpdateCombo_01_03_State(float elapsedTime);//近接コンボ３
 	void UpdateCombo_PowerL_State(float elapsedTime);//強攻撃左
 	void UpdateCombo_PowerR_State(float elapsedTime);//強攻撃右
+	void UpdateDamage_State(float elapsedTime);//ダメージ
+	void UpdateDead_State(float elapsedTime);//死亡
 
 
 	//更新関数の関数ポインタの定義

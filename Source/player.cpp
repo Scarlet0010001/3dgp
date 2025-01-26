@@ -59,6 +59,7 @@ void Player::Initialize()
 	charaParam = param.charaInitParam;
 
 	//ëÃóÕèâä˙âª
+	charaParam.maxHealth = 200.0f;
 	health = charaParam.maxHealth;
 	stepOffset = 2.0f;
 	jumpCount = jumpLimit;
@@ -486,7 +487,7 @@ void Player::OnLanding()
 
 void Player::OnDead()
 {
-	Initialize();
+	TransitionDead_State();
 
 }
 
@@ -497,7 +498,7 @@ void Player::OnDamaged(WINCE_TYPE type)
 	case WINCE_TYPE::NONE:
 		break;
 	case WINCE_TYPE::SMALL:
-		
+		TransitionDamage_State();
 		break;
 	case WINCE_TYPE::BIG:
 		break;

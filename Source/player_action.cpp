@@ -112,6 +112,22 @@ void Player::TransitionCombo_PowerR_State()
 
 }
 
+void Player::TransitionDamage_State()
+{
+	p_update = &Player::UpdateDamage_State;
+	playerAnimation = PlayerAnimation::PLAYER_DAMAGE;
+	state = STATE::DAMAGE;
+
+}
+
+void Player::TransitionDead_State()
+{
+	p_update = &Player::UpdateDead_State;
+	playerAnimation = PlayerAnimation::PLAYER_DEAD;
+	state = STATE::DAMAGE;
+
+}
+
 void Player::UpdateIdleState(float elapsedTime)
 {
 	if (InputMove(elapsedTime))
@@ -454,4 +470,23 @@ void Player::UpdateCombo_PowerL_State(float elapsedTime)
 
 void Player::UpdateCombo_PowerR_State(float elapsedTime)
 {
+}
+
+void Player::UpdateDamage_State(float elapsedTime)
+{
+	if (model->GetIsEndAnimation())
+	{
+		TransitionIdleState();
+	}
+	//‘¬—Íˆ—XV
+	UpdateVelocity(elapsedTime, position);
+
+}
+
+void Player::UpdateDead_State(float elapsedTime)
+{
+	if (model->GetIsEndAnimation())
+	{
+		isDead = true;
+	}
 }

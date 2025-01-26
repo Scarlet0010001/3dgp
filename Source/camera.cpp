@@ -92,7 +92,7 @@ void Camera::Update(float elapsedTime)
 				p_update = &Camera::UpdateWithWing;
 			}
 			
-			if (mouse.GetButton() & mouse.BTN_LEFT_CLICK)
+			//if (mouse.GetButton() & mouse.BTN_LEFT_CLICK)
 			{
 				float ax = mouse.GetCursorPosition().x - mouse.GetOldCursorPosition().x;
 				float ay = mouse.GetCursorPosition().y - mouse.GetOldCursorPosition().y;
@@ -107,6 +107,7 @@ void Camera::Update(float elapsedTime)
 				{
 					angle.y = ax * DirectX::XMConvertToRadians(rollSpeed) * elapsedTime;
 				}
+				//mouse.SetCursorPosition({ SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 });
 				// XMVECTORƒNƒ‰ƒX‚Ö•ÏŠ·
 				DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
 

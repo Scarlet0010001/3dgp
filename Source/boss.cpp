@@ -62,13 +62,16 @@ Boss::Boss()
 
 void Boss::Initialize()
 {
+	//パラメーターロード
+	LoadDataFile();
+
 	//パラメーター初期化
 	position = { 0.0f, 15.0f, 10.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
 	scale.x = scale.y = scale.z = 10.0f;
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.chara_init_param;
-	charaParam.maxHealth = 2000.0f;
+	charaParam.maxHealth = 500.0f;
 	TransitionIdleState();
 
 	//体力初期化
@@ -328,7 +331,7 @@ void Boss::CalcAttack_vs_Player(Capsule capsule_collider, float collider_height,
 		capsule_collider.start, capsule_collider.radius, collider_height))
 	{
 		//攻撃対象に与えるダメージ量と無敵時間
-		if (damaged_func(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::NONE))
+		if (damaged_func(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::SMALL))
 		{
 			//カメラシェイク
 			camera.SetCameraShake(attackParam.cameraShake);

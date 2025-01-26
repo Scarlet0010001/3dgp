@@ -33,6 +33,8 @@ void SceneGame::Initialize()
     StageMain* stageMain = new StageMain();
     stageManager.Register(stageMain);
 
+    BulletManager::Instance().Initialize();
+
     deferred = std::make_unique<DeferredRenderer>();
 
     LightManager::Instance().Initialize();
@@ -96,6 +98,10 @@ void SceneGame::Update(float elapsedTime)
     //    boss->GetBodyCollision().height, boss->damagedFunction);
 
     JudgeCollision();
+    if (player->GetIsDead() || boss->GetIsDead())
+    {
+        SceneManager::Instance().ChangeScene(new SceneTitle);
+    }
 
     cameraElapsedTime_ = cameraElapsedTime;
 }
@@ -170,11 +176,11 @@ void SceneGame::Render(float elapsedTime)
     bulletManager.Render(cameraElapsedTime_);
 
     //---------------------------UI----------------------------//
-    player->RenderUI(cameraElapsedTime_);
+    //player->RenderUI(cameraElapsedTime_);
 
     //-------------------DebugPrimitive----------------------//
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::WIREFRAME_CULL_BACK);
-    graphics.GetDebugRenderer()->RenderAlFigures(graphics.Get_DC().Get());
+    //graphics.GetDebugRenderer()->RenderAlFigures(graphics.Get_DC().Get());
 
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::CULL_NONE);
     framebuffers[0]->deactivate(graphics.Get_DC().Get());
@@ -191,7 +197,8 @@ void SceneGame::Render(float elapsedTime)
 
     radialBlur->blit(graphics.Get_DC().Get(), framebuffers[1]->get_color_map().GetAddressOf());
 
-#if USE_IMGUI
+//#if USE_IMGUI
+#if 0
     stageManager.DebugGUI();
     camera->DebugGui();
     player->DebugGUI();

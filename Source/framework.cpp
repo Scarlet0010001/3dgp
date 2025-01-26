@@ -6,7 +6,7 @@
 #include "Graphics.h"
 #include "scene_manager.h"
 #include "scene_title.h"
-
+#include "device.h"
 framework::framework(HWND hwnd) : hwnd(hwnd)
 {
 }
@@ -14,7 +14,7 @@ framework::framework(HWND hwnd) : hwnd(hwnd)
 bool framework::initialize()
 {
 	Graphics::Instance().Initialize(hwnd);
-
+	Device::Instance().GetMouse().Set_do_show(false);
 	SceneManager::Instance().ChangeScene(new SceneTitle());
 
 	{

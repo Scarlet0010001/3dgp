@@ -64,6 +64,8 @@ public:
     // カーソル
     const DirectX::XMFLOAT2& GetCursorPosition() const { return cursorPosition; }
     const DirectX::XMFLOAT2& GetOldCursorPosition() const { return oldCursorPosition; }
+    void SetCursorPosition(DirectX::XMFLOAT2 pos)  { cursorPosition = pos; }
+    //void SetOldCursorPosition(DirectX::XMFLOAT2 pos)  { oldCursorPosition = pos; }
     
     
     // ホイール
