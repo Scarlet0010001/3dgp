@@ -1,7 +1,10 @@
 #pragma once
 #include <vector>
 #include "bullet.h"
+#include "player.h"
+#include "Boss.h"
 #include <set>
+#include <cereal/cereal.hpp>
 
 class BulletManager
 {
@@ -51,10 +54,15 @@ public:
         return bullets.at(index);
     }
 
+    //íeä€Ç∆íeä€Ç∆ÇÃè’ìÀèàóù
+    void CollisionBullet(Player* player, Boss* boss);
 
 private:
-    //íeä€Ç∆íeä€Ç∆ÇÃè’ìÀèàóù
-    void CollisionBulletVsBullet();
+
+    //ÉfÅ[É^ÉtÉ@ÉCÉã
+    void LoadDataFile();
+    void SaveDataFile();
+    const char* filePath = "Resources/Bullet/bullet_param.json";
 
     //Effect* miniexplosion = nullptr;
     std::vector<Bullet*> bullets;
@@ -67,16 +75,35 @@ private:
         float speed = 100.0f;
         float lifeTimer = 3.0f;
         float radius = 1.0f;
-        
+
         DirectX::XMFLOAT3 target = { 0,0,0 };
         float turnSpeed = DirectX::XMConvertToRadians(180);
+        
+        AttackParam attackParam;
+
+        template<class Archive>
+        void serialize(Archive& archive)
+        {
+            archive(
+                cereal::make_nvp("scale", scale),
+                cereal::make_nvp("speed", speed),
+                cereal::make_nvp("lifeTimer", lifeTimer),
+                cereal::make_nvp("radius", radius),
+                cereal::make_nvp("target", target),
+                cereal::make_nvp("turnSpeed", turnSpeed),
+                cereal::make_nvp("attackParam", attackParam)
+            );
+        }
+
     };
     BulletParam P_param;
     BulletParam E_param;
 
+
     Bullet* setting{};
 
     //--------------ImGui--------------//
-    bool displayBulletImgui = false;
+    bool displayPlayerImgui = false;
+    bool displayBossImgui = false;
     
 };

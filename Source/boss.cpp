@@ -31,7 +31,7 @@ Boss::Boss()
 	//lookAt_nodes = model->nodes;
 
 	//turretHeadNode = model->find_nodes("Bone_Turret_Head_Main");
-	//turretNode = model->find_nodes("Bone_MGun_Main");
+	turretNode = model->find_nodes("Bone_MGun_Main");
 
 	// 初期姿勢時の頭ノードのローカル空間前方向を求める
 	{
@@ -205,23 +205,19 @@ void Boss::ShotBullet(ATTACK_TYPE type)
 {
 	BulletManager& bulletManager = BulletManager::Instance();
 
-	//model->fech_by_bone(bossAnimation, time, transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
-	//model->fech_by_bone(bossAnimation, time, transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
-
-	//前方向
-	DirectX::XMFLOAT3 dir = Math::get_posture_forward(transform);
+	targetPoint_pos = target_pos;
 	//発射位置(プレイヤーの腰あたり)
-	DirectX::XMFLOAT3 pos = { position.x,position.y + charaParam.height,position.z };
-	//if (bossAnimation == BossAnimation::PLAYER_SHOT_RIGHT
-	//	|| bossAnimation == BossAnimation::PLAYER_SHOT_BACK)
-	//	pos = beamSaber_position[LR::RIGHT];
-	//else pos = beamSaber_position[LR::LEFT];
+	DirectX::XMFLOAT3 turretPos{};
+	model->fech_by_bone(bossAnimation, time, transform, turretNode, turretPos);
+	//目標
+	DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(turretPos,
+		{ targetPoint_pos.x, targetPoint_pos.y + targetPoint_height, targetPoint_pos.z });
 
 	BulletStraight* bullet =
 		type == ATTACK_TYPE::SHOT_S ? new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy)
 		: new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy);
-	bullet->Launch(dir, pos);
-
+	
+	bullet->Launch(dir, turretPos);
 }
 void Boss::LookAt_turret(std::vector<gltf_model::node>& nodes)
 {

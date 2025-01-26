@@ -1120,8 +1120,6 @@ inline void ImguiMenuAndSubBar(std::string menu_label, std::string menu_item_lab
 #endif // USE_IMGUI
 }
 
-
-
 template <typename T>
 inline void safe_delete(T*& p)
 {

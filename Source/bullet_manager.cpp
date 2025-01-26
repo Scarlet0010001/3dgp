@@ -1,5 +1,11 @@
 #include "bullet_manager.h"
+#include "collision.h"
+#include "camera.h"
 #include "user.h"
+
+#include <filesystem>
+#include <fstream>
+#include <cereal/archives/json.hpp>
 
 BulletManager::BulletManager()
 {
@@ -37,9 +43,6 @@ void BulletManager::Update(float elapsedTime)
     }
     //破棄リストをクリア
     removes.clear();
-
-    //弾丸同士の衝突処理
-    CollisionBulletVsBullet();
 
 }
 
@@ -101,31 +104,118 @@ void BulletManager::Clear()
     bullets.clear();
 }
 
-void BulletManager::CollisionBulletVsBullet()
+void BulletManager::CollisionBullet(Player* player, Boss*boss)
 {
-    
-    //size_t bulletCount = bullets.size();
-    //for (int i = 0; i < bulletCount; i++)
-    //{
-    //    Projectile* projectileA = bullets.at(i);
-    //    for (int j = 1 + i; j < bulletCount; j++)
-    //    {
-    //        Projectile* projectileB = projectiles.at(j);
-    //        DirectX::XMFLOAT3 outPosition;
-    //        if (Collision::IntersectSphereVsSphere(
-    //            projectileA->GetPosition(),
-    //            projectileA->GetRadius(),
-    //            projectileB->GetPosition(),
-    //            projectileB->GetRadius(),
-    //            outPosition))
-    //        {
-    //            //miniexplosion->Play(projectileA->GetPosition());
-    //            projectileA->Destroy();
-    //            projectileB->Destroy();
-    //        }
-    //    }
-    //}
-    
+    Camera& camera = Camera::Instance();
+
+    size_t bulletCount = bullets.size();
+    for (int i = 0; i < bulletCount; i++)
+    {
+        Bullet* bulletA = bullets.at(i);
+        DirectX::XMFLOAT3 outPosition;
+
+        for (int j = 1 + i; j < bulletCount; j++)
+        {
+            Bullet* bulletB = bullets.at(j);
+            if (Collision::SphereVsSphere(
+                bulletA->GetPosition(),
+                bulletA->GetRadius(),
+                bulletB->GetPosition(),
+                bulletB->GetRadius()))
+            {
+                //miniexplosion->Play(projectileA->GetPosition());
+                bulletA->Destroy();
+                bulletB->Destroy();
+            }
+        }
+
+        //プレイヤーとの当たり判定
+        if (bulletA->GetMasterType() == Bullet::BULLET_MASTER::Enemy &&
+            Collision::SphereVsCylinder(
+                bulletA->GetPosition(),
+                bulletA->GetRadius(),
+                player->collider.start,
+                player->collider.radius,
+                player->GetHeight()))
+        {
+            AttackParam attackParam = E_param.attackParam;
+            //攻撃対象に与えるダメージ量と無敵時間
+            if (player->damagedFunction(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::NONE))
+            {
+                //カメラシェイク
+                camera.SetCameraShake(attackParam.cameraShake);
+
+                //ヒットストップ
+                camera.SetHitStop(attackParam.hitStop);
+
+                //game_pad->set_vibration(attack_sword_param.hit_viberation.l_moter, attack_sword_param.hit_viberation.r_moter, attack_sword_param.hit_viberation.vibe_time);
+
+                //ヒットエフェクト再生
+
+            }
+        }
+        //ボスとの当たり判定
+        if (bulletA->GetMasterType() == Bullet::BULLET_MASTER::Player &&
+            Collision::SphereVsCylinder(
+                bulletA->GetPosition(),
+                bulletA->GetRadius(),
+                boss->GetBodyCollision().capsule.start,
+                boss->GetBodyCollision().capsule.radius,
+                boss->GetBodyCollision().height))
+        {
+            AttackParam attackParam = P_param.attackParam;
+            //攻撃対象に与えるダメージ量と無敵時間
+            if (boss->damagedFunction(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::NONE))
+            {
+                //カメラシェイク
+                camera.SetCameraShake(attackParam.cameraShake);
+
+                //ヒットストップ
+                camera.SetHitStop(attackParam.hitStop);
+
+                //game_pad->set_vibration(attack_sword_param.hit_viberation.l_moter, attack_sword_param.hit_viberation.r_moter, attack_sword_param.hit_viberation.vibe_time);
+
+                //ヒットエフェクト再生
+
+            }
+
+        }
+
+    }
+}
+
+void BulletManager::LoadDataFile()
+{
+    // Jsonファイルから値を取得
+    std::filesystem::path path = filePath;
+    path.replace_extension(".json");
+    if (std::filesystem::exists(path.c_str()))
+    {
+        std::ifstream ifs;
+        ifs.open(path);
+        if (ifs)
+        {
+            cereal::JSONInputArchive o_archive(ifs);
+            //o_archive(P_param);
+            //o_archive(E_param);
+        }
+    }
+}
+
+void BulletManager::SaveDataFile()
+{
+    //ベースクラスの初期化パラメーター情報を更新
+    // Jsonファイルから値を取得
+    std::filesystem::path path = filePath;
+    path.replace_extension(".json");
+    std::ofstream ifs;
+    ifs.open(path);
+    if (ifs)
+    {
+        cereal::JSONOutputArchive o_archive(ifs);
+        //o_archive(P_param);
+        //o_archive(E_param);
+    }
 }
 
 void BulletManager::DebugGUI()
@@ -133,11 +223,11 @@ void BulletManager::DebugGUI()
 #ifdef USE_IMGUI
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-    imguiMenuBar("Bullet", "Bullet", displayBulletImgui);
+    imguiMenuBar("Bullet", "Player", displayPlayerImgui);
 
-    if (displayBulletImgui)
+    if (displayPlayerImgui)
     {
-        if (ImGui::Begin("Player", nullptr, ImGuiWindowFlags_None))
+        if (ImGui::Begin("PlayerBullet", nullptr, ImGuiWindowFlags_None))
         {
             if (ImGui::CollapsingHeader("Param", ImGuiTreeNodeFlags_DefaultOpen))
             {
@@ -147,11 +237,34 @@ void BulletManager::DebugGUI()
                 ImGui::DragFloat("radius:", &P_param.radius);
                 ImGui::DragFloat3("target:", &P_param.target.x);
                 ImGui::DragFloat("turnSpeed:", &P_param.turnSpeed);
+
+                if (ImGui::CollapsingHeader("attack_param"))
+                {
+                    ImGui::DragInt("power", &P_param.attackParam.power, 0.1f);
+                    ImGui::DragFloat("invinsible_time", &P_param.attackParam.invinsibleTime, 0.1f);
+
+                    ImGui::Text("camera_shake");
+                    ImGui::DragFloat("shake_x", &P_param.attackParam.cameraShake.max_X_shake, 0.1f);
+                    ImGui::DragFloat("shake_y", &P_param.attackParam.cameraShake.max_Y_shake, 0.1f);
+                    ImGui::DragFloat("time", &P_param.attackParam.cameraShake.time, 0.1f);
+                    ImGui::DragFloat("smmoth", &P_param.attackParam.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
+
+                    ImGui::Text("hit_stop");
+                    ImGui::DragFloat("stop_time", &P_param.attackParam.hitStop.time, 0.1f);
+                    ImGui::DragFloat("stopping_strength", &P_param.attackParam.hitStop.stoppingStrength, 0.1f);
+                    //ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
+                    //ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
+                    //ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
+                }
+
             }
         }
         ImGui::End();
-
-        if (ImGui::Begin("Enemy", nullptr, ImGuiWindowFlags_None))
+    }
+    imguiMenuBar("Bullet", "Enemy", displayBossImgui);
+    if (displayBossImgui)
+    {
+        if (ImGui::Begin("EnemyBullet", nullptr, ImGuiWindowFlags_None))
         {
             if (ImGui::CollapsingHeader("Param", ImGuiTreeNodeFlags_DefaultOpen))
             {
@@ -161,6 +274,26 @@ void BulletManager::DebugGUI()
                 ImGui::DragFloat("radius:", &E_param.radius);
                 ImGui::DragFloat3("target:", &E_param.target.x);
                 ImGui::DragFloat("turnSpeed:", &E_param.turnSpeed);
+
+                if (ImGui::CollapsingHeader("attack_param"))
+                {
+                    ImGui::DragInt("power", &E_param.attackParam.power, 0.1f);
+                    ImGui::DragFloat("invinsible_time", &E_param.attackParam.invinsibleTime, 0.1f);
+
+                    ImGui::Text("camera_shake");
+                    ImGui::DragFloat("shake_x", &E_param.attackParam.cameraShake.max_X_shake, 0.1f);
+                    ImGui::DragFloat("shake_y", &E_param.attackParam.cameraShake.max_Y_shake, 0.1f);
+                    ImGui::DragFloat("time", &E_param.attackParam.cameraShake.time, 0.1f);
+                    ImGui::DragFloat("smmoth", &E_param.attackParam.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
+
+                    ImGui::Text("hit_stop");
+                    ImGui::DragFloat("stop_time", &E_param.attackParam.hitStop.time, 0.1f);
+                    ImGui::DragFloat("stopping_strength", &E_param.attackParam.hitStop.stoppingStrength, 0.1f);
+                    //ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
+                    //ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
+                    //ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
+                }
+
             }
         }
         ImGui::End();

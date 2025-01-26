@@ -198,7 +198,7 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	if (!isJump && length < 0 && time > 0.1f)
 	{
 		isJump = true;
-		velocity.y = 20.0f;
+		//velocity.y = 20.0f;
 	}
 
 	//–Ú•W’n“_‚Ü‚ÅXZ•½–Ê‚Å‚Ì‹——£”»’è

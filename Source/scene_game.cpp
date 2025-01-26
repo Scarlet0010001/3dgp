@@ -77,6 +77,7 @@ void SceneGame::Update(float elapsedTime)
 
     //**********ボスの更新**********//
     boss->SetLocationOfAttackTarget(player->GetPosition());
+    boss->SetAttackTarget_height(player->GetHeight());
     boss->Update(cameraElapsedTime);
 
     camera->SetShakeDistance(
@@ -231,6 +232,8 @@ void SceneGame::JudgeCollision()
         boss->GetBodyCollision().height);
     player->CalcAttack_vs_Enemy(boss->GetBodyCollision().capsule,
         boss->GetBodyCollision().height, boss->damagedFunction);
+
+    BulletManager::Instance().CollisionBullet(player.get(), boss.get());
 }
 
 void SceneGame::DebugGui()

@@ -35,7 +35,7 @@ public:
 	DirectX::XMFLOAT3 GetWaistPosition() { return DirectX::XMFLOAT3(position.x, position.y + charaParam.height / 2, position.z); }
 	//カメラがプレイヤーを見るときに注視するポイント
 	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 1.5f), position.z); }
-
+	AttackParam GetAttackParam() { return attackParam; }
 
 	//プレイヤーのコリジョンと敵の当たり判定
 	void CalcCollision_vs_Enemy(Capsule capsule_collider, float colider_height);

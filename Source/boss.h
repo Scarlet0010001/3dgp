@@ -122,6 +122,7 @@ public:
 
 	//攻撃対象の位置を取得
 	void SetLocationOfAttackTarget(DirectX::XMFLOAT3 target) { target_pos = target; }
+	void SetAttackTarget_height(float target) { targetPoint_height = target; }
 
 	BodyCollision GetBodyCollision() { return bossBodyCollision; }
 
@@ -196,7 +197,7 @@ private:
 	//std::unique_ptr<BossUi> ui;
 
 	gltf_model::node arm;
-	//gltf_model::node turretNode;
+	gltf_model::node turretNode;
 	//gltf_model::node turretHeadNode;
 	
 	//テストでworld行列にしている
@@ -223,6 +224,7 @@ private:
 	//攻撃対象
 	DirectX::XMFLOAT3 target_pos;
 	DirectX::XMFLOAT3 targetPoint_pos{};
+	float targetPoint_height = 0.0f;
 	DirectX::XMFLOAT3 shot_pos;
 	bool isJump = false;
 
