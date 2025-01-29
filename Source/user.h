@@ -267,7 +267,7 @@ namespace Math
         using namespace DirectX;
         XMVECTOR start_vec = XMLoadFloat3(&start);
         XMVECTOR end_vec = XMLoadFloat3(&end);
-        XMFLOAT3 lerp;
+        XMFLOAT3 lerp{};
         XMStoreFloat3(&lerp, XMVectorLerp(start_vec, end_vec, lerp_rate));
         return lerp;
     }

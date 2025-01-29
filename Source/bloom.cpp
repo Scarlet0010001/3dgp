@@ -25,7 +25,7 @@ void bloom::make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceVie
 	//Extracting bright color
 	glow_extraction->clear(immediate_context, framebuffer::usage::color, { 0, 0, 0, 1 });
 	glow_extraction->activate(immediate_context);
-	fullscreen_quad::blit(immediate_context, &color_map, 0, 1, glow_extraction_ps.Get());
+	fullscreen_quad::Blit(immediate_context, &color_map, 0, 1, glow_extraction_ps.Get());
 	glow_extraction->deactivate(immediate_context);
 
 	//Gaussian blur
@@ -34,18 +34,18 @@ void bloom::make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceVie
 	// downsampling
 	gaussian_blur[0][0]->clear(immediate_context, framebuffer::usage::color, { 0, 0, 0, 1 });
 	gaussian_blur[0][0]->activate(immediate_context);
-	fullscreen_quad::blit(immediate_context, glow_extraction->color_map().GetAddressOf(), 0, 1, gaussian_blur_downsampling_ps.Get());
+	fullscreen_quad::Blit(immediate_context, glow_extraction->color_map().GetAddressOf(), 0, 1, gaussian_blur_downsampling_ps.Get());
 	gaussian_blur[0][0]->deactivate(immediate_context);
 
 	// ping-pong gaussian blur
 	gaussian_blur[0][1]->clear(immediate_context, framebuffer::usage::color, { 0, 0, 0, 1 });
 	gaussian_blur[0][1]->activate(immediate_context);
-	fullscreen_quad::blit(immediate_context, gaussian_blur[0][0]->color_map().GetAddressOf(), 0, 1, gaussian_blur_horizontal_ps.Get());
+	fullscreen_quad::Blit(immediate_context, gaussian_blur[0][0]->color_map().GetAddressOf(), 0, 1, gaussian_blur_horizontal_ps.Get());
 	gaussian_blur[0][1]->deactivate(immediate_context);
 
 	gaussian_blur[0][0]->clear(immediate_context, framebuffer::usage::color, { 0, 0, 0, 1 });
 	gaussian_blur[0][0]->activate(immediate_context);
-	fullscreen_quad::blit(immediate_context, gaussian_blur[0][1]->color_map().GetAddressOf(), 0, 1, gaussian_blur_vertical_ps.Get());
+	fullscreen_quad::Blit(immediate_context, gaussian_blur[0][1]->color_map().GetAddressOf(), 0, 1, gaussian_blur_vertical_ps.Get());
 	gaussian_blur[0][0]->deactivate(immediate_context);
 
 	for (size_t downsampled_index = 1; downsampled_index < downsampled_count; ++downsampled_index)
@@ -53,29 +53,29 @@ void bloom::make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceVie
 		// downsampling
 		gaussian_blur[downsampled_index][0]->clear(immediate_context, framebuffer::usage::color, { 0, 0, 0, 1 });
 		gaussian_blur[downsampled_index][0]->activate(immediate_context);
-		fullscreen_quad::blit(immediate_context, gaussian_blur[downsampled_index - 1][0]->color_map().GetAddressOf(), 0, 1, gaussian_blur_downsampling_ps.Get());
+		fullscreen_quad::Blit(immediate_context, gaussian_blur[downsampled_index - 1][0]->color_map().GetAddressOf(), 0, 1, gaussian_blur_downsampling_ps.Get());
 		gaussian_blur[downsampled_index][0]->deactivate(immediate_context);
 
 		// ping-pong gaussian blur
 		gaussian_blur[downsampled_index][1]->clear(immediate_context, framebuffer::usage::color, { 0, 0, 0, 1 });
 		gaussian_blur[downsampled_index][1]->activate(immediate_context);
-		fullscreen_quad::blit(immediate_context, gaussian_blur[downsampled_index][0]->color_map().GetAddressOf(), 0, 1, gaussian_blur_horizontal_ps.Get());
+		fullscreen_quad::Blit(immediate_context, gaussian_blur[downsampled_index][0]->color_map().GetAddressOf(), 0, 1, gaussian_blur_horizontal_ps.Get());
 		gaussian_blur[downsampled_index][1]->deactivate(immediate_context);
 
 		gaussian_blur[downsampled_index][0]->clear(immediate_context, framebuffer::usage::color, { 0, 0, 0, 1 });
 		gaussian_blur[downsampled_index][0]->activate(immediate_context);
-		fullscreen_quad::blit(immediate_context, gaussian_blur[downsampled_index][1]->color_map().GetAddressOf(), 0, 1, gaussian_blur_vertical_ps.Get());
+		fullscreen_quad::Blit(immediate_context, gaussian_blur[downsampled_index][1]->color_map().GetAddressOf(), 0, 1, gaussian_blur_vertical_ps.Get());
 		gaussian_blur[downsampled_index][0]->deactivate(immediate_context);
 	}
 }
 
-void bloom::blit(ID3D11DeviceContext* immediate_context)
+void bloom::Blit(ID3D11DeviceContext* immediate_context)
 {
 	std::vector<ID3D11ShaderResourceView*> shader_resource_views;
 	for (size_t downsampled_index = 0; downsampled_index < downsampled_count; ++downsampled_index)
 	{
 		shader_resource_views.push_back(gaussian_blur[downsampled_index][0]->color_map().Get());
 	}
-	fullscreen_quad::blit(immediate_context, shader_resource_views.data(), 0, downsampled_count, gaussian_blur_upsampling_ps.Get());
+	fullscreen_quad::Blit(immediate_context, shader_resource_views.data(), 0, downsampled_count, gaussian_blur_upsampling_ps.Get());
 }
 

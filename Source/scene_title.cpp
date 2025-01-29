@@ -24,6 +24,27 @@ void SceneTitle::Update(float elapsedTime)
 	Mouse& mouse = Device::Instance().GetMouse();
 	GamePad& gamePad = Device::Instance().GetGamePad();
 
+	const MouseButton anyMouseButton =
+		Mouse::BTN_ENTER
+		| Mouse::BTN_LEFT_CLICK
+		| Mouse::BTN_RIGHT_CLICK
+		| Mouse::BTN_SHIFT
+		| Mouse::BTN_SPACE
+		;
+	const GamePadButton anyButton =
+		GamePad::BTN_A
+		| GamePad::BTN_B
+		| GamePad::BTN_X
+		| GamePad::BTN_Y
+		| GamePad::BTN_LEFT_THUMB
+		| GamePad::BTN_LEFT_TRIGGER
+		| GamePad::BTN_LEFT_SHOULDER
+		| GamePad::BTN_RIGHT_THUMB
+		| GamePad::BTN_RIGHT_TRIGGER
+		| GamePad::BTN_RIGHT_SHOULDER
+		| GamePad::BTN_START
+		;
+
 	//メニューセレクト
 	if (gamePad.GetAxis_LY() > 0.2f)
 	{
@@ -41,13 +62,13 @@ void SceneTitle::Update(float elapsedTime)
 	switch (selectedMenuState)
 	{
 	case SceneTitle::TITLE_MENU::GAME_START:
-		if (mouse.GetButton() & mouse.BTN_Z || gamePad.GetButton() & gamePad.BTN_A)
+		if (mouse.GetButton() & anyMouseButton || gamePad.GetButton() & anyButton)
 		{
 			isStart = true;
 		}
 		break;
 	case SceneTitle::TITLE_MENU::EXIT:
-		if (mouse.GetButton() & mouse.BTN_Z || gamePad.GetButton() & gamePad.BTN_A)
+		if (mouse.GetButton() & anyMouseButton || gamePad.GetButton() & anyButton)
 		{
 			PostQuitMessage(0);
 		}

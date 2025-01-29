@@ -51,10 +51,11 @@ void RadialBlur::DebugGUI()
 
 		if (ImGui::Begin("radial_blur", nullptr, ImGuiWindowFlags_None))
 		{
-			ImGui::DragFloat2("blur_center", &radial_blur_constant->data.blur_center.x, 0.01f);
-			ImGui::SliderFloat("blur_strength", &radial_blur_constant->data.blur_strength, +0.0f, +1.0f);
-			ImGui::SliderFloat("blur_radius", &radial_blur_constant->data.blur_radius, +0.0f, +1.0f);
-			ImGui::SliderFloat("blur_decay", &radial_blur_constant->data.blur_decay, +0.0f, +1.0f);
+			ImGui::DragFloat2("blurCenter", &radial_blur_constant->data.blurCenter.x, 0.01f);
+			ImGui::SliderFloat("blurStrength", &radial_blur_constant->data.blurStrength, +0.0f, +1.0f);
+			ImGui::SliderFloat("blurRadius", &radial_blur_constant->data.blurRadius, +0.0f, +1.0f);
+			ImGui::SliderFloat("blurDecay", &radial_blur_constant->data.blurDecay, +0.0f, +1.0f);
+			ImGui::DragFloat("blurTimer", &radial_blur_constant->data.blurTimer);
 		}
 
 		ImGui::End();
@@ -62,7 +63,7 @@ void RadialBlur::DebugGUI()
 #endif
 }
 
-void RadialBlur::blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView** shader_resource_view)
+void RadialBlur::Blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView** shader_resource_view)
 {
 	Graphics& graphics = Graphics::Instance();
 	//	バックバッファ指定
@@ -79,5 +80,5 @@ void RadialBlur::blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderResour
 		static constexpr int RadialBlurCBVIndex = 2;
 		radial_blur_constant->Bind(graphics.Get_DC().Get(), RadialBlurCBVIndex, CB_FLAG::PS);
 	}
-	radial_quad->blit(immediate_context, shader_resource_view, 0, 2, radial_blur_pixel_shader.Get());
+	radial_quad->Blit(immediate_context, shader_resource_view, 0, 2, radial_blur_pixel_shader.Get());
 }

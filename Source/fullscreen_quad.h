@@ -13,7 +13,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11PixelShader> embedded_pixel_shader;
 
 public:
-    void blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView** shader_resource_view,
+    void Blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView** shader_resource_view,
         uint32_t start_slot, uint32_t num_views, ID3D11PixelShader* replaced_pixel_shader = nullptr);
 
     Microsoft::WRL::ComPtr<ID3D11PixelShader>& get_embedded_pixel_shader() { return embedded_pixel_shader; }

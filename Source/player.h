@@ -3,6 +3,8 @@
 #include "camera.h"
 #include "character.h"
 #include "player_UI.h"
+#include "radial_blur.h"
+
 //#include "gltf_model.h"
 
 #include "primitive.h"
@@ -37,6 +39,9 @@ public:
 	//カメラがプレイヤーを見るときに注視するポイント
 	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 1.5f), position.z); }
 	AttackParam GetAttackParam() { return attackParam; }
+
+	//ラジアルブラー
+	RadialBlur::radial_blur_constants GetRadialBlur() { return player_radialBlur; }
 
 	//プレイヤーのコリジョンと敵の当たり判定
 	void CalcCollision_vs_Enemy(Capsule capsule_collider, float colider_height);
@@ -212,6 +217,9 @@ private:
 	
 	const DirectX::XMFLOAT3 GetMoveVec(Camera* camera, bool wing = false) const;
 
+	//ラジアルブラー
+	void RadialBlurUpdate(float elapsedTime);
+
 	//ジャンプ入力処理
 	void InputJump();
 	//回避入力
@@ -265,6 +273,11 @@ private:
 	std::unique_ptr<PlayerUI> ui;
 
 	std::unique_ptr <gltf_model> model;
+
+	//ラジアルブラー
+	RadialBlur::radial_blur_constants player_radialBlur{}; 
+	float radialTimer = 0.0f;
+	bool isRadialBlur = false;
 
 	//当たり判定ノード
 	enum LR

@@ -111,6 +111,8 @@ void Player::Update(float elapsedTime)
 	collider.end = { position.x,position.y + charaParam.height, position.z };
 	collider.radius = 1.0f;
 
+	RadialBlurUpdate(elapsedTime);
+
 	ui->SetHPPercent(GetHpPercent());
 	ui->Update(elapsedTime);
 }
@@ -410,6 +412,30 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
 	return vec;
 }
 
+void Player::RadialBlurUpdate(float elapsedTime)
+{
+	if (player_radialBlur.blurStrength <= 0 
+		|| radialTimer <= 0) {
+		player_radialBlur.blurStrength = 0.0f;
+		player_radialBlur.blurRadius = 0.0f;
+		return;
+	}
+	if (state == STATE::WING)
+	{
+		player_radialBlur.blurStrength -= elapsedTime;
+		player_radialBlur.blurRadius -= elapsedTime;
+	}
+	else
+	{
+		float factor = radialTimer / player_radialBlur.blurTimer;
+		radialTimer -= elapsedTime;
+
+		player_radialBlur.blurStrength = factor;
+		player_radialBlur.blurRadius = factor;
+	}
+	
+}
+
 void Player::InputJump()
 {
 	if (gamePad->GetButtonDown() & GamePad::BTN_A ||
@@ -431,6 +457,7 @@ void Player::InputJump()
 
 void Player::InputAvoidance()
 {
+	if (param.boostTimer < 2.5f)return;
 	if (gamePad->GetButtonDown() & GamePad::BTN_B)
 	{
 		TransitionAvoidanceState();

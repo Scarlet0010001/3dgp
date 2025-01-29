@@ -37,7 +37,7 @@ void Mouse::Update(HWND hwnd)
 	//---キーボード----//
 	// スイッチ情報
 	MouseButton newButtonState = 0;
-
+	
 	for (int i = 0; i < ARRAYSIZE(KeyMap); ++i)
 	{
 		if (::GetAsyncKeyState(KeyMap[i]) & 0x8000)

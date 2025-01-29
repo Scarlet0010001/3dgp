@@ -133,7 +133,7 @@ void DeferredRenderer::Lighting() const
 	UINT G_BUFFERS_NUM = ARRAYSIZE(g_buffers);
 	//環境ライト
 	graphics.Get_DC().Get()->PSSetShaderResources(15, 1, env_texture.GetAddressOf());
-	deferred_screen->blit(graphics.Get_DC().Get(), g_buffers, 0, G_BUFFERS_NUM, deferred_env_light.Get());
+	deferred_screen->Blit(graphics.Get_DC().Get(), g_buffers, 0, G_BUFFERS_NUM, deferred_env_light.Get());
 
 	//平行光、点光源ライトを描き込む
 #if CAST_SHADOW
@@ -149,7 +149,7 @@ void DeferredRenderer::Lighting() const
 		1, &rtv, depth_stencil_view.Get());
 	graphics.Get_DC()->ClearRenderTargetView(l_composite->Get_rtv(), clearColor);
 
-	deferred_screen->blit(graphics.Get_DC().Get(), g_buffers, 0, G_BUFFERS_NUM, deferred_composite_light.Get());
+	deferred_screen->Blit(graphics.Get_DC().Get(), g_buffers, 0, G_BUFFERS_NUM, deferred_composite_light.Get());
 
 	LightManager::Instance().DebugGUI();
 
@@ -163,7 +163,7 @@ void DeferredRenderer::Render()
 		l_composite->Get_srv(),
 	};
 	UINT G_BUFFERS_NUM = ARRAYSIZE(g_buffers);
-	deferred_screen->blit(graphics.Get_DC().Get(), g_buffers, 0, G_BUFFERS_NUM, final_sprite_ps.Get());
+	deferred_screen->Blit(graphics.Get_DC().Get(), g_buffers, 0, G_BUFFERS_NUM, final_sprite_ps.Get());
 
 #if USE_IMGUI
 	imguiMenuBar("Window", "G-Buffer", displayImgui);

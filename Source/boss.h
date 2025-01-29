@@ -246,9 +246,9 @@ private:
 	//==============================================================
 
 	//歩くスピード
-	const float WALK_SPEED = 5;
+	const float WALK_SPEED = 6;
 	//走るスピード
-	const float RUN_SPEED = 12;
+	const float RUN_SPEED = 30;
 	//加速スピード
 	const float ACCELERATION_NORMAL_SPEED = 1.5f;
 	const float ACCELERATION_JUMP_SPEED = 25.0f;

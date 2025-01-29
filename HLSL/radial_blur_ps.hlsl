@@ -3,10 +3,11 @@
 
 cbuffer radial_blur_constants : register(b2)
 {
-	float2 blur_center; // center point where the blur is applied
-	float blur_strength; // blurring strength
-	float blur_radius; // blurred radiu
-	float blur_decay; // percentage of the maximum radius at which the intensity of the blur begins to decay
+	float2 blurCenter; // center point where the blur is applied
+	float blurStrength; // blurring strength
+	float blurRadius; // blurred radiu
+	float blurDecay; // percentage of the maximum radius at which the intensity of the blur begins to decay
+	float blurTimer; // percentage of the maximum radius at which the intensity of the blur begins to decay
 };
 
 #define POINT 0
@@ -27,19 +28,19 @@ float4 main(VS_OUT pin) : SV_TARGET
 
 	const int samples = 16;
 
-	float2 center_to_pixel = pin.texcoord - blur_center;
+	float2 center_to_pixel = pin.texcoord - blurCenter;
 	float distance = length(center_to_pixel);
 
-	float factor = blur_strength / float(samples) * distance;
+	float factor = blurStrength / float(samples) * distance;
 #if 1
-	factor *= smoothstep(blur_radius, blur_radius * blur_decay, distance);
+	factor *= smoothstep(blurRadius, blurRadius * blurDecay, distance);
 #endif
 
 	float3 color = 0.0;
 	for (int i = 0; i < samples; i++)
 	{
 		float sample_offset = 1.0 - factor * i;
-		color += texture_maps[0].Sample(sampler_states[LINEAR_CLAMP], blur_center + (center_to_pixel * sample_offset)).rgb;
+		color += texture_maps[0].Sample(sampler_states[LINEAR_CLAMP], blurCenter + (center_to_pixel * sample_offset)).rgb;
 	}
 	color /= float(samples);
 

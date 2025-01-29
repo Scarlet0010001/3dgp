@@ -76,6 +76,7 @@ void SceneGame::Update(float elapsedTime)
     float cameraElapsedTime = camera->HitStopUpdate(elapsedTime);
     //**********プレイヤーの更新**********//
     player->Update(cameraElapsedTime);
+    radialBlur->radial_blur_constant->DataSet(player->GetRadialBlur());
 
     //**********ボスの更新**********//
     boss->SetLocationOfAttackTarget(player->GetPosition());
@@ -87,6 +88,7 @@ void SceneGame::Update(float elapsedTime)
             DirectX::XMVectorSubtract(
                 DirectX::XMLoadFloat3(&player->GetPosition()),
                 DirectX::XMLoadFloat3(&boss->GetPosition())))));
+
 
     //**********弾の更新**********//
     bulletManager.Update(cameraElapsedTime);
@@ -138,7 +140,7 @@ void SceneGame::Render(float elapsedTime)
     DirectX::XMStoreFloat4x4(&view_pro, V * P);
 
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthOFF_WriteOFF, ST_BLEND::ALPHA, ST_RASTERIZER::CULL_NONE);
-    skymap->blit(graphics.Get_DC().Get(), view_pro);
+    skymap->Blit(graphics.Get_DC().Get(), view_pro);
     IBL_constant->Bind(Graphics::Instance().Get_DC().Get(), 11, CB_FLAG::ALL);
     //***************************************************************//
     ///						ディファ―ドレンダリング				  ///
@@ -176,7 +178,7 @@ void SceneGame::Render(float elapsedTime)
     bulletManager.Render(cameraElapsedTime_);
 
     //---------------------------UI----------------------------//
-    //player->RenderUI(cameraElapsedTime_);
+    player->RenderUI(cameraElapsedTime_);
 
     //-------------------DebugPrimitive----------------------//
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::WIREFRAME_CULL_BACK);
@@ -189,16 +191,16 @@ void SceneGame::Render(float elapsedTime)
     
     framebuffers[1]->activate(graphics.Get_DC().Get());
     LightManager::Instance().Draw(shader_resource_views, 1);
-    bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1);
+    bit_block_transfer->Blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1);
     framebuffers[1]->deactivate(graphics.Get_DC().Get());
     
     //graphics.SetGraphicStatePriset(ST_DEPTH::DepthOFF_WriteOFF, ST_BLEND::NORMAL, ST_RASTERIZER::CULL_NONE);
     //bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1, toneMapPixelShader.Get());
 
-    radialBlur->blit(graphics.Get_DC().Get(), framebuffers[1]->get_color_map().GetAddressOf());
+    radialBlur->Blit(graphics.Get_DC().Get(), framebuffers[1]->get_color_map().GetAddressOf());
 
-//#if USE_IMGUI
-#if 0
+#if USE_IMGUI
+//#if 0
     stageManager.DebugGUI();
     camera->DebugGui();
     player->DebugGUI();

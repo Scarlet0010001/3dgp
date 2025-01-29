@@ -64,7 +64,7 @@ void LightManager::Draw(ID3D11ShaderResourceView** rtv, int rtv_num)
 		{
 			//監視しているライトの関数処理
 			light.second.lock()->lightConstants->Bind(graphics.Get_DC().Get(), 7);
-			lightScreen->blit(graphics.Get_DC().Get(), rtv, 0, rtv_num, deferredLight.Get());
+			lightScreen->Blit(graphics.Get_DC().Get(), rtv, 0, rtv_num, deferredLight.Get());
 		}
 		//要素がないのにmapの領域をとっているときに警告を出す
 		_ASSERT_EXPR(!light.second.expired(), L"light_mapにnullptrが存在しています\n delete_light()を呼び忘れている可能性があります");

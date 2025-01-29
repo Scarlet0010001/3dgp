@@ -2,13 +2,18 @@
 #include "user.h"
 
 PlayerHpGauge::PlayerHpGauge() :
-	GaugeUI(L"Resources/Sprite/UI/Player/Player_HPframe_small.png",
-		L"Resources/Sprite/UI/Player/Player_HP_small.png",
+	GaugeUI(L"Resources/Sprite/UI/Player/Player_HPframe.png",
+		L"Resources/Sprite/UI/Player/Player_HP.png",
 		nullptr)
 {
-	gauge.position = { 30.0f,30.0f };
-	gauge.scale = { 0.15f, 0.1f };
-	gauge.color = { 0.5f,1,0,1 };
+	gauge.position = { 50.0f,45.0f };
+	gauge.scale = { 0.45f,0.45f };
+	gauge.color = { 1.0f,1.0f,1.0f,1.0f };
+	
+	gaugeBack.position = { 30.0f,30.0f };
+	gaugeBack.scale = { 0.45f,0.45f };
+	gaugeBack.color = { 0.7f,0.7f,0.7f,1.0f };
+
 	diffColor = { 1.0f,0.0f, 0.0f, 1.0f };
 }
 
@@ -24,7 +29,7 @@ void PlayerHpGauge::DebugGUI()
 		if (ImGui::Begin("playerUI", nullptr, ImGuiWindowFlags_None))
 		{
 			//ÉGÉåÉÅÉìÉg
-			if (ImGui::CollapsingHeader("Element", ImGuiTreeNodeFlags_DefaultOpen))
+			if (ImGui::CollapsingHeader("Gauge", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::DragFloat2("Position", &gauge.position.x);
 				ImGui::DragFloat2("Scale", &gauge.scale.x);
@@ -36,6 +41,19 @@ void PlayerHpGauge::DebugGUI()
 				ImGui::DragFloat("Angle", &gauge.angle);
 				ImGui::DragFloat2("Texpos", &gauge.texpos.x);
 				ImGui::DragFloat2("Texsize", &gauge.texsize.x);
+			}
+			if (ImGui::CollapsingHeader("GaugeBack", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::DragFloat2("BackPosition", &gaugeBack.position.x);
+				ImGui::DragFloat2("BackScale", &gaugeBack.scale.x);
+				ImGui::DragFloat2("BackPivot", &gaugeBack.pivot.x);
+				if (ImGui::CollapsingHeader("Backcolor_picker", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::ColorPicker4("BackColor", &gaugeBack.color.x);
+				}
+				ImGui::DragFloat("BackAngle", &gaugeBack.angle);
+				ImGui::DragFloat2("BackTexpos", &gaugeBack.texpos.x);
+				ImGui::DragFloat2("BackTexsize", &gaugeBack.texsize.x);
 			}
 			ImGui::ColorPicker4("DiffColor", &diffColor.x);
 			ImGui::DragFloat("nowPercent", &nowPercent);

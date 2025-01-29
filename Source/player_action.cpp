@@ -34,6 +34,11 @@ void Player::TransitionAvoidanceState()
 	charaParam.maxMoveSpeed = param.avoidanceSpeed;
 	charaParam.acceleration = accelerationState[ACCELERATION_STATE::AVOIDANCE];
 
+	player_radialBlur.blurStrength = 1.0f;
+	player_radialBlur.blurRadius = 1.0f;
+	radialTimer = player_radialBlur.blurTimer = 0.5f;
+
+	param.boostTimer -= 2.5f;
 	param.avoidanceTimer = 0;
 }
 
@@ -213,6 +218,10 @@ void Player::UpdateWingState(float elapsedTime)
 		velocity.y = (forward * (param.wingSpeed)).y;
 		velocity.z = (forward * (param.wingSpeed)).z;
 
+		player_radialBlur.blurStrength = 0.2f;
+		player_radialBlur.blurRadius = 1.0f;
+		radialTimer = player_radialBlur.blurTimer = 0.5f;
+
 		InputMoveWing(elapsedTime);
 	}
 	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)//Q
@@ -228,7 +237,6 @@ void Player::UpdateWingState(float elapsedTime)
 	}
 	//‰ñ”ð“ü—Í
 	//InputAvoidance();
-
 	//UŒ‚“ü—Í
 	if (mouse->GetButton() & mouse->BTN_RIGHT_CLICK)
 	{

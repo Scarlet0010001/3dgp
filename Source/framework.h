@@ -30,7 +30,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam
 extern ImWchar glyphRangesJapanese[];
 #endif
 
-CONST LPCWSTR APPLICATION_NAME{ L"X3DGP" };
+CONST LPCWSTR APPLICATION_NAME{ L"Crow Dancer" };
 
 class framework
 {

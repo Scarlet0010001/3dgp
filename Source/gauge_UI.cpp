@@ -16,7 +16,8 @@ GaugeUI::GaugeUI(const wchar_t* back_filename, const wchar_t* body_filename, con
     oldPercent = 1.0f;
     diffColor = { 2.0f,2.0f, 1.0f, 1.0f };
 
-    gauge.texsize = { static_cast<float>(back->GetTexture2dDesc().Width), static_cast<float>(back->GetTexture2dDesc().Height) };
+    gauge.texsize = { static_cast<float>(body->GetTexture2dDesc().Width), static_cast<float>(body->GetTexture2dDesc().Height) };
+    gaugeBack.texsize = { static_cast<float>(back->GetTexture2dDesc().Width), static_cast<float>(back->GetTexture2dDesc().Height) };
 
 }
 
@@ -37,15 +38,19 @@ void GaugeUI::Render(ID3D11DeviceContext* dc)
     gauge.angle = 0;
     //--back--//
     back->begin(dc);
-    back->render(dc, gauge.position, gauge.scale, gauge.pivot, gauge.color, gauge.angle, gauge.texpos, gauge.texsize);
+    back->render(dc, gaugeBack.position, gaugeBack.scale,
+        gaugeBack.pivot, gaugeBack.color, gaugeBack.angle,
+        gaugeBack.texpos, gaugeBack.texsize);
     back->end(dc);
     //--body--//
     body->begin(dc);
     //ゲージ差分
-    body->render(dc, gauge.position, gauge.scale, gauge.pivot, diffColor, gauge.angle, gauge.texpos,
+    body->render(dc, gauge.position, gauge.scale,
+        gauge.pivot, diffColor, gauge.angle, gauge.texpos,
         { gauge.texsize.x * oldPercent, gauge.texsize.y });
     //ゲージ本体
-    body->render(dc, gauge.position, gauge.scale, gauge.pivot, gauge.color, gauge.angle, gauge.texpos,
+    body->render(dc, gauge.position, gauge.scale,
+        gauge.pivot, gauge.color, gauge.angle, gauge.texpos,
         { gauge.texsize.x * nowPercent, gauge.texsize.y });
     body->end(dc);
     //--frame--//

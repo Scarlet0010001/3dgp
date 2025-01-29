@@ -66,7 +66,7 @@ void Boss::Initialize()
 	LoadDataFile();
 
 	//パラメーター初期化
-	position = { 0.0f, 15.0f, 10.0f };
+	position = { 0.0f, 5.0f, 15.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
 	scale.x = scale.y = scale.z = 10.0f;
 	//Charactorクラスのパラメーター初期化

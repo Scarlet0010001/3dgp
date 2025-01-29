@@ -25,7 +25,7 @@ public:
 	bloom& operator =(bloom&&) noexcept = delete;
 
 	void make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView* color_map);
-	void blit(ID3D11DeviceContext* immediate_context);
+	void Blit(ID3D11DeviceContext* immediate_context);
 
 private:
 	std::unique_ptr<framebuffer> glow_extraction;

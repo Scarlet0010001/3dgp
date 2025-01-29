@@ -17,7 +17,7 @@ fullscreen_quad::fullscreen_quad(ID3D11Device* device)
 
 }
 
-void fullscreen_quad::blit(ID3D11DeviceContext* immediate_context,
+void fullscreen_quad::Blit(ID3D11DeviceContext* immediate_context,
     ID3D11ShaderResourceView** shader_resource_view,
     uint32_t start_slot, uint32_t num_views,
     ID3D11PixelShader* replaced_pixel_shader)

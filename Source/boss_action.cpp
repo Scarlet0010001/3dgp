@@ -189,16 +189,17 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	{
 		charaParam.moveSpeed = CalcMoveSpeed(target_pos, 0.5f);
 		targetPoint_pos.x = target_pos.x;
+		targetPoint_pos.y = target_pos.y;
 		targetPoint_pos.z = target_pos.z;
 		return;
 	}
 	else bossAnimation = BossAnimation::BOSS_JUMP;
 
 	float length = targetPoint_pos.y - position.y;
-	if (!isJump && length < 10.0f && time > 0.1f)
+	if (!isJump && length > 5.0f && time > 0.1f)
 	{
 		isJump = true;
-		velocity.y = 40.0f;
+		velocity.y = 30.0f;
 	}
 
 	//–Ú•W’n“_‚Ü‚ÅXZ•½–Ê‚Å‚Ì‹——£”»’è

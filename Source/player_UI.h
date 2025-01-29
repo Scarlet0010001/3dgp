@@ -20,6 +20,7 @@ public:
 	~PlayerUI() {};
 	void Update(float elapsed_time);
 	void Render();
+
 	void SetHPPercent(float arg) { hpGauge->SetPercent(arg); }
 private:
 	std::unique_ptr<PlayerHpGauge> hpGauge;

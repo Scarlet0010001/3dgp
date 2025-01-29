@@ -22,6 +22,15 @@ public:
 	void SetTexSize(DirectX::XMFLOAT2 texsize) { gauge.texsize = texsize; }
 	void SetColor(DirectX::XMFLOAT4 color) { gauge.color = color; }
 	void SetDiffColor(DirectX::XMFLOAT4 color) { diffColor = color; }
+
+	//void SetBackAngle(float ang) { gaugeBack.angle = ang; }
+	//void SetBackPosition(DirectX::XMFLOAT2 pos) { gaugeBack.position = pos; }
+	//void SetBackScale(DirectX::XMFLOAT2 scale) { gaugeBack.scale = scale; }
+	//void SetBackTexSize(DirectX::XMFLOAT2 texsize) { gaugeBack.texsize = texsize; }
+	//void SetBackColor(DirectX::XMFLOAT4 color) { gaugeBack.color = color; }
+	//
+	//const Element GetGauge() { return gauge; }
+	//const Element GetGaugeBack() { return gaugeBack; }
 protected:
 	//--------< •Ï” >--------//
 	std::unique_ptr<SpriteBatch> frame{ nullptr };
@@ -29,6 +38,7 @@ protected:
 	std::unique_ptr<SpriteBatch> body{ nullptr };
 	DirectX::XMFLOAT4 diffColor = { 1.0f,1.0f,1.0f,1.0f };
 	Element gauge;
+	Element gaugeBack;
 	float nowPercent;
 	float oldPercent;
 	bool animation = false;

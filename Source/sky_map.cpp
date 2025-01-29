@@ -35,7 +35,7 @@ SkyMap::SkyMap(ID3D11Device* device, const wchar_t* filename, bool generate_mips
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 }
 
-void SkyMap::blit(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4& view_projection)
+void SkyMap::Blit(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4& view_projection)
 {
 	immediate_context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
 	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
