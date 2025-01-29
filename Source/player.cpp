@@ -111,9 +111,10 @@ void Player::Update(float elapsedTime)
 	collider.end = { position.x,position.y + charaParam.height, position.z };
 	collider.radius = 1.0f;
 
-	RadialBlurUpdate(elapsedTime);
+	ShaderUpdate(elapsedTime);
 
 	ui->SetHPPercent(GetHpPercent());
+	ui->SetBoostPercent(GetBoostPercent());
 	ui->Update(elapsedTime);
 }
 
@@ -412,28 +413,59 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
 	return vec;
 }
 
-void Player::RadialBlurUpdate(float elapsedTime)
+void Player::ShaderUpdate(float elapsedTime)
 {
-	if (player_radialBlur.blurStrength <= 0 
+
+	if (player_radialBlur_constant.blurStrength <= 0 
 		|| radialTimer <= 0) {
-		player_radialBlur.blurStrength = 0.0f;
-		player_radialBlur.blurRadius = 0.0f;
-		return;
-	}
-	if (state == STATE::WING)
-	{
-		player_radialBlur.blurStrength -= elapsedTime;
-		player_radialBlur.blurRadius -= elapsedTime;
+		player_radialBlur_constant.blurStrength = 0.0f;
+		player_radialBlur_constant.blurRadius = 0.0f;
 	}
 	else
 	{
-		float factor = radialTimer / player_radialBlur.blurTimer;
-		radialTimer -= elapsedTime;
+		if (state == STATE::WING)
+		{
+			player_radialBlur_constant.blurStrength -= elapsedTime;
+			player_radialBlur_constant.blurRadius -= elapsedTime;
+		}
+		else
+		{
+			float factor = radialTimer / player_radialBlur_constant.blurTimer;
+			radialTimer -= elapsedTime;
 
-		player_radialBlur.blurStrength = factor;
-		player_radialBlur.blurRadius = factor;
+			player_radialBlur_constant.blurStrength = factor;
+			player_radialBlur_constant.blurRadius = factor;
+		}
 	}
 	
+	if (isGlitch_CA && glitch_CATimer > 0)
+	{
+		float factor = glitch_CATimer / 0.03f;
+		glitch_CATimer -= 0.03f * elapsedTime;
+
+		player_glitch_CA_constant.density = factor;
+		player_glitch_CA_constant.shift = 0.015f;
+		player_glitch_CA_constant.x_shifting = 0.015f;
+		player_glitch_CA_constant.y_shifting = 0.015f;
+	}
+	else
+	{
+		//player_glitch_CA_constant.time = 0.0f;
+		player_glitch_CA_constant.center = { 0.5f,0.5f };
+		player_glitch_CA_constant.brightness = 0.0f;
+		player_glitch_CA_constant.density = 0.0f;
+		player_glitch_CA_constant.extension = 0.0f;
+		player_glitch_CA_constant.glitch_mask_radius = 0.0f;
+		player_glitch_CA_constant.glitch_sampling_count = 0.0f;
+		player_glitch_CA_constant.rand_float = 0.0f;
+		player_glitch_CA_constant.shift = 0.0f;
+		player_glitch_CA_constant.uv_slider = 0.0f;
+		player_glitch_CA_constant.x_shift = { 0,0 };
+		player_glitch_CA_constant.x_shifting = 0.0f;
+		player_glitch_CA_constant.y_shift = { 0,0 };
+		player_glitch_CA_constant.y_shifting = 0.0f;
+
+	}
 }
 
 void Player::InputJump()

@@ -92,7 +92,7 @@ void Camera::Update(float elapsedTime)
                 p_update = &Camera::UpdateWithWing;
             }
 
-            //if (mouse.GetButton() & mouse.BTN_LEFT_CLICK)
+            if (mouse.GetButton() & mouse.BTN_LEFT_CLICK)
             {
                 DirectX::XMFLOAT2 CPos = mouse.GetCursorPosition();
                 DirectX::XMFLOAT2 CPosOld = mouse.GetOldCursorPosition();

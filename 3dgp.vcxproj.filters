@@ -118,6 +118,12 @@
     <Filter Include="Sources\UI">
       <UniqueIdentifier>{9152fc60-01f7-4e89-80c3-7265916b2975}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\glitch">
+      <UniqueIdentifier>{2451d0b6-5124-462e-8bac-36145415f678}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Glitch">
+      <UniqueIdentifier>{278a42f8-4623-410e-92e8-5f3da69f510f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\resource_manager.cpp">
@@ -296,6 +302,9 @@
     </ClCompile>
     <ClCompile Include="Source\player_UI.cpp">
       <Filter>Sources\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\glitch_chromatic_aberration.cpp">
+      <Filter>Sources\Glitch</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -509,6 +518,9 @@
     <ClInclude Include="Source\player_UI.h">
       <Filter>Sources\Character\Player</Filter>
     </ClInclude>
+    <ClInclude Include="Source\glitch_chromatic_aberration.h">
+      <Filter>Sources\Glitch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\blur_ps.hlsl">
@@ -658,6 +670,9 @@
     <FxCompile Include="HLSL\accumulate_husk_particles_ps.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="HLSL\glitch_chromatic_aberration.hlsl">
+      <Filter>Shaders\glitch</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\bidirectional_reflectance_distribution_function.hlsli">
@@ -710,6 +725,9 @@
     </None>
     <None Include="HLSL\sprite.hlsli">
       <Filter>Shaders\sprite</Filter>
+    </None>
+    <None Include="HLSL\math_utils.hlsli">
+      <Filter>Shaders\glitch</Filter>
     </None>
   </ItemGroup>
 </Project>

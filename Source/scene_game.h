@@ -9,6 +9,7 @@
 
 #include "sky_map.h"
 #include "radial_blur.h"
+#include "glitch_chromatic_aberration.h"
 
 
 class SceneGame :
@@ -76,6 +77,8 @@ private:
     std::unique_ptr<SkyMap> skymap;
 
     std::unique_ptr<RadialBlur> radialBlur;
+
+    std::unique_ptr<Glitch_CA> glitch_CA;
 
     std::unique_ptr<framebuffer> framebuffers[8];
 

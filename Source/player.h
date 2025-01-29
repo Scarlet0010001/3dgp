@@ -4,11 +4,14 @@
 #include "character.h"
 #include "player_UI.h"
 #include "radial_blur.h"
+#include "glitch_chromatic_aberration.h"
 
 //#include "gltf_model.h"
 
 #include "primitive.h"
 #include <cereal/cereal.hpp>
+
+#define BOOST_TIMER_MAX (10.0f)
 
 //プレイヤー :final このクラスの継承ができないことを明示する
 class Player final :
@@ -40,8 +43,14 @@ public:
 	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 1.5f), position.z); }
 	AttackParam GetAttackParam() { return attackParam; }
 
+	//HPパーセンテージ
+	float GetBoostPercent() const { return param.boostTimer <= 0 ? 0.0f : static_cast<float>(param.boostTimer) / BOOST_TIMER_MAX; }
+
 	//ラジアルブラー
-	RadialBlur::radial_blur_constants GetRadialBlur() { return player_radialBlur; }
+	RadialBlur::radial_blur_constants GetRadialBlur() { return player_radialBlur_constant; }
+	
+	//色収差
+	Glitch_CA::glitch_CA_constants GetGlitch_CA() { return player_glitch_CA_constant; }
 
 	//プレイヤーのコリジョンと敵の当たり判定
 	void CalcCollision_vs_Enemy(Capsule capsule_collider, float colider_height);
@@ -130,7 +139,7 @@ private:
 		//飛行速度
 		float wingSpeed = 40;
 		//ブースト
-		float boostTimer = 10.0f;
+		float boostTimer = BOOST_TIMER_MAX;
 		//浮遊度
 		float floatingValue = 1.5f;
 		//剣エフェクトの速度
@@ -218,7 +227,7 @@ private:
 	const DirectX::XMFLOAT3 GetMoveVec(Camera* camera, bool wing = false) const;
 
 	//ラジアルブラー
-	void RadialBlurUpdate(float elapsedTime);
+	void ShaderUpdate(float elapsedTime);
 
 	//ジャンプ入力処理
 	void InputJump();
@@ -275,9 +284,14 @@ private:
 	std::unique_ptr <gltf_model> model;
 
 	//ラジアルブラー
-	RadialBlur::radial_blur_constants player_radialBlur{}; 
+	RadialBlur::radial_blur_constants player_radialBlur_constant{}; 
 	float radialTimer = 0.0f;
 	bool isRadialBlur = false;
+
+	//ラジアルブラー
+	Glitch_CA::glitch_CA_constants player_glitch_CA_constant{};
+	float glitch_CATimer = 0.0f;
+	bool isGlitch_CA = false;
 
 	//当たり判定ノード
 	enum LR

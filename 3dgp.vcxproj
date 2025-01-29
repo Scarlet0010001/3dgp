@@ -219,6 +219,7 @@
     <ClCompile Include="Source\game_pad.cpp" />
     <ClCompile Include="Source\gauge_UI.cpp" />
     <ClCompile Include="Source\geometric_primitive.cpp" />
+    <ClCompile Include="Source\glitch_chromatic_aberration.cpp" />
     <ClCompile Include="Source\gltf_model.cpp" />
     <ClCompile Include="Source\graphics.cpp" />
     <ClCompile Include="Source\g_buffer.cpp" />
@@ -294,6 +295,7 @@
     <ClInclude Include="Source\game_pad.h" />
     <ClInclude Include="Source\gauge_UI.h" />
     <ClInclude Include="Source\geometric_primitive.h" />
+    <ClInclude Include="Source\glitch_chromatic_aberration.h" />
     <ClInclude Include="Source\gltf_model.h" />
     <ClInclude Include="Source\graphics.h" />
     <ClInclude Include="Source\g_buffer.h" />
@@ -399,6 +401,12 @@
     </FxCompile>
     <FxCompile Include="HLSL\geometric_primitive_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\glitch_chromatic_aberration.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\glow_extraction_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
@@ -542,6 +550,7 @@
     </None>
     <None Include="HLSL\husk_particles.hlsli" />
     <None Include="HLSL\image_based_lighting.hlsli" />
+    <None Include="HLSL\math_utils.hlsli" />
     <None Include="HLSL\noise.hlsli" />
     <None Include="HLSL\rendering_equation.hlsli" />
     <None Include="HLSL\skinned_mesh.hlsli" />

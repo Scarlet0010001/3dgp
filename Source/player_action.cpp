@@ -34,9 +34,9 @@ void Player::TransitionAvoidanceState()
 	charaParam.maxMoveSpeed = param.avoidanceSpeed;
 	charaParam.acceleration = accelerationState[ACCELERATION_STATE::AVOIDANCE];
 
-	player_radialBlur.blurStrength = 1.0f;
-	player_radialBlur.blurRadius = 1.0f;
-	radialTimer = player_radialBlur.blurTimer = 0.5f;
+	player_radialBlur_constant.blurStrength = 1.0f;
+	player_radialBlur_constant.blurRadius = 1.0f;
+	radialTimer = player_radialBlur_constant.blurTimer = 0.5f;
 
 	param.boostTimer -= 2.5f;
 	param.avoidanceTimer = 0;
@@ -122,7 +122,8 @@ void Player::TransitionDamage_State()
 	p_update = &Player::UpdateDamage_State;
 	playerAnimation = PlayerAnimation::PLAYER_DAMAGE;
 	state = STATE::DAMAGE;
-
+	isGlitch_CA = true;
+	glitch_CATimer = 0.03f;
 }
 
 void Player::TransitionDead_State()
@@ -218,9 +219,9 @@ void Player::UpdateWingState(float elapsedTime)
 		velocity.y = (forward * (param.wingSpeed)).y;
 		velocity.z = (forward * (param.wingSpeed)).z;
 
-		player_radialBlur.blurStrength = 0.2f;
-		player_radialBlur.blurRadius = 1.0f;
-		radialTimer = player_radialBlur.blurTimer = 0.5f;
+		player_radialBlur_constant.blurStrength = 0.2f;
+		player_radialBlur_constant.blurRadius = 1.0f;
+		radialTimer = player_radialBlur_constant.blurTimer = 0.5f;
 
 		InputMoveWing(elapsedTime);
 	}
@@ -483,9 +484,11 @@ void Player::UpdateCombo_PowerR_State(float elapsedTime)
 void Player::UpdateDamage_State(float elapsedTime)
 {
 	if (model->GetIsEndAnimation())
-	{
+	{//ダメージがちゃんと出ない理由はアニメーション終わりに合わせて変えてしまっているからFindLoop
 		TransitionIdleState();
+		isGlitch_CA = false;
 	}
+
 	//速力処理更新
 	UpdateVelocity(elapsedTime, position);
 

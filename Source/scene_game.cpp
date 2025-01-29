@@ -22,6 +22,7 @@ void SceneGame::Initialize()
     
     framebuffers[0] = std::make_unique<framebuffer>(graphics.GetDevice().Get(), SCREEN_WIDTH, SCREEN_HEIGHT);
     framebuffers[1] = std::make_unique<framebuffer>(graphics.GetDevice().Get(), SCREEN_WIDTH, SCREEN_HEIGHT);
+    framebuffers[2] = std::make_unique<framebuffer>(graphics.GetDevice().Get(), SCREEN_WIDTH, SCREEN_HEIGHT);
     bit_block_transfer = std::make_unique<fullscreen_quad>(graphics.GetDevice().Get());
 
     //camera = std::make_unique<Camera>();
@@ -47,6 +48,8 @@ void SceneGame::Initialize()
     skymap = std::make_unique<SkyMap>(graphics.GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/skybox.dds");
 
     radialBlur = std::make_unique<RadialBlur>(graphics.GetDevice().Get());
+    glitch_CA = std::make_unique<Glitch_CA>(graphics.GetDevice().Get());
+   
     IBL_constant = std::make_unique<Constants<IBL_constants>>(Graphics::Instance().GetDevice().Get());
     create_ps_from_cso(graphics.GetDevice().Get(), "Shader/tone_map_ps.cso", toneMapPixelShader.GetAddressOf());
 
@@ -77,6 +80,7 @@ void SceneGame::Update(float elapsedTime)
     //**********プレイヤーの更新**********//
     player->Update(cameraElapsedTime);
     radialBlur->radial_blur_constant->DataSet(player->GetRadialBlur());
+    glitch_CA->glitch_CA_constant->DataSet(player->GetGlitch_CA());
 
     //**********ボスの更新**********//
     boss->SetLocationOfAttackTarget(player->GetPosition());
@@ -96,14 +100,18 @@ void SceneGame::Update(float elapsedTime)
     //**********ステージの更新**********//
     StageManager::Instance().Update(cameraElapsedTime);
     
-    //player->CalcAttack_vs_Enemy(boss->GetBodyCollision().capsule,
-    //    boss->GetBodyCollision().height, boss->damagedFunction);
-
     JudgeCollision();
+
+    //グリッチ
+    glitch_CA->glitch_CA_constant->data.time += elapsedTime;
+    if (glitch_CA->glitch_CA_constant->data.time > 20.0f)
+        glitch_CA->glitch_CA_constant->data.time = 1.0f;
+
     if (player->GetIsDead() || boss->GetIsDead())
     {
         SceneManager::Instance().ChangeScene(new SceneTitle);
     }
+
 
     cameraElapsedTime_ = cameraElapsedTime;
 }
@@ -117,6 +125,8 @@ void SceneGame::Render(float elapsedTime)
     framebuffers[0]->clear(graphics.Get_DC().Get(),
         FB_FLAG::COLOR_DEPTH_STENCIL);
     framebuffers[1]->clear(graphics.Get_DC().Get(),
+        FB_FLAG::COLOR_DEPTH_STENCIL);
+    framebuffers[2]->clear(graphics.Get_DC().Get(),
         FB_FLAG::COLOR_DEPTH_STENCIL);
     framebuffers[0]->activate(graphics.Get_DC().Get(),
         FB_FLAG::COLOR_DEPTH_STENCIL);
@@ -193,11 +203,12 @@ void SceneGame::Render(float elapsedTime)
     LightManager::Instance().Draw(shader_resource_views, 1);
     bit_block_transfer->Blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1);
     framebuffers[1]->deactivate(graphics.Get_DC().Get());
-    
-    //graphics.SetGraphicStatePriset(ST_DEPTH::DepthOFF_WriteOFF, ST_BLEND::NORMAL, ST_RASTERIZER::CULL_NONE);
-    //bit_block_transfer->blit(graphics.Get_DC().Get(), shader_resource_views, 0, 1, toneMapPixelShader.Get());
 
+    framebuffers[2]->activate(graphics.Get_DC().Get());
     radialBlur->Blit(graphics.Get_DC().Get(), framebuffers[1]->get_color_map().GetAddressOf());
+    framebuffers[2]->deactivate(graphics.Get_DC().Get());
+
+    glitch_CA->Blit(graphics.Get_DC().Get(), framebuffers[2]->get_color_map().GetAddressOf());
 
 #if USE_IMGUI
 //#if 0
@@ -208,6 +219,7 @@ void SceneGame::Render(float elapsedTime)
 
     bulletManager.DebugGUI();
     radialBlur->DebugGUI();
+    glitch_CA->DebugGUI();
     LightManager::Instance().DebugGUI();
     imguiMenuBar("Game", "game_menu", displayImgui);
 

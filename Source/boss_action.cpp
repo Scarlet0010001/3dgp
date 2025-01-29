@@ -306,8 +306,7 @@ void Boss::AttackRoutine(float elapsedTime)
 	attackResponderTimer += elapsedTime;
 	if (attackResponderTimer > ATTACK_RESPONDER_TIME)
 	{
-		//SelectAttackTypeLong();
-		TransitionAttack_Jump_State();
+		SelectAttackTypeLong();
 		attackResponderTimer = 0;
 	}
 }

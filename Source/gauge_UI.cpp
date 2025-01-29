@@ -31,11 +31,14 @@ void GaugeUI::Update(float elapsed_time)
         const float diff_rate = Math::Lerp(min_rate, max_rate, (1 - (nowPercent / oldPercent))) * elapsed_time;
         oldPercent = Math::Lerp(oldPercent, nowPercent, diff_rate);
     }
+    else
+    {
+        oldPercent = nowPercent;
+    }
 }
 
 void GaugeUI::Render(ID3D11DeviceContext* dc)
 {
-    gauge.angle = 0;
     //--back--//
     back->begin(dc);
     back->render(dc, gaugeBack.position, gaugeBack.scale,
