@@ -81,7 +81,7 @@ void Boss::TransitionDamageState()
 	state = STATE::DAMAGE;
 	bossAnimation = BossAnimation::BOSS_HIT;
 	stateTimer = 0;
-	state_duration = 3.0f;
+	state_duration = DAMAGE_STUN_DURATION;
 }
 
 void Boss::TransitionDeadState()
@@ -168,7 +168,7 @@ void Boss::UpdateAttack_Tackle_State(float elapsedTime)
 	Move(dir_target_vec.x, dir_target_vec.z, param.run_speed);
 	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);	
 
-	const float radius = 3.5f;
+	const float radius = 2.0f;
 	if (distSq < radius * radius)
 	{
 		TransitionIdleState();
@@ -210,7 +210,7 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	DirectX::XMFLOAT3 dir_target_vec{};
 	attackParam.isAttack = true;
 
-	const float radius = 2.0f;
+	const float radius = 1.0f;
 	if (distSq < radius * radius)
 	{
 		if (model->GetIsEndAnimation())
@@ -277,15 +277,19 @@ void Boss::UpdateAttack_ShotHoming_State(float elapsedTime)
 
 void Boss::UpdateDamageState(float elapsedTime)
 {
-	if (model->GetIsEndAnimation())
+	if (stateTimer > state_duration)
 	{
-		state_duration = DAMAGE_STUN_DURATION;;
 		TransitionIdleState();
+		state_duration = DAMAGE_STUN_DURATION;
 	}
 }
 
 void Boss::UpdateDeadState(float elapsedTime)
 {
+	if (model->GetIsEndAnimation())
+	{
+		isDead = true;
+	}
 }
 
 void Boss::UpdateDownState(float elapsedTime)

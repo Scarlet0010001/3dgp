@@ -117,18 +117,18 @@ void Player::TransitionCombo_PowerR_State()
 
 }
 
-void Player::TransitionDamage_State()
+void Player::TransitionDamageState()
 {
-	p_update = &Player::UpdateDamage_State;
+	p_update = &Player::UpdateDamageState;
 	playerAnimation = PlayerAnimation::PLAYER_DAMAGE;
 	state = STATE::DAMAGE;
 	isGlitch_CA = true;
 	glitch_CATimer = 0.03f;
 }
 
-void Player::TransitionDead_State()
+void Player::TransitionDeadState()
 {
-	p_update = &Player::UpdateDead_State;
+	p_update = &Player::UpdateDeadState;
 	playerAnimation = PlayerAnimation::PLAYER_DEAD;
 	state = STATE::DAMAGE;
 
@@ -366,6 +366,7 @@ void Player::UpdateShotState(float elapsedTime)
 
 void Player::UpdateCombo_01_01_State(float elapsedTime)
 {
+	//先行入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
 		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
 		)
@@ -373,17 +374,21 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 		nextCombo = true;
 	}
 
+	//攻撃判定オン
 	if (0.023f < time && !attackParam.isAttack)
 	{
 		//camera->SetCameraShake(attackParam.cameraShake);
 		//camera->SetHitStop(attackParam.hitStop);
 		attackParam.isAttack = true;
 	}
-	if (0.023f < time && nextCombo)
+
+	//先行入力されていたら次のコンボに移行
+	if (0.173f < time && nextCombo)
 	{
 		TransitionCombo_01_02_State();
 		attackParam.isAttack = false;
 	}
+
 	if (0.15f < time)
 		attackParam.isAttack = false;
 
@@ -393,25 +398,29 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 		attackParam.isAttack = false;
 
 	}
+	InputMove(elapsedTime, param.attackMoveSpeed, 1);
+
+	UpdateVelocity(elapsedTime, position);
 }
 
 void Player::UpdateCombo_01_02_State(float elapsedTime)
 {
+	//先行入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
 		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
 		)
 	{
 		nextCombo = true;
-
 	}
 
+	//攻撃判定オン
 	if (0.03f < time && !attackParam.isAttack)
 	{
-		//camera->SetCameraShake(attackParam.cameraShake);
-		//camera->SetHitStop(attackParam.hitStop);
 		attackParam.isAttack = true;
 	}
-	if (0.03f < time && nextCombo)
+
+	//先行入力されていたら次のコンボに移行
+	if (0.2f < time && nextCombo)
 	{
 		TransitionCombo_01_03_State();
 		attackParam.isAttack = false;
@@ -426,6 +435,8 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 
 		TransitionIdleState();
 	}
+	InputMove(elapsedTime, param.attackMoveSpeed, 1);
+	UpdateVelocity(elapsedTime, position);
 }
 
 void Player::UpdateCombo_01_03_State(float elapsedTime)
@@ -436,27 +447,31 @@ void Player::UpdateCombo_01_03_State(float elapsedTime)
 	{
 		nextCombo = true;
 	}
-	if (0.03f < time && !attackParam.isAttack)
+
+
+	if (0.325f < time && !attackParam.isAttack)
 	{
-		//camera->SetCameraShake(attackParam.cameraShake);
-		//camera->SetHitStop(attackParam.hitStop);
 		attackParam.isAttack = true;
 	}
+
 	if (0.65f < time)
 		attackParam.isAttack = false;
 
-	if (0.48f < time && nextCombo)
-	{
-		TransitionCombo_01_03_State();
-		attackParam.isAttack = false;
-
-	}
+	//if (0.48f < time && nextCombo)
+	//{
+	//	TransitionCombo_01_03_State();
+	//	attackParam.isAttack = false;
+	//
+	//}
 	if (model->GetIsEndAnimation())
 	{
 		TransitionIdleState();
 		attackParam.isAttack = false;
 
 	}
+	InputMove(elapsedTime, param.attackMoveSpeed, 1);
+
+	UpdateVelocity(elapsedTime, position);
 }
 
 void Player::UpdateCombo_PowerL_State(float elapsedTime)
@@ -474,14 +489,14 @@ void Player::UpdateCombo_PowerL_State(float elapsedTime)
 	{
 		TransitionIdleState();
 	}
-
+	UpdateVelocity(elapsedTime, position);
 }
 
 void Player::UpdateCombo_PowerR_State(float elapsedTime)
 {
 }
 
-void Player::UpdateDamage_State(float elapsedTime)
+void Player::UpdateDamageState(float elapsedTime)
 {
 	if (model->GetIsEndAnimation())
 	{//ダメージがちゃんと出ない理由はアニメーション終わりに合わせて変えてしまっているからFindLoop
@@ -491,10 +506,9 @@ void Player::UpdateDamage_State(float elapsedTime)
 
 	//速力処理更新
 	UpdateVelocity(elapsedTime, position);
-
 }
 
-void Player::UpdateDead_State(float elapsedTime)
+void Player::UpdateDeadState(float elapsedTime)
 {
 	if (model->GetIsEndAnimation())
 	{

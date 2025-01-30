@@ -71,7 +71,7 @@ void Boss::Initialize()
 	scale.x = scale.y = scale.z = 10.0f;
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.chara_init_param;
-	charaParam.maxHealth = 500.0f;
+	charaParam.maxHealth = 1000.0f;
 	TransitionIdleState();
 
 	//体力初期化
@@ -351,10 +351,25 @@ float Boss::CalcMoveSpeed(DirectX::XMFLOAT3 target, float time)
 
 void Boss::OnDead()
 {
+	TransitionDeadState();
+
 }
 
 void Boss::OnDamaged(WINCE_TYPE type)
 {
+	switch (type)
+	{
+	case WINCE_TYPE::NONE:
+		break;
+	case WINCE_TYPE::SMALL:
+		TransitionDamageState();
+		break;
+	case WINCE_TYPE::BIG:
+		break;
+	default:
+		break;
+	}
+
 }
 
 void Boss::LoadDataFile()

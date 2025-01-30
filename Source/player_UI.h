@@ -32,6 +32,7 @@ public:
 	~PlayerUI() {};
 	void Update(float elapsed_time);
 	void Render();
+	void DebugGUI();
 
 	void SetHPPercent(float arg) { hpGauge->SetPercent(arg); }
 	void SetBoostPercent(float arg) { boostGauge->SetPercent(arg); }

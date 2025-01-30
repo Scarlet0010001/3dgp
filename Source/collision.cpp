@@ -38,6 +38,8 @@ bool Collision::SphereVsSphere(const DirectX::XMFLOAT3& center_a, float radius_a
     float range = radius_a + radius_b;
     if (length_sq >= range * range) return false;
 
+    if (out_center_b == nullptr)return true;
+
     // A‚ªB‚ğ‰Ÿ‚µo‚·
     XMVECTOR norm_sq_vec = XMVector3Normalize(vec);
     XMVECTOR out_position_add = XMVectorScale(norm_sq_vec, range);

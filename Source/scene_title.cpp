@@ -62,7 +62,7 @@ void SceneTitle::Update(float elapsedTime)
 	switch (selectedMenuState)
 	{
 	case SceneTitle::TITLE_MENU::GAME_START:
-		if (mouse.GetButton() & anyMouseButton || gamePad.GetButton() & anyButton)
+		if (mouse.GetButton() & Mouse::BTN_Z || gamePad.GetButton() & anyButton)
 		{
 			isStart = true;
 		}

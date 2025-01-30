@@ -145,6 +145,10 @@ void PlayerUI::Render()
 	Graphics& graphics = Graphics::Instance();
 	hpGauge->Render(graphics.Get_DC().Get());
 	boostGauge->Render(graphics.Get_DC().Get());
+}
+
+void PlayerUI::DebugGUI()
+{
 	hpGauge->DebugGUI();
 	boostGauge->DebugGUI();
 }

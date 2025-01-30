@@ -172,11 +172,11 @@ void Character::UpdateVelocity(float elapsedTime, DirectX::XMFLOAT3& position)
 	//垂直速力更新処理
 	UpdateVerticalVelocity(elapsed_frame);
 
-	//垂直移動更新処理
-	UpdateVerticalMove(elapsedTime, position);
-
 	//水平速力更新処理
 	UpdateHorizontalVelocity(elapsed_frame);
+
+	//垂直移動更新処理
+	UpdateVerticalMove(elapsedTime, position);
 
 	//水平移動更新処理
 	UpdateHorizontalMove(elapsedTime, position);

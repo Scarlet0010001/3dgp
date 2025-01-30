@@ -102,7 +102,6 @@ void SceneGame::Update(float elapsedTime)
     
     JudgeCollision();
 
-    //ƒOƒŠƒbƒ`
     glitch_CA->glitch_CA_constant->data.time += elapsedTime;
     if (glitch_CA->glitch_CA_constant->data.time > 20.0f)
         glitch_CA->glitch_CA_constant->data.time = 1.0f;
@@ -111,7 +110,6 @@ void SceneGame::Update(float elapsedTime)
     {
         SceneManager::Instance().ChangeScene(new SceneTitle);
     }
-
 
     cameraElapsedTime_ = cameraElapsedTime;
 }

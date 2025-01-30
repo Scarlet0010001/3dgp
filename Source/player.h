@@ -51,7 +51,7 @@ public:
 	
 	//色収差
 	Glitch_CA::glitch_CA_constants GetGlitch_CA() { return player_glitch_CA_constant; }
-
+	
 	//プレイヤーのコリジョンと敵の当たり判定
 	void CalcCollision_vs_Enemy(Capsule capsule_collider, float colider_height);
 
@@ -142,6 +142,8 @@ private:
 		float boostTimer = BOOST_TIMER_MAX;
 		//浮遊度
 		float floatingValue = 1.5f;
+		//浮遊度
+		float attackMoveSpeed =10.0f;
 		//剣エフェクトの速度
 		float swordSwingSpeed = 1500.0f;
 		//コンボ1攻撃のパラメーター
@@ -162,6 +164,7 @@ private:
 				cereal::make_nvp("wingSpeed", wingSpeed),
 				cereal::make_nvp("boostTimer", boostTimer),
 				cereal::make_nvp("floatingValue", floatingValue),
+				cereal::make_nvp("attackMoveSpeed", attackMoveSpeed),
 				cereal::make_nvp("swordSwingSpeed", swordSwingSpeed),
 				cereal::make_nvp("attack_combo_1", combo_1),
 				cereal::make_nvp("attack_combo_2", combo_2),
@@ -185,8 +188,8 @@ private:
 	void TransitionCombo_01_03_State();//近接コンボ３
 	void TransitionCombo_PowerL_State();//強攻撃左
 	void TransitionCombo_PowerR_State();//強攻撃右
-	void TransitionDamage_State();//ダメージ
-	void TransitionDead_State();//死亡
+	void TransitionDamageState();//ダメージ
+	void TransitionDeadState();//死亡
 
 
 	//--------各ステートのアップデート--------//r_はルートモーション付き
@@ -202,8 +205,8 @@ private:
 	void UpdateCombo_01_03_State(float elapsedTime);//近接コンボ３
 	void UpdateCombo_PowerL_State(float elapsedTime);//強攻撃左
 	void UpdateCombo_PowerR_State(float elapsedTime);//強攻撃右
-	void UpdateDamage_State(float elapsedTime);//ダメージ
-	void UpdateDead_State(float elapsedTime);//死亡
+	void UpdateDamageState(float elapsedTime);//ダメージ
+	void UpdateDeadState(float elapsedTime);//死亡
 
 
 	//更新関数の関数ポインタの定義

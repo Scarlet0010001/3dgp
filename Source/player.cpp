@@ -195,7 +195,7 @@ void Player::RenderUI(float elapsed_time)
 {
 	//ƒvƒŒƒCƒ„[‚ÌUI
 	ui->Render();
-
+	
 }
 
 void Player::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_height)
@@ -434,7 +434,7 @@ void Player::ShaderUpdate(float elapsedTime)
 			radialTimer -= elapsedTime;
 
 			player_radialBlur_constant.blurStrength = factor;
-			player_radialBlur_constant.blurRadius = factor;
+			//player_radialBlur_constant.blurRadius = factor;
 		}
 	}
 	
@@ -539,14 +539,15 @@ void Player::OnLanding()
 	}
 	else
 	{
-		TransitionIdleState();
+		if (state != STATE::SHOT)
+			TransitionIdleState();
 	}
 
 }
 
 void Player::OnDead()
 {
-	TransitionDead_State();
+	TransitionDeadState();
 
 }
 
@@ -557,7 +558,7 @@ void Player::OnDamaged(WINCE_TYPE type)
 	case WINCE_TYPE::NONE:
 		break;
 	case WINCE_TYPE::SMALL:
-		TransitionDamage_State();
+		TransitionDamageState();
 		break;
 	case WINCE_TYPE::BIG:
 		break;
@@ -744,6 +745,7 @@ void Player::DebugGUI()
 				ImGui::DragFloat("radius", &charaParam.radius);
 				ImGui::DragFloat("gravity", &gravity);
 				ImGui::DragFloat("floating_value", &param.floatingValue);
+				ImGui::DragFloat("attack_MoveSpeed", &param.attackMoveSpeed);
 				ImGui::DragFloat("invinsible_timer", &invincibleTimer);
 				ImGui::DragFloat("boostTimer", &param.boostTimer);
 				ImGui::DragFloat("TurnSpeed", &charaParam.turnSpeed, 0.1f);
@@ -866,6 +868,7 @@ void Player::DebugGUI()
 
 	}
 
+	ui->DebugGUI();
 #endif // USE_IMGUI
 
 }

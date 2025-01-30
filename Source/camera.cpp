@@ -99,11 +99,12 @@ void Camera::Update(float elapsedTime)
                 float ax = CPos.x - CPosOld.x;
                 float ay = CPos.y - CPosOld.y;
 
-                /*
+                
                 // 画面中心に向かうベクトルだったらマウスの移動量を0にする
                 float center_x = static_cast<float>(SCREEN_WIDTH) / 2;
                 float center_y = static_cast<float>(SCREEN_HEIGHT) / 2;
 
+                /*
                 // 画面中央からのベクトル
                 //DirectX::XMFLOAT2 vec = { CPos.x - center_x, CPos.y - center_y };
 
@@ -128,7 +129,7 @@ void Camera::Update(float elapsedTime)
                     ay = 0;
                 }
                 */
-
+                
                 //カメラ縦操作
                 if (ay > 0.1f || ay < 0.1f)
                 {
@@ -143,8 +144,8 @@ void Camera::Update(float elapsedTime)
                 //RECT rc;
                 //GetClientRect(Graphics::Instance().GetHwnd(), &rc);
                 //
-                //SetCursorPos( SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 );
                 //SetCursorPos(SCREEN_WIDTH / 2 + rc.left, SCREEN_HEIGHT / 2 + rc.top);
+                //SetCursorPos( SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 );
 
                 // XMVECTORクラスへ変換
                 DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
@@ -543,7 +544,7 @@ void Camera::CameraShakeUpdate(float elapsedTime)
 
 
     //カメラシェイク効果中でありプレイヤーやロックオンなどのによるカメラへの力が加わっていない場合のみ揺らす
-    if (isCameraShake && fabs(angle.x) <= 0 && fabs(angle.y) <= 0 && fabs(lockOnAngle) <= 0)
+    if (isCameraShake || fabs(angle.x) <= 0 && fabs(angle.y) <= 0 && fabs(lockOnAngle) <= 0)
     {
         float Y_shake = cameraShakeParam.max_Y_shake;
         float X_shake = cameraShakeParam.max_X_shake;

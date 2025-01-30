@@ -199,7 +199,7 @@ private:
     bool isMove;
     float attendRate; // Œ¸Š”ä—¦
     float capeVision = 60.0f;//‹–ìŠp
-    float rollSpeed = 60;//‰ñ“]‘¬“x
+    float rollSpeed = 40;//‰ñ“]‘¬“x
 
     //‚’¼’x‰„
     float verticalRotationDegree = 0;
