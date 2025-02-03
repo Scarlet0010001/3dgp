@@ -306,6 +306,9 @@
     <ClCompile Include="Source\glitch_chromatic_aberration.cpp">
       <Filter>Sources\Glitch</Filter>
     </ClCompile>
+    <ClCompile Include="Source\bullet_homing.cpp">
+      <Filter>Sources\Bullet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\inline.h">
@@ -520,6 +523,9 @@
     </ClInclude>
     <ClInclude Include="Source\glitch_chromatic_aberration.h">
       <Filter>Sources\Glitch</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\bullet_homing.h">
+      <Filter>Sources\Bullet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

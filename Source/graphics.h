@@ -193,7 +193,8 @@ public:
     //BOOL get_file_name(HWND hWnd, TCHAR* fname, int sz, TCHAR* initDir);
     //bool recompile_pixel_shader(ID3D11PixelShader** pixel_shader, std::string id);
 private:
-    std::mutex mutex_;
+    std::
+        mutex mutex_;
 
     HWND hwnd;
 

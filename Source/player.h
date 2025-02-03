@@ -123,7 +123,6 @@ private:
 
 	};
 
-	const float JUST_GURD_TIME = 3.0f;
 	const float MAX_BOOST_TIMER = 10.0f;
 
 	struct PlayerParam

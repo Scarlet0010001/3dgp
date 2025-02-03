@@ -1,5 +1,6 @@
 #include "boss.h"
 #include "bullet_straight.h"
+#include "bullet_homing.h"
 #include "bullet_manager.h"
 #include "shader.h"
 #include"user.h"
@@ -32,6 +33,7 @@ Boss::Boss()
 
 	//turretHeadNode = model->find_nodes("Bone_Turret_Head_Main");
 	turretNode = model->find_nodes("Bone_MGun_Main");
+	doorNode = model->find_nodes("Bone_PowerDoor");
 
 	// 初期姿勢時の頭ノードのローカル空間前方向を求める
 	{
@@ -208,20 +210,35 @@ void Boss::Render_ui(float elapsedTime)
 void Boss::ShotBullet(ATTACK_TYPE type)
 {
 	BulletManager& bulletManager = BulletManager::Instance();
-
-	targetPoint_pos = target_pos;
-	//発射位置(プレイヤーの腰あたり)
-	DirectX::XMFLOAT3 turretPos{};
-	model->fech_by_bone(bossAnimation, time, transform, turretNode, turretPos);
-	//目標
-	DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(turretPos,
-		{ targetPoint_pos.x, targetPoint_pos.y + targetPoint_height, targetPoint_pos.z });
-
-	BulletStraight* bullet =
-		type == ATTACK_TYPE::SHOT_S ? new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy)
-		: new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy);
 	
-	bullet->Launch(dir, turretPos);
+	DirectX::XMFLOAT3 shotPos{};
+	if (type == ATTACK_TYPE::SHOT_S)
+	{
+		targetPoint_pos = target_pos;
+		//発射位置(プレイヤーの腰あたり)
+		model->fech_by_bone(bossAnimation, time, transform, turretNode, shotPos);
+		//目標
+		DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(shotPos,
+			{ targetPoint_pos.x, targetPoint_pos.y + targetPoint_height, targetPoint_pos.z });
+
+		BulletStraight* bullet = 
+			new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy);
+		bullet->Launch(dir, shotPos);
+	}
+	else
+	{
+		targetPoint_pos = target_pos;
+		DirectX::XMFLOAT3& target = target_pos;
+		
+		//発射位置(プレイヤーの腰あたり)
+		model->fech_by_bone(bossAnimation, time, transform, doorNode, shotPos);
+		//目標
+		DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(shotPos, target);
+	
+		BulletHoming* bullet =
+			new BulletHoming(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy);
+		bullet->Launch(dir, shotPos, target);
+	}
 }
 void Boss::LookAt_turret(std::vector<gltf_model::node>& nodes)
 {
@@ -576,8 +593,6 @@ void Boss::DebugDUI()
 		}
 		ImGui::End();
 	}
-	//attack_skill_1->debug_gui("");
-	//attack_skill_2->debug_gui("");
 #endif
 }
 
@@ -585,9 +600,6 @@ void Boss::DebugPrimitiveUpdate()
 {
 	DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
 	
-	//debugRender->CreateSphere(
-	//	position,
-	//	1.0f, { 1.0f,0.0f,0.0f,1.0f });
 	debugRender->CreateCylinder(
 		bossBodyCollision.capsule.start,
 		bossBodyCollision.capsule.radius,

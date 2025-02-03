@@ -253,7 +253,11 @@ void Player::UpdateAvoidanceState(float elapsedTime)
 {	
 	//進行ベクトル取得
 	const DirectX::XMFLOAT3 moveVec = GetMoveVec(camera);
-	//if(moveVec.x ==0.0f && moveVec.z == 0.0f)
+
+	if (moveVec.x > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_RIGHT;
+	else if (moveVec.x < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_LEFT;
+	if (moveVec.y > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
+	else if (moveVec.y < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
 
 	//徐々に速度を落としていく
 	velocity.x /= 2.0f;
@@ -261,13 +265,6 @@ void Player::UpdateAvoidanceState(float elapsedTime)
 	//速力処理更新
 	UpdateVelocity(elapsedTime, position);
 
-	//if (param.avoidanceTimer < 0.1f)
-	//{
-	//	//向いている方向に速度を足す
-	//	//velocity.x += moveVec.x * param.avoidanceSpeed;
-	//	//velocity.z += moveVec.z * param.avoidanceSpeed;
-	//	charaParam.acceleration = accelerationState[ACCELERATION_STATE::AVOIDANCE];
-	//}
 	if (param.avoidanceTimer > 0.1f)
 	{
 		charaParam.maxMoveSpeed = charaParam.moveSpeed;
@@ -498,11 +495,15 @@ void Player::UpdateCombo_PowerR_State(float elapsedTime)
 
 void Player::UpdateDamageState(float elapsedTime)
 {
-	if (model->GetIsEndAnimation())
-	{//ダメージがちゃんと出ない理由はアニメーション終わりに合わせて変えてしまっているからFindLoop
+	static float damageTimer = 0.0f;
+	if (model->GetIsEndAnimation() && damageTimer> 0.2f)
+	{
 		TransitionIdleState();
 		isGlitch_CA = false;
+		damageTimer = 0.0f;
 	}
+
+	damageTimer += elapsedTime;
 
 	//速力処理更新
 	UpdateVelocity(elapsedTime, position);

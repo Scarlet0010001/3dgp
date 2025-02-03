@@ -1,6 +1,5 @@
 #pragma once
 #include "bullet.h"
-#include "gltf_model.h"
 
 class BulletStraight :
     public Bullet

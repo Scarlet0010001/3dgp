@@ -92,18 +92,18 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>USE_IMGUI;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\include;.\DirectXTK-master\Inc;.\cereal-master\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\include;.\DirectXTK-master\Inc;.\cereal-master\include;.\Effekseer170b\include\Effekseer;.\Effekseer170b\include\EffekseerRendererDX11</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;Effekseer.lib;EffekseerRenderDX11.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
-      <AdditionalLibraryDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x86\debug;.\DirectXTK-master\Bin\Desktop_2019\Win32\Debug;$(VC_LibraryPath_x86)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x86\debug;.\DirectXTK-master\Bin\Desktop_2019\Win32\Debug;$(VC_LibraryPath_x86);.¥Effekseer170b¥lib\vs2019¥MT¥$(PlatformTarget)¥$(Configuration);.\Effekseer170b¥lib¥vs2019¥MT¥$(PlatformTarget)¥$(Configuration)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -118,15 +118,15 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ENABLE_MSAA;NOMINMAX;ENABLE_DIRECT2D;USE_IMGUI;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\include;.\DirectXTK-master\Inc;.\cereal-master\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\include;.\DirectXTK-master\Inc;.\cereal-master\include;.\Effekseer170b\include\Effekseer;.\Effekseer170b\include\EffekseerRendererDX11</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\DirectXTK-master\Bin\Desktop_2019\x64\Debug;$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\DirectXTK-master\Bin\Desktop_2019\x64\Debug;$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x64\debug;%(AdditionalLibraryDirectories);.¥Effekseer170b¥lib\vs2019¥MT¥$(PlatformTarget)¥$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;Effekseer.lib;EffekseerRendererDX11.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <FxCompile>
@@ -146,7 +146,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\include;.\DirectXTK-master\Inc;.\cereal-master\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\include;.\DirectXTK-master\Inc;.\cereal-master\include;.\Effekseer170b\include\Effekseer;.\Effekseer170b\include\EffekseerRendererDX11</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -155,8 +155,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x86\release;.\DirectXTK-master\Bin\Desktop_2019\win32\Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x86\release;.\DirectXTK-master\Bin\Desktop_2019\win32\Release;.¥Effekseer170b¥lib\vs2019¥MT¥$(PlatformTarget)¥$(Configuration);.\Effekseer170b¥lib¥vs2019¥MT¥$(PlatformTarget)¥$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;Effekseer.lib;EffekseerRenderDX11.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <FxCompile>
@@ -174,7 +174,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_MSAA;ENABLE_DIRECT2D;USE_IMGUI;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\include;.\DirectXTK-master\Inc;.\cereal-master\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\include;.\DirectXTK-master\Inc;.\cereal-master\include;.\Effekseer170b\include\Effekseer;.\Effekseer170b\include\EffekseerRendererDX11</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -183,8 +183,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x64\release;.\DirectXTK-master\Bin\Desktop_2019\x64\Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;Effekseer.lib;EffekseerRendererDX11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x64\release;.\DirectXTK-master\Bin\Desktop_2019\x64\Release;.¥Effekseer170b¥lib\vs2019¥MT¥$(PlatformTarget)¥$(Configuration)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <FxCompile>
@@ -203,6 +203,7 @@
     <ClCompile Include="Source\boss.cpp" />
     <ClCompile Include="Source\boss_action.cpp" />
     <ClCompile Include="Source\bullet.cpp" />
+    <ClCompile Include="Source\bullet_homing.cpp" />
     <ClCompile Include="Source\bullet_manager.cpp" />
     <ClCompile Include="Source\bullet_straight.cpp" />
     <ClCompile Include="Source\camera.cpp" />
@@ -277,6 +278,7 @@
     </ClInclude>
     <ClInclude Include="Source\boss.h" />
     <ClInclude Include="Source\bullet.h" />
+    <ClInclude Include="Source\bullet_homing.h" />
     <ClInclude Include="Source\bullet_manager.h" />
     <ClInclude Include="Source\bullet_straight.h" />
     <ClInclude Include="Source\camera.h" />

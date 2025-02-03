@@ -164,6 +164,8 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
 
                 //ヒットエフェクト再生
 
+                bulletA->Destroy();
+
             }
         }
         //ボスとの当たり判定
@@ -177,7 +179,7 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
         {
             AttackParam attackParam = P_param.attackParam;
             //攻撃対象に与えるダメージ量と無敵時間
-            if (boss->damagedFunction(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::NONE))
+            if (boss->damagedFunction(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::SMALL))
             {
                 //カメラシェイク
                 camera.SetCameraShake(attackParam.cameraShake);
@@ -188,6 +190,8 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
                 //game_pad->set_vibration(attack_sword_param.hit_viberation.l_moter, attack_sword_param.hit_viberation.r_moter, attack_sword_param.hit_viberation.vibe_time);
 
                 //ヒットエフェクト再生
+
+                bulletA->Destroy();
 
             }
 

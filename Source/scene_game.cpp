@@ -93,7 +93,6 @@ void SceneGame::Update(float elapsedTime)
                 DirectX::XMLoadFloat3(&player->GetPosition()),
                 DirectX::XMLoadFloat3(&boss->GetPosition())))));
 
-
     //**********’e‚ÌXV**********//
     bulletManager.Update(cameraElapsedTime);
 

@@ -25,6 +25,7 @@ private:
 		BOSS_HIT,
 		BOSS_DEAD,
 		BOSS_WAKEUP,
+		BOSS_CHARGE,
 		BOSS_ANIME_COUNT,
 	};
 	enum class STATE
@@ -39,6 +40,7 @@ private:
 		DAMAGE,
 		DEAD,
 		WAKEUP,
+		CHARGE,
 	};
 	enum class ATTACK_TYPE
 	{
@@ -143,15 +145,11 @@ private:
 	void TransitionAttack_Jump_State();//ジャンプ攻撃
 	void TransitionAttack_ShotStraight_State();//射撃
 	void TransitionAttack_ShotHoming_State();//ホーミングミサイル
-	//void TransitionSkill_1_State();
 
 	//			ダウン系			//
 	void TransitionDamageState();
 	void TransitionDeadState();
 	void TransitionDownState();
-
-	//			チャージ系			//
-	//void TransitionChargeState(float time);
 
 	/*---------------状態更新------------------------*/
 
@@ -196,7 +194,7 @@ private:
 	std::unique_ptr<gltf_model> model;
 	//std::unique_ptr<BossUi> ui;
 
-	gltf_model::node arm;
+	gltf_model::node doorNode;
 	gltf_model::node turretNode;
 	//gltf_model::node turretHeadNode;
 	
@@ -258,6 +256,10 @@ private:
 	const float NORMAL_ATTACK_COOLTIME = 1;
 
 	const float ATTACK_RESPONDER_TIME = 3.0f;
+
+	//ジャンプの攻撃チャージ時間
+	const float CHARGE_JUMP_TIME = 2.5f;
+
 	//ダメージを受けたときのスタン時間
 	const float DAMAGE_STUN_DURATION = 0.7f;
 

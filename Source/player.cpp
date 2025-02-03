@@ -539,7 +539,11 @@ void Player::OnLanding()
 	}
 	else
 	{
-		if (state != STATE::SHOT)
+		if (state != STATE::SHOT 
+			&& state != STATE::LEFT_ATTACK
+			&& state != STATE::RIGHT_ATTACK
+			&& state != STATE::DAMAGE
+			)
 			TransitionIdleState();
 	}
 

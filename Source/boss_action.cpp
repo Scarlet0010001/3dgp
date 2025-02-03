@@ -51,7 +51,7 @@ void Boss::TransitionAttack_Jump_State()
 	//charaParam.moveSpeed = CalcMoveSpeed(target_pos, 0.6f);
 	charaParam.acceleration = ACCELERATION_JUMP_SPEED;
 	attackParam = param.stompParam;
-	bossAnimation = BossAnimation::BOSS_HIT;
+	bossAnimation = BossAnimation::BOSS_CHARGE;
 	stateTimer = 0;
 	state_duration = 2.5f;
 
@@ -117,7 +117,6 @@ void Boss::UpdateIdleState(float elapsedTime)
 
 void Boss::UpdateWalkState(float elapsedTime)
 {
-
 	//ƒvƒŒƒCƒ„[•ûŒü‚É•à‚­
 	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, target_pos);
 	Move(dir_target_vec.x, dir_target_vec.z, charaParam.moveSpeed);
@@ -262,7 +261,7 @@ void Boss::UpdateAttack_ShotStraight_State(float elapsedTime)
 
 void Boss::UpdateAttack_ShotHoming_State(float elapsedTime)
 {
-	ShotBullet(ATTACK_TYPE::SHOT_S);
+	ShotBullet(ATTACK_TYPE::SHOT_H);
 	TransitionIdleState();
 	if (model->GetIsEndAnimation())
 	{
@@ -311,6 +310,7 @@ void Boss::AttackRoutine(float elapsedTime)
 	if (attackResponderTimer > ATTACK_RESPONDER_TIME)
 	{
 		SelectAttackTypeLong();
+		//TransitionAttack_Tackle_State();
 		attackResponderTimer = 0;
 	}
 }
