@@ -229,11 +229,12 @@ void Boss::ShotBullet(ATTACK_TYPE type)
 	{
 		targetPoint_pos = target_pos;
 		DirectX::XMFLOAT3& target = target_pos;
+		DirectX::XMFLOAT3 atarget = { position.x, position.y + 10.0f,position.z };
 		
 		//発射位置(プレイヤーの腰あたり)
 		model->fech_by_bone(bossAnimation, time, transform, doorNode, shotPos);
 		//目標
-		DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(shotPos, target);
+		DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(shotPos, atarget);
 	
 		BulletHoming* bullet =
 			new BulletHoming(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy);

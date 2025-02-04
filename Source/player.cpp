@@ -9,6 +9,8 @@
 #include "Graphics.h"
 #include "magic_enum/include/magic_enum.hpp"
 
+#include "effect_manager.h"
+
 #include <filesystem>
 #include <fstream>
 #include <cereal/archives/json.hpp>
@@ -20,6 +22,8 @@ Player::Player()
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
 		"Resources/Character/Player/glb/white_crow.glb", true);
 	
+	slashEffect = std::make_unique<Effect>("Resources/Effect/Slash/slash.efkefc");
+
 	model->cumulate_transforms(model->nodes, transform);
 	for (auto& node : animated_nodes)
 	{
@@ -229,7 +233,7 @@ void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 			//game_pad->set_vibration(attack_sword_param.hit_viberation.l_moter, attack_sword_param.hit_viberation.r_moter, attack_sword_param.hit_viberation.vibe_time);
 
 			//ヒットエフェクト再生
-
+			slashEffect->Play(attackCollision_position[side], 0.5f);
 		}
 	}
 }

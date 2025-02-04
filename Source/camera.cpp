@@ -104,10 +104,11 @@ void Camera::Update(float elapsedTime)
                 float center_x = static_cast<float>(SCREEN_WIDTH) / 2;
                 float center_y = static_cast<float>(SCREEN_HEIGHT) / 2;
 
-                /*
+                
                 // 画面中央からのベクトル
                 //DirectX::XMFLOAT2 vec = { CPos.x - center_x, CPos.y - center_y };
 
+                
                 // 右側にあれば
                 if (center_x < CPosOld.x && signbit(ax))
                 {
@@ -128,7 +129,7 @@ void Camera::Update(float elapsedTime)
                 {
                     ay = 0;
                 }
-                */
+                
                 
                 //カメラ縦操作
                 if (ay > 0.1f || ay < 0.1f)

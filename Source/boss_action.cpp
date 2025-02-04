@@ -310,7 +310,6 @@ void Boss::AttackRoutine(float elapsedTime)
 	if (attackResponderTimer > ATTACK_RESPONDER_TIME)
 	{
 		SelectAttackTypeLong();
-		//TransitionAttack_Tackle_State();
 		attackResponderTimer = 0;
 	}
 }
@@ -327,14 +326,6 @@ void Boss::SelectAttackTypeShort()
 		break;
 	case ATTACK_TYPE::JUMP:
 		TransitionAttack_Jump_State();
-		break;
-
-	case ATTACK_TYPE::SHOT_S:
-		TransitionAttack_ShotStraight_State();
-		break;
-
-	case ATTACK_TYPE::SHOT_H:
-		TransitionAttack_ShotHoming_State();
 		break;
 	}
 
@@ -356,10 +347,6 @@ void Boss::SelectAttackTypeLong()
 		break;
 	case ATTACK_TYPE::SHOT_S:
 		TransitionAttack_ShotStraight_State();
-		break;
-
-	case ATTACK_TYPE::SHOT_H:
-		TransitionAttack_ShotHoming_State();
 		break;
 	}
 }

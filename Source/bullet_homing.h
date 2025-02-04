@@ -26,7 +26,6 @@ private:
 
 private:
     std::vector<gltf_model::node> animated_nodes{};
-    DirectX::XMFLOAT3 target = { 0,0,0 };
 
 };
 

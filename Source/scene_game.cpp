@@ -7,6 +7,7 @@
 #include "scene_loading.h"
 
 #include "bullet_manager.h"
+#include "effect_manager.h"
 
 #include "stage_manager.h"
 #include "stage_main.h"
@@ -101,6 +102,9 @@ void SceneGame::Update(float elapsedTime)
     
     JudgeCollision();
 
+    //**********エフェクトの更新**********//
+    EffectManager::Instance().Update(elapsedTime);
+
     glitch_CA->glitch_CA_constant->data.time += elapsedTime;
     if (glitch_CA->glitch_CA_constant->data.time > 20.0f)
         glitch_CA->glitch_CA_constant->data.time = 1.0f;
@@ -108,6 +112,14 @@ void SceneGame::Update(float elapsedTime)
     if (player->GetIsDead() || boss->GetIsDead())
     {
         SceneManager::Instance().ChangeScene(new SceneTitle);
+    }
+
+    Mouse& mouse = Device::Instance().GetMouse();
+    static bool fixed = false;
+    if (mouse.GetButtonDown() & Mouse::BTN_F1)
+    {
+        fixed = !fixed;
+        mouse.SetIsFixedCursor(fixed);
     }
 
     cameraElapsedTime_ = cameraElapsedTime;
@@ -141,7 +153,6 @@ void SceneGame::Render(float elapsedTime)
     
     DirectX::XMVECTOR up{ DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) };
     DirectX::XMMATRIX V{ DirectX::XMLoadFloat4x4(&camera->GetView()) };
-    //DirectX::XMMATRIX V{ DirectX::XMMatrixLookAtLH(eye, focus, up) };
 
     DirectX::XMFLOAT4X4 view_pro{};
     DirectX::XMStoreFloat4x4(&view_pro, V * P);
@@ -186,6 +197,11 @@ void SceneGame::Render(float elapsedTime)
 
     //---------------------------UI----------------------------//
     player->RenderUI(cameraElapsedTime_);
+
+    // 3Dエフェクト描画
+    {
+        EffectManager::Instance().Render(camera->GetView(), camera->GetProjection());
+    }
 
     //-------------------DebugPrimitive----------------------//
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::WIREFRAME_CULL_BACK);

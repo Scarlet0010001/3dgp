@@ -6,6 +6,8 @@
 #include "radial_blur.h"
 #include "glitch_chromatic_aberration.h"
 
+#include "effect.h"
+
 //#include "gltf_model.h"
 
 #include "primitive.h"
@@ -329,6 +331,9 @@ private:
 
 	bool isHover = false;
 	bool isBoost = false;
+
+	//エフェクト
+	std::unique_ptr<Effect> slashEffect = nullptr;
 
 	bool displayPlayerImgui = false;
 

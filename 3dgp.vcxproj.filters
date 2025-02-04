@@ -124,6 +124,9 @@
     <Filter Include="Sources\Glitch">
       <UniqueIdentifier>{278a42f8-4623-410e-92e8-5f3da69f510f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Effect">
+      <UniqueIdentifier>{72a06be2-f71d-49d4-baab-d28c148e5e92}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\resource_manager.cpp">
@@ -308,6 +311,12 @@
     </ClCompile>
     <ClCompile Include="Source\bullet_homing.cpp">
       <Filter>Sources\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\effect_manager.cpp">
+      <Filter>Sources\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\effect.cpp">
+      <Filter>Sources\Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -526,6 +535,12 @@
     </ClInclude>
     <ClInclude Include="Source\bullet_homing.h">
       <Filter>Sources\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\effect_manager.h">
+      <Filter>Sources\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\effect.h">
+      <Filter>Sources\Effect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

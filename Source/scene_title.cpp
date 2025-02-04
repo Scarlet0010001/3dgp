@@ -11,6 +11,8 @@ void SceneTitle::Initialize()
 	spriteTitleBack = std::make_unique<SpriteBatch>(
 		graphics.GetDevice().Get(),
 		L"Resources/Sprite/Title/title_back_all.png", 1);
+	audios[0] = audio::_emplace(L"Resources/Sound/BGM/プラネタリウムガーデン.wav");
+
 	selectedMenuState = TITLE_MENU::GAME_START;
 	isStart = false;
 }
@@ -23,6 +25,9 @@ void SceneTitle::Update(float elapsedTime)
 {
 	Mouse& mouse = Device::Instance().GetMouse();
 	GamePad& gamePad = Device::Instance().GetGamePad();
+
+	audios[0]->play();
+	audios[0]->volume(0.7f);
 
 	const MouseButton anyMouseButton =
 		Mouse::BTN_ENTER

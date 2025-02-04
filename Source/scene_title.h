@@ -1,6 +1,7 @@
 #pragma once
 #include "scene.h"
 #include "sprite_batch.h"
+#include "audio.h"
 
 class SceneTitle :
     public Scene
@@ -30,6 +31,8 @@ private:
 
     //ƒ^ƒCƒgƒ‹”wŒi
     std::unique_ptr<SpriteBatch> spriteTitleBack = nullptr;
+
+    std::shared_ptr<audio> audios[8];
 
 };
 

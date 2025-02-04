@@ -7,6 +7,8 @@
 #include "scene_manager.h"
 #include "scene_title.h"
 #include "device.h"
+#include "effect_manager.h"
+
 framework::framework(HWND hwnd) : hwnd(hwnd)
 {
 }
@@ -16,6 +18,9 @@ bool framework::initialize()
 	Graphics::Instance().Initialize(hwnd);
 	Device::Instance().GetMouse().Set_do_show(true);
 	SceneManager::Instance().ChangeScene(new SceneTitle());
+
+	// エフェクトマネージャー初期化
+	EffectManager::Instance().Initialize();
 
 	//IBLテクスチャをロード
 	D3D11_TEXTURE2D_DESC texture2d_desc;
@@ -100,6 +105,9 @@ bool framework::uninitialize()
 {
 	//Sprite オブジェクトを解放する
 	SceneManager::Instance().Clear();
+
+	// エフェクトマネージャー終了化
+	EffectManager::Instance().Finalize();
 
 	return true;
 }

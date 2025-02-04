@@ -125,7 +125,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\DirectXTK-master\Bin\Desktop_2019\x64\Debug;$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x64\debug;%(AdditionalLibraryDirectories);.¥Effekseer170b¥lib\vs2019¥MT¥$(PlatformTarget)¥$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\DirectXTK-master\Bin\Desktop_2019\x64\Debug;$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x64\debug;%(AdditionalLibraryDirectories);.\Effekseer170b\lib\vs2019\MD\x64\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;Effekseer.lib;EffekseerRendererDX11.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -184,7 +184,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>zlib-md.lib;libxml2-md.lib;libfbxsdk-md.lib;DirectXTK.lib;d3d11.lib;dxgi.lib;Effekseer.lib;EffekseerRendererDX11.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x64\release;.\DirectXTK-master\Bin\Desktop_2019\x64\Release;.¥Effekseer170b¥lib\vs2019¥MT¥$(PlatformTarget)¥$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProgramW6432)\Autodesk\FBX\FBX SDK\2020.2\lib\vs2019\x64\release;.\DirectXTK-master\Bin\Desktop_2019\x64\Release;C:\Users\2220411\Desktop\課題\自作ライブラリ\描画とゲープロmark2\描画とゲープロ\Effekseer170b\lib\vs2019\MD\x64\Release</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <FxCompile>
@@ -214,6 +214,8 @@
     <ClCompile Include="Source\debug_renderer.cpp" />
     <ClCompile Include="Source\deferred_renderer.cpp" />
     <ClCompile Include="Source\device.cpp" />
+    <ClCompile Include="Source\effect.cpp" />
+    <ClCompile Include="Source\effect_manager.cpp" />
     <ClCompile Include="Source\framebuffer.cpp" />
     <ClCompile Include="Source\framework.cpp" />
     <ClCompile Include="Source\fullscreen_quad.cpp" />
@@ -291,6 +293,8 @@
     <ClInclude Include="Source\debug_renderer.h" />
     <ClInclude Include="Source\deferred_renderer.h" />
     <ClInclude Include="Source\device.h" />
+    <ClInclude Include="Source\effect.h" />
+    <ClInclude Include="Source\effect_manager.h" />
     <ClInclude Include="Source\framebuffer.h" />
     <ClInclude Include="Source\framework.h" />
     <ClInclude Include="Source\fullscreen_quad.h" />

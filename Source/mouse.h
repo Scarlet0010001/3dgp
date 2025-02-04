@@ -84,6 +84,8 @@ public:
     // ‘€ì—LŒøA–³Œø
     void OperationDisablement() { operable = false; }
     void OperationActivation() { operable = true; }
+    const bool GetIsFixedCursor() const{ return isFixedCursor; }
+    void SetIsFixedCursor(bool fixed) { isFixedCursor = fixed; }
 
 private:
     //--------< ŠÖ” >--------//
@@ -105,6 +107,8 @@ private:
     MouseButton	buttonState[2] = { 0 };
     MouseButton	buttonDown = 0;
     MouseButton	buttonUp = 0;
+
+    bool isFixedCursor = false;
 
     bool operable = true;
 };
