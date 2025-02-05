@@ -7,6 +7,7 @@
 #include "light_manager.h"
 #include "deferred_renderer.h"
 
+#include "audio.h"
 #include "sky_map.h"
 #include "radial_blur.h"
 #include "glitch_chromatic_aberration.h"
@@ -73,6 +74,10 @@ private:
 
     std::unique_ptr<Tutorial> tutorial = nullptr;
     */
+
+    std::shared_ptr<audio> audios[8];
+
+
     //スカイマップ
     std::unique_ptr<SkyMap> skymap;
 
@@ -83,6 +88,11 @@ private:
     std::unique_ptr<framebuffer> framebuffers[8];
 
     std::unique_ptr<fullscreen_quad> bit_block_transfer;
+
+    std::unique_ptr<SpriteBatch> spriteVictory = nullptr;
+    std::unique_ptr<SpriteBatch> spriteLose = nullptr;
+
+    bool isEnd = false;
 
     //タイトルに戻る　※テスト用
     bool displayImgui = false;

@@ -30,9 +30,12 @@ void Player::TransitionAvoidanceState()
 {
 	p_update = &Player::UpdateAvoidanceState;
 	playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
-	state = STATE::ROLL;
+	state = STATE::BOOST;
 	charaParam.maxMoveSpeed = param.avoidanceSpeed;
 	charaParam.acceleration = accelerationState[ACCELERATION_STATE::AVOIDANCE];
+
+	audios[PLAYER_SE::SE_BOOST]->play();
+	audios[PLAYER_SE::SE_BOOST]->volume(0.5f);
 
 	player_radialBlur_constant.blurStrength = 1.0f;
 	player_radialBlur_constant.blurRadius = 1.0f;
@@ -77,6 +80,11 @@ void Player::TransitionCombo_01_01_State()
 	state = STATE::RIGHT_ATTACK;
 	attackParam = param.combo_1;
 	nextCombo = false;
+
+	//éaåÇâπçƒê∂
+	audios[SE_SABER]->play();
+	audios[SE_SABER]->volume(1.0f);
+
 }
 
 void Player::TransitionCombo_01_02_State()
@@ -86,6 +94,10 @@ void Player::TransitionCombo_01_02_State()
 	state = STATE::LEFT_ATTACK;
 	attackParam = param.combo_2;
 	nextCombo = false;
+
+	//éaåÇâπçƒê∂
+	audios[SE_SABER]->play();
+	audios[SE_SABER]->volume(1.0f);
 
 }
 
@@ -97,6 +109,10 @@ void Player::TransitionCombo_01_03_State()
 	attackParam = param.combo_3;
 	nextCombo = false;
 
+	//éaåÇâπçƒê∂
+	audios[SE_SABER]->play();
+	audios[SE_SABER]->volume(1.0f);
+
 }
 
 void Player::TransitionCombo_PowerL_State()
@@ -106,6 +122,10 @@ void Player::TransitionCombo_PowerL_State()
 	state = STATE::LEFT_ATTACK;
 	nextCombo = false;
 
+	//éaåÇâπçƒê∂
+	audios[SE_SABER]->play();
+	audios[SE_SABER]->volume(1.0f);
+
 }
 
 void Player::TransitionCombo_PowerR_State()
@@ -114,6 +134,10 @@ void Player::TransitionCombo_PowerR_State()
 	playerAnimation = PlayerAnimation::PLAYER_POWER_R;
 	state = STATE::RIGHT_ATTACK;
 	nextCombo = false;
+
+	//éaåÇâπçƒê∂
+	audios[SE_SABER]->play();
+	audios[SE_SABER]->volume(1.0f);
 
 }
 
@@ -148,13 +172,14 @@ void Player::UpdateIdleState(float elapsedTime)
 	InputWing();
 	//çUåÇì¸óÕ
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
 		)
 	{
 		TransitionCombo_01_01_State();
 	}
 	//éÀåÇì¸óÕ
-	if (mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
+	if (mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK
+		|| gamePad->GetButtonDown() & gamePad->BTN_RIGHT_SHOULDER)
 	{
 		TransitionShotState();
 	}
@@ -188,13 +213,14 @@ void Player::UpdateMoveState(float elapsedTime)
 	InputWing();
 	//çUåÇì¸óÕ
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
 		)
 	{
 		TransitionCombo_01_01_State();
 	}
 	//éÀåÇì¸óÕ
-	if (mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK)
+	if (mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK
+		|| gamePad->GetButtonDown() & gamePad->BTN_RIGHT_SHOULDER)
 	{
 		TransitionShotState();
 	}
@@ -225,7 +251,7 @@ void Player::UpdateWingState(float elapsedTime)
 
 		InputMoveWing(elapsedTime);
 	}
-	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)//Q
+	if (gamePad->GetButtonDown() & GamePad::BTN_A)
 	{
 		playerAnimation = PlayerAnimation::PLAYER_WING_END;
 	}
@@ -238,11 +264,6 @@ void Player::UpdateWingState(float elapsedTime)
 	}
 	//âÒîì¸óÕ
 	//InputAvoidance();
-	//çUåÇì¸óÕ
-	if (mouse->GetButton() & mouse->BTN_RIGHT_CLICK)
-	{
-
-	}
 
 	//ë¨óÕèàóùçXêV
 	UpdateVelocity(elapsedTime, position);
@@ -252,12 +273,13 @@ void Player::UpdateWingState(float elapsedTime)
 void Player::UpdateAvoidanceState(float elapsedTime)
 {	
 	//êiçsÉxÉNÉgÉãéÊìæ
-	const DirectX::XMFLOAT3 moveVec = GetMoveVec(camera);
+	float ax = gamePad->GetAxis_LX();
+	float ay = gamePad->GetAxis_LY();
 
-	if (moveVec.x > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_RIGHT;
-	else if (moveVec.x < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_LEFT;
-	if (moveVec.y > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
-	else if (moveVec.y < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
+	if (ax > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_RIGHT;
+	else if (ax < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_LEFT;
+	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_FORWARD;
+	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_MOVE_BACK;
 
 	//èôÅXÇ…ë¨ìxÇóéÇ∆ÇµÇƒÇ¢Ç≠
 	velocity.x /= 2.0f;
@@ -304,7 +326,7 @@ void Player::UpdateJumpState(float elapsedTime)
 	InputWing();
 	//çUåÇì¸óÕ
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
 		)
 	{
 		TransitionCombo_01_01_State();
@@ -324,11 +346,6 @@ void Player::UpdateLandingState(float elapsedTime)
 
 void Player::UpdateShotState(float elapsedTime)
 {
-	if (mouse->GetButtonUp() & mouse->BTN_RIGHT_CLICK)
-	{
-		TransitionIdleState();
-	}
-
 	float ax = gamePad->GetAxis_LX();
 	float ay = gamePad->GetAxis_LY();
 
@@ -337,6 +354,12 @@ void Player::UpdateShotState(float elapsedTime)
 	else if (ax < 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_LEFT;
 	if (ay > 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_FORWARD;
 	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_BACK;
+
+	if (mouse->GetButtonUp() & mouse->BTN_RIGHT_CLICK
+		|| gamePad->GetButtonUp() & gamePad->BTN_RIGHT_SHOULDER)
+	{
+		TransitionIdleState();
+	}
 
 	if(time <= 0) InputShot();
 
@@ -350,7 +373,7 @@ void Player::UpdateShotState(float elapsedTime)
 	InputWing();
 	//çUåÇì¸óÕ
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
 		)
 	{
 		TransitionCombo_01_01_State();
@@ -365,7 +388,7 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 {
 	//êÊçsì¸óÕ
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
 		)
 	{
 		nextCombo = true;
@@ -374,8 +397,6 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 	//çUåÇîªíËÉIÉì
 	if (0.023f < time && !attackParam.isAttack)
 	{
-		//camera->SetCameraShake(attackParam.cameraShake);
-		//camera->SetHitStop(attackParam.hitStop);
 		attackParam.isAttack = true;
 	}
 
@@ -404,7 +425,7 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 {
 	//êÊçsì¸óÕ
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
 		)
 	{
 		nextCombo = true;
@@ -432,14 +453,16 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 
 		TransitionIdleState();
 	}
+
 	InputMove(elapsedTime, param.attackMoveSpeed, 1);
+
 	UpdateVelocity(elapsedTime, position);
 }
 
 void Player::UpdateCombo_01_03_State(float elapsedTime)
 {
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+		|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
 		)
 	{
 		nextCombo = true;
@@ -454,12 +477,6 @@ void Player::UpdateCombo_01_03_State(float elapsedTime)
 	if (0.65f < time)
 		attackParam.isAttack = false;
 
-	//if (0.48f < time && nextCombo)
-	//{
-	//	TransitionCombo_01_03_State();
-	//	attackParam.isAttack = false;
-	//
-	//}
 	if (model->GetIsEndAnimation())
 	{
 		TransitionIdleState();
@@ -476,7 +493,7 @@ void Player::UpdateCombo_PowerL_State(float elapsedTime)
 	if (0.6f < time)
 	{
 		if (gamePad->GetButtonDown() & gamePad->BTN_X
-			//|| mouse->GetButton() & mouse->BTN_LEFT_CLICK
+			|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
 			)
 		{
 			TransitionCombo_01_03_State();

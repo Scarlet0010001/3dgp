@@ -13,6 +13,9 @@ void SceneLoading::Initialize()
 	spriteIcon = std::make_unique<SpriteBatch>(
 		Graphics::Instance().GetDevice().Get(),
 		L"Resources/Sprite/Loading/LoadingIcon.png", 1);
+	spriteOperation = std::make_unique<SpriteBatch>(
+		Graphics::Instance().GetDevice().Get(),
+		L"Resources/Sprite/Loading/operation.png", 1);
 
 	//スレッド開始
 	std::thread thread(LoadingThread, this);
@@ -63,6 +66,11 @@ void SceneLoading::Render(float elapsedTime)
 	spriteIcon->begin(graphics.Get_DC().Get());
 	spriteIcon->render(graphics.Get_DC().Get(), { positionX, positionY }, { 1, 1 }, { 1,1,1,1 }, angle);
 	spriteIcon->end(graphics.Get_DC().Get());
+
+	spriteOperation->begin(graphics.Get_DC().Get());
+	spriteOperation->render(graphics.Get_DC().Get(),
+		{ 300.0f, 300.0f }, { 0.3f, 0.3f }, { 1,1,1,1 }, 0);
+	spriteOperation->end(graphics.Get_DC().Get());
 
 }
 

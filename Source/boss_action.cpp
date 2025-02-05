@@ -8,7 +8,7 @@ void Boss::TransitionIdleState()
 	state = STATE::IDLE;
 	bossAnimation = BossAnimation::BOSS_IDLE;
 	stateTimer = 0;
-	state_duration = 2.0f;
+	stateDuration = 2.0f;
 
 }
 
@@ -19,7 +19,7 @@ void Boss::TransitionWalkState()
 	charaParam.moveSpeed = WALK_SPEED;
 	bossAnimation = BossAnimation::BOSS_WALK;
 	stateTimer = 0;
-	state_duration = 3.0f;
+	stateDuration = 3.0f;
 }
 
 void Boss::TransitionRunState()
@@ -29,7 +29,7 @@ void Boss::TransitionRunState()
 	charaParam.moveSpeed = RUN_SPEED;
 	//bossAnimation = BossAnimation::BOSS_IDLE;
 	stateTimer = 0;
-	state_duration = 3.0f;
+	stateDuration = 3.0f;
 }
 
 void Boss::TransitionAttack_Tackle_State()
@@ -41,29 +41,30 @@ void Boss::TransitionAttack_Tackle_State()
 	attackParam = param.tackleParam;
 	bossAnimation = BossAnimation::BOSS_RUN;
 	stateTimer = 0;
-	state_duration = 1.0f;
+	stateDuration = 1.0f;
 }
 
 void Boss::TransitionAttack_Jump_State()
 {
 	act_update = &Boss::UpdateAttack_Jump_State;
 	state = STATE::JUMP;
-	//charaParam.moveSpeed = CalcMoveSpeed(target_pos, 0.6f);
 	charaParam.acceleration = ACCELERATION_JUMP_SPEED;
 	attackParam = param.stompParam;
 	bossAnimation = BossAnimation::BOSS_CHARGE;
 	stateTimer = 0;
-	state_duration = 2.5f;
-
+	stateDuration = 2.5f;
+	chargeEffect->Play(position,3.0f);
 }
 
 void Boss::TransitionAttack_ShotStraight_State()
 {
 	act_update = &Boss::UpdateAttack_ShotStraight_State;
+	charaParam.acceleration = ACCELERATION_JUMP_SPEED;
 	state = STATE::SHOT_S;
-	//bossAnimation = BossAnimation::BOSS_IDLE;
+	rapidCount = 0;
+	bossAnimation = BossAnimation::BOSS_JUMP;
 	stateTimer = 0;
-	state_duration = 3.0f;
+	stateDuration = RAPIDFIRE_TIME;
 }
 
 void Boss::TransitionAttack_ShotHoming_State()
@@ -72,7 +73,7 @@ void Boss::TransitionAttack_ShotHoming_State()
 	state = STATE::SHOT_H;
 	bossAnimation = BossAnimation::BOSS_MISSILE;
 	stateTimer = 0;
-	state_duration = 3.0f;
+	stateDuration = 3.0f;
 }
 
 void Boss::TransitionDamageState()
@@ -81,7 +82,7 @@ void Boss::TransitionDamageState()
 	state = STATE::DAMAGE;
 	bossAnimation = BossAnimation::BOSS_HIT;
 	stateTimer = 0;
-	state_duration = DAMAGE_STUN_DURATION;
+	stateDuration = DAMAGE_STUN_DURATION;
 }
 
 void Boss::TransitionDeadState()
@@ -99,7 +100,7 @@ void Boss::TransitionDownState()
 
 void Boss::UpdateIdleState(float elapsedTime)
 {
-	if (stateTimer > state_duration)
+	if (stateTimer > stateDuration)
 	{
 		//if (health < charaParam.maxHealth / 2)
 		//{
@@ -122,7 +123,7 @@ void Boss::UpdateWalkState(float elapsedTime)
 	Move(dir_target_vec.x, dir_target_vec.z, charaParam.moveSpeed);
 	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);
 
-	if (stateTimer > state_duration)
+	if (stateTimer > stateDuration)
 	{
 		//攻撃のルーチン
 		AttackRoutine(elapsedTime);
@@ -148,7 +149,7 @@ void Boss::UpdateRunState(float elapsedTime)
 
 void Boss::UpdateAttack_Tackle_State(float elapsedTime)
 {
-	if (stateTimer < state_duration)
+	if (stateTimer < stateDuration)
 	{
 		targetPoint_pos.x = target_pos.x;
 		targetPoint_pos.z = target_pos.z;
@@ -171,7 +172,7 @@ void Boss::UpdateAttack_Tackle_State(float elapsedTime)
 	if (distSq < radius * radius)
 	{
 		TransitionIdleState();
-		state_duration = NORMAL_ATTACK_COOLTIME;
+		stateDuration = NORMAL_ATTACK_COOLTIME;
 		attackParam.isAttack = false;
 		Camera::Instance().SetOnDistanceShake(false);
 	}
@@ -184,8 +185,9 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	if (bossAnimation == BossAnimation::BOSS_JUMP
 		&& time < 0.1f)
 		return;
-	if (stateTimer < state_duration)
+	if (stateTimer < stateDuration)
 	{
+
 		charaParam.moveSpeed = CalcMoveSpeed(target_pos, 0.5f);
 		targetPoint_pos.x = target_pos.x;
 		targetPoint_pos.y = target_pos.y;
@@ -223,7 +225,7 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 		}
 		else
 		{
-			state_duration = NORMAL_ATTACK_COOLTIME;
+			stateDuration = NORMAL_ATTACK_COOLTIME;
 			charaParam.moveSpeed = 0;
 			velocity.x = 0.0f;
 			velocity.z = 0.0f;
@@ -245,14 +247,44 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 
 void Boss::UpdateAttack_ShotStraight_State(float elapsedTime)
 {
-	ShotBullet(ATTACK_TYPE::SHOT_S);
-	TransitionIdleState();
+	//飛びのいた後連射設定する
+	if (model->GetIsEndAnimation() && !isBackJump)
+	{
+		stateDuration = RAPIDFIRE_TIME;
+		stateTimer = 0.0f;
+		isBackJump = true;
 
-	if (model->GetIsEndAnimation())
+		charaParam.moveSpeed = 0;
+		velocity.x = 0.0f;
+		velocity.z = 0.0f;
+		charaParam.acceleration = 0.0f;
+	}
+	//後方に飛びのく
+	if (!isBackJump)
+	{
+		const float backJumpSpeed = 20.0f;
+		DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(target_pos, position);
+		Move(dir_target_vec.x, dir_target_vec.z, backJumpSpeed);
+		Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);
+	}
+	
+	if (stateTimer > stateDuration && isBackJump)
+	{
+		ShotBullet(ATTACK_TYPE::SHOT_S);
+		stateTimer = 0;
+		rapidCount++;
+	}
+
+
+
+	if (rapidCount > RAPID_MAX && isBackJump)
 	{
 		TransitionIdleState();
-		state_duration = NORMAL_ATTACK_COOLTIME;
-
+		isBackJump = false;
+		stateDuration = NORMAL_ATTACK_COOLTIME;
+		charaParam.moveSpeed = WALK_SPEED;
+		charaParam.maxMoveSpeed = WALK_SPEED;
+		charaParam.acceleration = ACCELERATION_NORMAL_SPEED;
 	}
 
 	//速度更新
@@ -266,7 +298,7 @@ void Boss::UpdateAttack_ShotHoming_State(float elapsedTime)
 	if (model->GetIsEndAnimation())
 	{
 		TransitionIdleState();
-		state_duration = NORMAL_ATTACK_COOLTIME;
+		stateDuration = NORMAL_ATTACK_COOLTIME;
 
 	}
 
@@ -276,10 +308,10 @@ void Boss::UpdateAttack_ShotHoming_State(float elapsedTime)
 
 void Boss::UpdateDamageState(float elapsedTime)
 {
-	if (stateTimer > state_duration)
+	if (stateTimer > stateDuration)
 	{
 		TransitionIdleState();
-		state_duration = DAMAGE_STUN_DURATION;
+		stateDuration = DAMAGE_STUN_DURATION;
 	}
 }
 
@@ -327,6 +359,9 @@ void Boss::SelectAttackTypeShort()
 	case ATTACK_TYPE::JUMP:
 		TransitionAttack_Jump_State();
 		break;
+	case ATTACK_TYPE::SHOT_S:
+		TransitionAttack_ShotStraight_State();
+
 	}
 
 }

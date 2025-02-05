@@ -8,7 +8,7 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
 	float4 color = color_map.Sample(anisotropic_sampler_state, pin.texcoord);
 	float alpha = color.a;
-#if 1
+#if 0
 	// Inverse gamma process(ãtÉKÉìÉ}ï‚ê≥Çé{Ç∑)
 	const float GAMMA = 2.2;
 	color.rgb = pow(color.rgb, GAMMA);

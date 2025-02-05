@@ -1,12 +1,16 @@
 #pragma once
 #include "bullet.h"
+#include "effect.h"
 
 class BulletStraight :
     public Bullet
 {
 public:
     BulletStraight(BulletManager* manager, BULLET_MASTER MasterType);
-    ~BulletStraight() {};
+    ~BulletStraight() 
+    {
+        bulletEffect->Stop(handle);
+    };
 
     //更新処理
     void Update(float elapsedTime)override;
@@ -22,6 +26,9 @@ private:
     void Move(float elapsedTime, float speed);
 
 private:
+    //エフェクト
+    std::unique_ptr<Effect> bulletEffect = nullptr;
+    Effekseer::Handle handle;
     std::vector<gltf_model::node> animated_nodes{};
 
 };

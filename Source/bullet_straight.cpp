@@ -8,6 +8,9 @@ BulletStraight::BulletStraight(BulletManager* manager, BULLET_MASTER MasterType)
     Graphics& graphics = Graphics::Instance();
     model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
         "Resources/Bullet/Bullet.glb");
+    bulletEffect = 
+        std::make_unique<Effect>("Resources/Effect/Bullet/playerBullet.efkefc");
+
     type = BULLET_TYPE::Straight;
     masterType = MasterType;
     //表示サイズを調整
@@ -23,10 +26,10 @@ void BulletStraight::Update(float elapsedTime)
     //寿命処理
     lifeTimer -= elapsedTime;
     if (lifeTimer <= 0.0f) Destroy();
-
     //移動
     float speed = this->speed * elapsedTime;
 
+    bulletEffect->SetPosition(handle, position);
     Move(elapsedTime, speed);
 
     //オブジェクト行列を更新
@@ -39,7 +42,7 @@ void BulletStraight::Update(float elapsedTime)
 void BulletStraight::Render(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
-    model->render(graphics.Get_DC().Get(), transform, animated_nodes);
+    //model->render(graphics.Get_DC().Get(), transform, animated_nodes);
     
     DrawDebugPrimitive();
 }
@@ -48,6 +51,8 @@ void BulletStraight::Launch(const DirectX::XMFLOAT3& direction, const DirectX::X
 {
     this->direction = direction;
     this->position = position;
+    handle = bulletEffect->Play(position, 3.0f);
+
 }
 
 void BulletStraight::Move(float elapsedTime, float speed)

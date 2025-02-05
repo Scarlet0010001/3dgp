@@ -13,8 +13,9 @@ Camera::Camera()
     , trakkingTarget(0.0f, 0, 0)
     , lockOnTarget(30.0f, 10, 0)
     , lightDirection(0.6f, -1, 0.1f, 0.7f)
-    , rollSpeed(60)
-    , attendRate(8.0f)
+    , mouseRollSpeed(60)
+    , stickRollSpeed(300)
+    , attendRate(12.0f)
     , maxAngle_X(DirectX::XMConvertToRadians(60))
     , minAngle_X(DirectX::XMConvertToRadians(-60))
     , view()
@@ -62,6 +63,44 @@ Camera::Camera()
     state = STATE::Tracking;
 }
 
+void Camera::Initialize()
+{
+    //----定数バッファ----//
+    // orientationの初期化
+    {
+        DirectX::XMFLOAT3 n(0, 1, 0); // 軸（正規化）
+        constexpr float angle = DirectX::XMConvertToRadians(0); //角度（ラジアン）
+        orientation = {
+            sinf(angle / 2) * n.x,
+            sinf(angle / 2) * n.y,
+            sinf(angle / 2) * n.z,
+            cosf(angle / 2)
+        };
+
+        standardOrientation = {
+            sinf(angle / 2) * n.x,
+            sinf(angle / 2) * n.y,
+            sinf(angle / 2) * n.z,
+            cosf(angle / 2)
+        };
+    }
+    // eyeの初期化
+    {
+        //カメラ回転値を回転行列に変換
+        DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
+        //回転行列の前方向ベクトルを取り出す
+        DirectX::XMVECTOR Front = Transform.r[2];
+        DirectX::XMFLOAT3 front;
+        DirectX::XMStoreFloat3(&front, Front);
+        //注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
+        eye.x = trakkingTarget.x - front.x * range;
+        eye.y = trakkingTarget.y - front.y * range;
+        eye.z = trakkingTarget.z - front.z * range;
+    }
+    state = STATE::Tracking;
+
+}
+
 void Camera::Update(float elapsedTime)
 {
     using namespace DirectX;
@@ -81,8 +120,8 @@ void Camera::Update(float elapsedTime)
         //ロックオンしていないときのカメラの挙動
         if (!cameraOperateStop)
         {
-            //ControlByGamePadStick(elapsedTime);
-            Mouse& mouse = Device::Instance().GetMouse();
+            ControlByGamePadStick(elapsedTime);
+            ControlByMouse(elapsedTime);
             if (state == STATE::Tracking)
             {
                 p_update = &Camera::UpdateWithTracking;
@@ -90,127 +129,6 @@ void Camera::Update(float elapsedTime)
             else
             {
                 p_update = &Camera::UpdateWithWing;
-            }
-
-            if (mouse.GetButton() & mouse.BTN_LEFT_CLICK)
-            {
-                DirectX::XMFLOAT2 CPos = mouse.GetCursorPosition();
-                DirectX::XMFLOAT2 CPosOld = mouse.GetOldCursorPosition();
-                float ax = CPos.x - CPosOld.x;
-                float ay = CPos.y - CPosOld.y;
-
-                
-                // 画面中心に向かうベクトルだったらマウスの移動量を0にする
-                float center_x = static_cast<float>(SCREEN_WIDTH) / 2;
-                float center_y = static_cast<float>(SCREEN_HEIGHT) / 2;
-
-                
-                // 画面中央からのベクトル
-                //DirectX::XMFLOAT2 vec = { CPos.x - center_x, CPos.y - center_y };
-
-                
-                // 右側にあれば
-                if (center_x < CPosOld.x && signbit(ax))
-                {
-                    ax = 0;
-                }
-                // 左側にあれば
-                if (center_x > CPosOld.x && !signbit(ax))
-                {
-                    ax = 0;
-                }
-                // 上側にあれば
-                if (center_y > CPosOld.y && !signbit(ay))
-                {
-                    ay = 0;
-                }
-                // 下側にあれば
-                if (center_y < CPosOld.y && signbit(ay))
-                {
-                    ay = 0;
-                }
-                
-                
-                //カメラ縦操作
-                if (ay > 0.1f || ay < 0.1f)
-                {
-                    angle.x = ay * DirectX::XMConvertToRadians(rollSpeed) * elapsedTime;
-                }
-                //カメラ横操作
-                if (ax > 0.1f || ax < 0.1f)
-                {
-                    angle.y = ax * DirectX::XMConvertToRadians(rollSpeed) * elapsedTime;
-                }
-
-                //RECT rc;
-                //GetClientRect(Graphics::Instance().GetHwnd(), &rc);
-                //
-                //SetCursorPos(SCREEN_WIDTH / 2 + rc.left, SCREEN_HEIGHT / 2 + rc.top);
-                //SetCursorPos( SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 );
-
-                // XMVECTORクラスへ変換
-                DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
-
-                DirectX::XMVECTOR forward = Math::get_posture_forward_vec(orientation);
-                DirectX::XMVECTOR up = { 0,1,0 };//カメラのY軸は常に（0,1,0）とする
-                DirectX::XMVECTOR right = Math::get_posture_right_vec(orientation);
-
-                //縦回転
-                {
-                    //回転軸
-                    DirectX::XMVECTOR axis = DirectX::XMVector3Cross(forward, up);
-
-                    if (fabs(angle.x) > DirectX::XMConvertToRadians(0.1f))
-                    {
-                        //回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-                        DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, angle.x);
-                        //矢印を徐々に目標座標に向ける
-                        DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-                        orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, sensitivityRate);
-                    }
-
-                }
-
-                //横回転
-                {
-                    //回転軸
-                    DirectX::XMVECTOR axis = up;
-
-                    if (fabs(angle.y) > DirectX::XMConvertToRadians(0.1f))
-                    {
-                        //回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-                        DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, angle.y);
-                        //矢印を徐々に目標座標に向ける
-                        DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-                        orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, sensitivityRate);
-                    }
-
-                }
-                //------------------------------------
-                //カメラが上か下を向きすぎたときに補正する
-                //------------------------------------
-
-                //向きすぎと判断する値
-                const float overdirection = 0.4f;
-                if (Math::get_posture_up(orientation).y < overdirection)
-                {
-                    if (Math::get_posture_forward(orientation).y < 0.0f)
-                    {
-                        float correction_rate = -5.0f;
-                        DirectX::XMVECTOR correct_angles_axis = DirectX::XMQuaternionRotationAxis(right, DirectX::XMConvertToRadians(correction_rate));
-                        orientationVec = DirectX::XMQuaternionMultiply(orientationVec, correct_angles_axis);
-                    }
-                    else
-                    {
-                        float correction_rate = 5.0f;
-                        DirectX::XMVECTOR correct_angles_axis = DirectX::XMQuaternionRotationAxis(right, DirectX::XMConvertToRadians(correction_rate));
-                        orientationVec = DirectX::XMQuaternionMultiply(orientationVec, correct_angles_axis);
-                    }
-                }
-
-                // orientationVecからorientationを更新
-                DirectX::XMStoreFloat4(&orientation, orientationVec);
-
             }
         }
     }
@@ -279,10 +197,10 @@ void Camera::UpdateWithTracking(float elapsedTime)
     DirectX::XMFLOAT3 start = ray_target;
     DirectX::XMFLOAT3 end = ray_target - forward * DirectX::XMFLOAT3(range, range, range);
     HitResult hit;
-    //StageManager::Instance().RayCast(start, end, hit);
+    StageManager::Instance().RayCast(start, end, hit);
 
-    //hit.distance = (std::max)(hit.distance, 0.5f);
-    //hit.distance = (std::min)(hit.distance, range);
+    hit.distance = (std::max)(hit.distance, 0.5f);
+    hit.distance = (std::min)(hit.distance, range);
 
     hit.distance = range;
 
@@ -385,45 +303,6 @@ void Camera::UpdateWithLockOn(float elapsedTime)
             }
         }
     }
-    //縦回転
-    //{
-    //	//回転軸
-    //	DirectX::XMVECTOR axis = Right;
-    //	//回転角度がこの値を超えたときのみ計算
-    //	const float extrapolated_angle = 1.0f;
-    //	if (fabs(lockOnAngle) > DirectX::XMConvertToRadians(extrapolated_angle))
-    //	{
-    //		//float cross{ forward.x * d_vec.z - forward.z * d_vec.x };
-    //		//DirectX::XMVector3Cross(Forward, TargetVecNorm);
-    //		DirectX::XMVECTOR Projected = 
-    //			DirectX::XMVectorSubtract(
-    //				TargetVecNorm, DirectX::XMVectorMultiply(
-    //					DirectX::XMVector3Dot(TargetVecNorm, Right), Right));
-    //		Projected = DirectX::XMVector3Normalize(Projected);
-    //
-    //		DirectX::XMVECTOR Cross = DirectX::XMVector3Cross(Forward, Projected);
-    //		
-    //		float angle = DirectX::XMVectorGetX(DirectX::XMVector3Dot(Cross, Right));
-    //
-    //		//クオータニオンは回転の仕方(どの向きに)
-    //		if (angle < 0.0f)
-    //		{
-    //			//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-    //			DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, lockOnAngle);
-    //			//矢印を徐々に目標座標に向ける
-    //			DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-    //			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
-    //		}
-    //		else
-    //		{
-    //			//回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
-    //			DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, -lockOnAngle);
-    //			//矢印を徐々に目標座標に向ける
-    //			DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
-    //			orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, lockOnRate * elapsedTime);
-    //		}
-    //	}
-    //}
 
 #endif
     // orientationVecからorientationを更新
@@ -467,12 +346,12 @@ void Camera::ControlByGamePadStick(float elapsedTime)
     //カメラ縦操作
     if (ay > 0.1f || ay < 0.1f)
     {
-        angle.x = ay * DirectX::XMConvertToRadians(rollSpeed) * elapsedTime;
+        angle.x = -ay * DirectX::XMConvertToRadians(stickRollSpeed * 0.5f) * elapsedTime;
     }
     //カメラ横操作
     if (ax > 0.1f || ax < 0.1f)
     {
-        angle.y = ax * DirectX::XMConvertToRadians(rollSpeed) * elapsedTime;
+        angle.y = ax * DirectX::XMConvertToRadians(stickRollSpeed) * elapsedTime;
     }
     // XMVECTORクラスへ変換
     DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
@@ -536,6 +415,125 @@ void Camera::ControlByGamePadStick(float elapsedTime)
 
     // orientationVecからorientationを更新
     XMStoreFloat4(&orientation, orientationVec);
+}
+
+void Camera::ControlByMouse(float elapsedTime)
+{
+    Mouse& mouse = Device::Instance().GetMouse();
+
+    if (mouse.GetButton() & mouse.BTN_LEFT_CLICK)
+    {
+        DirectX::XMFLOAT2 CPos = mouse.GetCursorPosition();
+        DirectX::XMFLOAT2 CPosOld = mouse.GetOldCursorPosition();
+        float ax = CPos.x - CPosOld.x;
+        float ay = CPos.y - CPosOld.y;
+
+
+        // 画面中心に向かうベクトルだったらマウスの移動量を0にする
+        float center_x = static_cast<float>(SCREEN_WIDTH) / 2;
+        float center_y = static_cast<float>(SCREEN_HEIGHT) / 2;
+
+        if (mouse.GetIsFixedCursor())
+        {
+            // 右側にあれば
+            if (center_x < CPosOld.x && signbit(ax))
+            {
+                ax = 0;
+            }
+            // 左側にあれば
+            if (center_x > CPosOld.x && !signbit(ax))
+            {
+                ax = 0;
+            }
+            // 上側にあれば
+            if (center_y > CPosOld.y && !signbit(ay))
+            {
+                ay = 0;
+            }
+            // 下側にあれば
+            if (center_y < CPosOld.y && signbit(ay))
+            {
+                ay = 0;
+            }
+        }
+
+
+        //カメラ縦操作
+        if (ay > 0.1f || ay < 0.1f)
+        {
+            angle.x = ay * DirectX::XMConvertToRadians(mouseRollSpeed) * elapsedTime;
+        }
+        //カメラ横操作
+        if (ax > 0.1f || ax < 0.1f)
+        {
+            angle.y = ax * DirectX::XMConvertToRadians(mouseRollSpeed) * elapsedTime;
+        }
+
+        // XMVECTORクラスへ変換
+        DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
+
+        DirectX::XMVECTOR forward = Math::get_posture_forward_vec(orientation);
+        DirectX::XMVECTOR up = { 0,1,0 };//カメラのY軸は常に（0,1,0）とする
+        DirectX::XMVECTOR right = Math::get_posture_right_vec(orientation);
+
+        //縦回転
+        {
+            //回転軸
+            DirectX::XMVECTOR axis = DirectX::XMVector3Cross(forward, up);
+
+            if (fabs(angle.x) > DirectX::XMConvertToRadians(0.1f))
+            {
+                //回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+                DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, angle.x);
+                //矢印を徐々に目標座標に向ける
+                DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+                orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, sensitivityRate);
+            }
+
+        }
+
+        //横回転
+        {
+            //回転軸
+            DirectX::XMVECTOR axis = up;
+
+            if (fabs(angle.y) > DirectX::XMConvertToRadians(0.1f))
+            {
+                //回転軸（axis）と回転角（axis）から回転クオータニオン（q）を求める
+                DirectX::XMVECTOR q = DirectX::XMQuaternionRotationAxis(axis, angle.y);
+                //矢印を徐々に目標座標に向ける
+                DirectX::XMVECTOR  q2 = DirectX::XMQuaternionMultiply(orientationVec, q);
+                orientationVec = DirectX::XMQuaternionSlerp(orientationVec, q2, sensitivityRate);
+            }
+
+        }
+        //------------------------------------
+        //カメラが上か下を向きすぎたときに補正する
+        //------------------------------------
+
+        //向きすぎと判断する値
+        const float overdirection = 0.4f;
+        if (Math::get_posture_up(orientation).y < overdirection)
+        {
+            if (Math::get_posture_forward(orientation).y < 0.0f)
+            {
+                float correction_rate = -5.0f;
+                DirectX::XMVECTOR correct_angles_axis = DirectX::XMQuaternionRotationAxis(right, DirectX::XMConvertToRadians(correction_rate));
+                orientationVec = DirectX::XMQuaternionMultiply(orientationVec, correct_angles_axis);
+            }
+            else
+            {
+                float correction_rate = 5.0f;
+                DirectX::XMVECTOR correct_angles_axis = DirectX::XMQuaternionRotationAxis(right, DirectX::XMConvertToRadians(correction_rate));
+                orientationVec = DirectX::XMQuaternionMultiply(orientationVec, correct_angles_axis);
+            }
+        }
+
+        // orientationVecからorientationを更新
+        DirectX::XMStoreFloat4(&orientation, orientationVec);
+
+    }
+
 }
 
 void Camera::CameraShakeUpdate(float elapsedTime)
@@ -717,7 +715,8 @@ void Camera::DebugGui()
             ImGui::DragFloat3("right", &right.x, 0.1f);
             ImGui::DragFloat("cape_vision", &capeVision, 0.1f);
             ImGui::DragFloat("attend_rate", &attendRate, 0.1f);
-            ImGui::DragFloat("roll_speed", &rollSpeed, 0.1f);
+            ImGui::DragFloat("mouse_rollSpeed", &mouseRollSpeed, 0.1f);
+            ImGui::DragFloat("stick_rollSpeed", &stickRollSpeed, 0.1f);
             ImGui::DragFloat("lock_on_rate", &lockOnRate, 0.1f);
             angle = { DirectX::XMConvertToRadians(a.x),DirectX::XMConvertToRadians(a.y),DirectX::XMConvertToRadians(a.z) };
             ImGui::DragFloat3("target", &trakkingTarget.x, 0.1f);

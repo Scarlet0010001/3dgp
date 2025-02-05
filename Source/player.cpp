@@ -24,6 +24,11 @@ Player::Player()
 	
 	slashEffect = std::make_unique<Effect>("Resources/Effect/Slash/slash.efkefc");
 
+	audios[PLAYER_SE::SE_SABER] = audio::_emplace(L"Resources/Sound/SE/saber.wav");
+	audios[PLAYER_SE::SE_LASER] = audio::_emplace(L"Resources/Sound/SE/laser.wav");
+	audios[PLAYER_SE::SE_BOOST] = audio::_emplace(L"Resources/Sound/SE/boost.wav");
+	audios[PLAYER_SE::SE_DAMAGE] = audio::_emplace(L"Resources/Sound/SE/Damage.wav");
+
 	model->cumulate_transforms(model->nodes, transform);
 	for (auto& node : animated_nodes)
 	{
@@ -56,7 +61,7 @@ void Player::Initialize()
 	LoadDataFile();
 
 	//パラメーター初期化
-	position = { 0.0f, 5.0f, 0.0f };
+	position = { 0.0f, 37.0f, 0.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
 	scale.x = scale.y = scale.z = 2.0f;
 	//Charactorクラスのパラメーター初期化
@@ -222,7 +227,7 @@ void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 		capsule_collider.start, capsule_collider.radius,collider_height))
 	{
 		//攻撃対象に与えるダメージ量と無敵時間
-		if (damaged_func(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::NONE))
+		if (damaged_func(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::SMALL))
 		{
 			//カメラシェイク
 			camera->SetCameraShake(attackParam.cameraShake);
@@ -297,10 +302,10 @@ void Player::Move(float vx, float vy, float vz, float speed)
 
 void Player::BoostUpdate(float elapsedTime)
 {
-	if (isGround)
+	if (isGround && STATE::BOOST != state)
 		param.boostTimer += elapsedTime * 3.0f;
 	if (isHover)
-		param.boostTimer -= elapsedTime;
+		param.boostTimer -= 0.7f * elapsedTime;
 	if (param.boostTimer >= MAX_BOOST_TIMER)
 		param.boostTimer = MAX_BOOST_TIMER;
 	
@@ -316,7 +321,7 @@ void Player::BoostUpdate(float elapsedTime)
 		)
 	{
 		if (!isGround
-			&& gamePad->GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
+			&& gamePad->GetButtonDown() & GamePad::BTN_A)
 		{
 			isHover = !isHover;
 		}
@@ -419,7 +424,7 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
 
 void Player::ShaderUpdate(float elapsedTime)
 {
-
+	//ラジアルブラー
 	if (player_radialBlur_constant.blurStrength <= 0 
 		|| radialTimer <= 0) {
 		player_radialBlur_constant.blurStrength = 0.0f;
@@ -427,21 +432,24 @@ void Player::ShaderUpdate(float elapsedTime)
 	}
 	else
 	{
+		//飛行モードの時
 		if (state == STATE::WING)
 		{
 			player_radialBlur_constant.blurStrength -= elapsedTime;
 			player_radialBlur_constant.blurRadius -= elapsedTime;
 		}
+		//ブーストの時
 		else
 		{
 			float factor = radialTimer / player_radialBlur_constant.blurTimer;
 			radialTimer -= elapsedTime;
 
 			player_radialBlur_constant.blurStrength = factor;
-			//player_radialBlur_constant.blurRadius = factor;
 		}
 	}
 	
+	//色収差
+	//ダメージを食らったとき
 	if (isGlitch_CA && glitch_CATimer > 0)
 	{
 		float factor = glitch_CATimer / 0.03f;
@@ -452,6 +460,7 @@ void Player::ShaderUpdate(float elapsedTime)
 		player_glitch_CA_constant.x_shifting = 0.015f;
 		player_glitch_CA_constant.y_shifting = 0.015f;
 	}
+	//平常時
 	else
 	{
 		//player_glitch_CA_constant.time = 0.0f;
@@ -474,8 +483,7 @@ void Player::ShaderUpdate(float elapsedTime)
 
 void Player::InputJump()
 {
-	if (gamePad->GetButtonDown() & GamePad::BTN_A ||
-		gamePad->GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER
+	if (gamePad->GetButtonDown() & GamePad::BTN_A
 		) //スペースを押したらジャンプ
 	{
 		if (jumpCount < jumpLimit)
@@ -494,7 +502,7 @@ void Player::InputJump()
 void Player::InputAvoidance()
 {
 	if (param.boostTimer < 2.5f)return;
-	if (gamePad->GetButtonDown() & GamePad::BTN_B)
+	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_SHOULDER)
 	{
 		TransitionAvoidanceState();
 	}
@@ -529,6 +537,9 @@ void Player::InputShot()
 		new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Player);
 	bullet->Launch(dir, pos);
 
+	//射撃音
+	audios[PLAYER_SE::SE_LASER]->play();
+	audios[PLAYER_SE::SE_LASER]->volume(0.3f);
 }
 
 void Player::OnLanding()
@@ -602,6 +613,9 @@ bool Player::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 		OnDamaged(type);
 	}
 
+	audios[PLAYER_SE::SE_DAMAGE]->play();
+	audios[PLAYER_SE::SE_DAMAGE]->volume(0.5f);
+
 	//健康状態が変更した場合はtrueを返す
 	return true;
 
@@ -627,9 +641,7 @@ bool Player::Flying()
 
 void Player::UpdateVerticalVelocity(float elapsed_frame)
 {
-	if (isHover)
-		velocity.y = 0.0f;
-	else if (playerAnimation != PlayerAnimation::PLAYER_WING_START)
+	if (playerAnimation != PlayerAnimation::PLAYER_WING_START)
 		velocity.y += gravity * elapsed_frame;
 	else if(playerAnimation == PlayerAnimation::PLAYER_WING_START)
 		velocity.y += (gravity * 0.2f) * elapsed_frame;

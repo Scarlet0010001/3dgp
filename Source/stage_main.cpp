@@ -5,16 +5,13 @@ StageMain::StageMain()
 {
     Graphics& graphics = Graphics::Instance();
     model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
-		//"Resources/Stage/testStage.gltf");
 		"Resources/Stage/low_poly_hole_in_the_road.glb");
+	//当たり判定用
 	model->collisionMesh = std::make_unique<CollisionMesh>(
 		graphics.GetDevice().Get(),
-		//"Resources/Stage//testStage.gltf");
 		"Resources/Stage/low_poly_hole_in_the_road.glb");
-		//"Resources/glTF-Sample-Models-master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf");
-	//modelCollision = std::make_unique<gltf_model>(graphics.GetDevice().Get(), ".\\resources\\Model\\Stage\\stage_hall_collision.fbx", 1);
-    //scale = { 50.0f, 50.0f, 50.0f };
-    scale = { 10.0f, 10.0f, 10.0f };
+
+    scale = { 100.0f, 100.0f, 100.0f };
     
     animeTimer = 0.0f;
     animated_nodes = model->nodes;
@@ -64,32 +61,6 @@ void StageMain::DebugDUI()
 		ImGui::End();
 	}
 #endif
-	// フレーム表示
-	{
-		ImGui::Begin("##frame stage_rate");
-
-		static float temp_value = 0;
-		static float values[90] = {};
-		static int values_offset = 0;
-		static float refresh_time = 0.0f;
-		static const float PLOT_SENSE = 0.2f;
-
-		refresh_time += elapsedTime_;
-		if (static_cast<int>(refresh_time / PLOT_SENSE) >= 1)
-		{
-			values_offset = values_offset >= IM_ARRAYSIZE(values) ? 0 : values_offset;
-			values[values_offset] = temp_value = elapsedTime_ * 1000.0f;
-
-			++values_offset;
-			refresh_time = 0;
-		}
-
-		char overlay[32];
-		sprintf_s(overlay, "now: %d fps  %.3f ms", static_cast<int>(1000.0f / temp_value), temp_value);
-		ImGui::PlotLines("##frame", values, IM_ARRAYSIZE(values), values_offset, overlay, 0, 20, ImVec2(ImGui::GetWindowSize().x * 0.75f, ImGui::GetWindowSize().y * 0.5f));
-
-		ImGui::End();
-	}
 
 }
 

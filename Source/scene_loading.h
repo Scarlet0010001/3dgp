@@ -19,6 +19,7 @@ private:
 
 	std::unique_ptr<SpriteBatch> spriteBack = nullptr;
 	std::unique_ptr<SpriteBatch> spriteIcon = nullptr;
+	std::unique_ptr<SpriteBatch> spriteOperation = nullptr;
 	float angle = 0.0f;
 	Scene* nextScene = nullptr;
 };

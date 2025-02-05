@@ -22,41 +22,20 @@ Boss::Boss()
 	//キャラクターモデル
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
 		"Resources/Character/Boss/RobotDog_main.glb", false);
-	
+	chargeEffect = std::make_unique<Effect>("Resources/Effect/Charge/charge.efkefc");
+
 	model->cumulate_transforms(model->nodes, transform);
 	for (auto& node : animated_nodes)
 	{
 		node = model->nodes;
 	}
 	blended_animated_nodes = model->nodes;
-	//lookAt_nodes = model->nodes;
 
-	//turretHeadNode = model->find_nodes("Bone_Turret_Head_Main");
 	turretNode = model->find_nodes("Bone_MGun_Main");
 	doorNode = model->find_nodes("Bone_PowerDoor");
 
-	// 初期姿勢時の頭ノードのローカル空間前方向を求める
-	{
-		DirectX::XMFLOAT4X4 worldTransform = model->nodes.at(42).world_transform;
-		DirectX::XMMATRIX WorldTransform =
-			DirectX::XMLoadFloat4x4(&worldTransform);
-		DirectX::XMMATRIX InverseWorldTransform =
-			DirectX::XMMatrixInverse(nullptr, WorldTransform);
-		DirectX::XMVECTOR HeadWorldForward = DirectX::XMLoadFloat3(&Math::get_posture_forward(worldTransform));
-		HeadWorldForward = DirectX::XMVector3Normalize(HeadWorldForward);
-		//DirectX::XMVECTOR HeadLocalForward =
-		//	DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
-		//HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
-
-		//DirectX::XMStoreFloat3(&turretLocalForward, HeadLocalForward);
-		DirectX::XMStoreFloat3(&turretWorldForward, HeadWorldForward);
-	}
-
-	//skill_manager = std::make_unique<SkillManager>();
 	//UI 
 	//ui = std::make_unique<PlayerUI>();
-
-	//arm = model->find_nodes("lowerarm_l");
 
 	Initialize();
 
@@ -68,12 +47,15 @@ void Boss::Initialize()
 	LoadDataFile();
 
 	//パラメーター初期化
-	position = { 0.0f, 5.0f, 15.0f };
+	position = { 0.0f, 41.0f, 30.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
 	scale.x = scale.y = scale.z = 10.0f;
+
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.chara_init_param;
-	charaParam.maxHealth = 1000.0f;
+	charaParam.maxHealth = 1000;
+	lineHealth = 700;
+
 	TransitionIdleState();
 
 	//体力初期化
@@ -85,7 +67,7 @@ void Boss::Initialize()
 	tackleCameraShake.max_Y_shake = 12.0f;
 
 	charaParam.moveSpeed = WALK_SPEED;
-	state_duration = 2.0f;
+	stateDuration = 2.0f;
 	param.run_speed = RUN_SPEED;
 	bossBodyCollision.capsule.start = position;
 	bossBodyCollision.capsule.radius = 5;
@@ -105,23 +87,6 @@ void Boss::Update(float elapsedTime)
 #endif
 
 	(this->*act_update)(elapsedTime);
-
-	//{//テスト
-	//	DirectX::XMFLOAT4X4 worldTransform = animated_nodes[ANIME_NODE::NOW_ANIMATION].at(42).world_transform;
-	//	DirectX::XMMATRIX WorldTransform =
-	//		DirectX::XMLoadFloat4x4(&worldTransform);
-	//	DirectX::XMMATRIX InverseWorldTransform =
-	//		DirectX::XMMatrixInverse(nullptr, WorldTransform);
-	//	DirectX::XMVECTOR HeadWorldForward = DirectX::XMLoadFloat3(&Math::get_posture_forward(worldTransform));
-	//	HeadWorldForward = DirectX::XMVector3Normalize(HeadWorldForward);
-	//	//DirectX::XMVECTOR HeadLocalForward =
-	//	//	DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
-	//	//HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
-	//	
-	//	//DirectX::XMStoreFloat3(&turretLocalForward, HeadLocalForward);
-	//	DirectX::XMStoreFloat3(&turretWorldForward, HeadWorldForward);
-	//}
-
 
 	UpdateInvicibleTimer(elapsedTime);
 
@@ -365,6 +330,40 @@ float Boss::CalcMoveSpeed(DirectX::XMFLOAT3 target, float time)
 {
 	float direction = Math::calc_vector_AtoB_length(position, target);
 	return direction / time;
+}
+
+bool Boss::ApplyDamage(int damage, float invincibleTime, WINCE_TYPE type)
+{
+	//ダメージが0の場合は健康状態を変更する必要がない
+	if (damage == 0)return false;
+
+	//死亡している場合は健康状態を変更しない
+	if (health <= 0)return false;
+
+
+	if (invincibleTimer > 0.0f)return false;
+
+	//無敵時間設定
+	invincibleTimer = invincibleTime;
+	//ダメージ処理
+	health -= damage;
+
+	//死亡通知
+	if (health <= 0)
+	{
+		OnDead();
+	}
+	else//ダメージ通知
+	{
+		if (health < lineHealth)
+		{
+			lineHealth -= 300;
+			OnDamaged(type);
+		}
+	}
+
+	//健康状態が変更した場合はtrueを返す
+	return true;
 }
 
 void Boss::OnDead()

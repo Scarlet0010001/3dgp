@@ -95,37 +95,6 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[8];
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
-	//Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shaders[8];
-	//
-	//Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler_states[4];
-	//
-	//Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_states[4];
-	//
-	//Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer_states[4];
-	//
-	//Microsoft::WRL::ComPtr<ID3D11BlendState> blend_states[4];
-	//
-	//std::unique_ptr<Sprite> sprites[8];
-	//
-	//std::unique_ptr<Sprite_Batch> sprite_batches[8];
-	//
-	//std::unique_ptr<geometric_primitive> geometric_primitives[8];
-	//
-	//std::unique_ptr<static_mesh> static_meshes[8];
-	//
-	//std::unique_ptr<skinned_mesh> skinned_meshes[8];
-	//
-	//std::unique_ptr<gltf_model> gltf_models[8];
-	//
-	//std::unique_ptr<framebuffer> framebuffers[8];
-	//
-	//std::unique_ptr<fullscreen_quad> bit_block_transfer;
-
-#if 0
-	DirectX::XMFLOAT3 axis{ 1, 0, 0 };
-	DirectX::XMFLOAT3 kf_Translation{ 0, 0, 0 };
-#endif
-
 
 private:
 	high_resolution_timer tictoc;

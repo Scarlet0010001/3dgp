@@ -22,7 +22,7 @@ public:
     void Render(float elapsedTime) override;
 
 private:
-    enum class TITLE_MENU
+    enum TITLE_MENU
     {
         GAME_START,
         EXIT
@@ -31,6 +31,12 @@ private:
 
     //ƒ^ƒCƒgƒ‹”wŒi
     std::unique_ptr<SpriteBatch> spriteTitleBack = nullptr;
+
+    const DirectX::XMFLOAT4 select{ 1.0f,0,0,1.0f };
+    DirectX::XMFLOAT4 colorMenu[2]{};
+
+    std::unique_ptr<SpriteBatch> spriteStart = nullptr;
+    std::unique_ptr<SpriteBatch> spriteExit = nullptr;
 
     std::shared_ptr<audio> audios[8];
 

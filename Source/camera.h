@@ -81,6 +81,8 @@ public:
     Camera();
     ~Camera() = default;
 
+    void Initialize();
+
     //--------< 関数 >--------//
     void Update(float elapsedTime);
     //対象を追従する
@@ -91,6 +93,8 @@ public:
     void UpdateWithWing(float elapsedTime);
     //コントローラーのスティックで操作
     void ControlByGamePadStick(float elapsedTime);
+    //マウスで操作
+    void ControlByMouse(float elapsedTime);
     //void move_viewing_angle(bool is_move, float elapsed_time){};
     void CalcViewProjection(float elapsedTime);
 
@@ -199,7 +203,8 @@ private:
     bool isMove;
     float attendRate; // 減衰比率
     float capeVision = 60.0f;//視野角
-    float rollSpeed = 40;//回転速度
+    float mouseRollSpeed = 60;//回転速度
+    float stickRollSpeed = 300;//回転速度
 
     //垂直遅延
     float verticalRotationDegree = 0;

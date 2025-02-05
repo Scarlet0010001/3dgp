@@ -7,8 +7,7 @@
 #include "glitch_chromatic_aberration.h"
 
 #include "effect.h"
-
-//#include "gltf_model.h"
+#include "audio.h"
 
 #include "primitive.h"
 #include <cereal/cereal.hpp>
@@ -120,8 +119,6 @@ private:
 		RIGHT_ATTACK,
 		DAMAGE,
 		DEAD,
-		ROLL,
-		SKILL,
 
 	};
 
@@ -281,6 +278,15 @@ private:
 	GamePad* gamePad;
 	Mouse* mouse;
 	Camera* camera;
+
+	enum PLAYER_SE
+	{
+		SE_SABER = 0,
+		SE_LASER = 1,
+		SE_BOOST =2,
+		SE_DAMAGE = 3,
+	};
+	std::shared_ptr<audio> audios[8];
 
 	//UI
 	std::unique_ptr<PlayerUI> ui;

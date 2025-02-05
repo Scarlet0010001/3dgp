@@ -3,6 +3,9 @@
 #include "camera.h"
 #include "character.h"
 
+#include "audio.h"
+#include "effect.h"
+
 #include "primitive.h"
 #include <cereal/cereal.hpp>
 class Boss :
@@ -180,6 +183,9 @@ private:
 
 	void LookAt_turret(std::vector<gltf_model::node>& nodes);
 
+	//ダメージを受ける処理
+	bool ApplyDamage(int damage, float invincibleTime, WINCE_TYPE type)override;
+
 	void OnDead() override;
 	void OnDamaged(WINCE_TYPE type) override;
 
@@ -215,8 +221,10 @@ private:
 
 	//ステートのタイマー
 	float stateTimer;
+	//怯むHPライン
+	int32_t lineHealth;
 	//次のステート移行時間
-	float state_duration;
+	float stateDuration;
 	//攻撃までの猶予時間
 	float attackResponderTimer;
 	//攻撃対象
@@ -225,6 +233,12 @@ private:
 	float targetPoint_height = 0.0f;
 	DirectX::XMFLOAT3 shot_pos;
 	bool isJump = false;
+
+	//エフェクト
+	std::unique_ptr<Effect> chargeEffect = nullptr;
+
+	int rapidCount = 0;
+	bool isBackJump = false;
 
 	STATE state;
 
@@ -256,6 +270,12 @@ private:
 	const float NORMAL_ATTACK_COOLTIME = 1;
 
 	const float ATTACK_RESPONDER_TIME = 3.0f;
+
+	//連射数
+	const int RAPID_MAX = 15;
+
+	//連射間隔の時間
+	const float RAPIDFIRE_TIME = 0.5f;
 
 	//ジャンプの攻撃チャージ時間
 	const float CHARGE_JUMP_TIME = 2.5f;

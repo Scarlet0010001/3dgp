@@ -28,6 +28,7 @@ void SceneGame::Initialize()
 
     //camera = std::make_unique<Camera>();
     camera = &Camera::Instance();
+    camera->Initialize();
     player = std::make_unique<Player>();
     boss = std::make_unique<Boss>();
 
@@ -44,6 +45,20 @@ void SceneGame::Initialize()
         DirectX::XMFLOAT3(0.6f, -0.6f, 1.6f),
         DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
     LightManager::Instance().Register("scene_dir", dirLight);
+
+    spriteVictory = std::make_unique<SpriteBatch>(
+        graphics.GetDevice().Get(),
+        L"Resources/Sprite/Game/victory.png", 1);
+    spriteLose = std::make_unique<SpriteBatch>(
+        graphics.GetDevice().Get(),
+        L"Resources/Sprite/Game/lose.png", 1);
+
+    audios[0] = audio::_emplace(L"Resources/Sound/BGM/Electric_Highway.wav");
+
+    audios[0]->play(30);
+    audios[0]->volume(0.3f);
+
+    isEnd = false;
 
     // SKY_MAP
     skymap = std::make_unique<SkyMap>(graphics.GetDevice().Get(), L"Resources/SkyMap/captured at (0, 0, 0)/skybox.dds");
@@ -69,6 +84,21 @@ void SceneGame::Update(float elapsedTime)
     GamePad& gamepad = Device::Instance().GetGamePad();
     BulletManager& bulletManager = BulletManager::Instance();
 
+    if (isEnd)
+    {
+        const GamePadButton anyButton =
+            GamePad::BTN_A
+            | GamePad::BTN_B
+            | GamePad::BTN_X
+            | GamePad::BTN_Y;
+        if (gamepad.GetButtonDown() & anyButton)
+        {
+            audios[0]->stop();
+            SceneManager::Instance().ChangeScene(new SceneTitle);
+        }
+        return;
+    }
+
     //**********カメラの更新**********//
     camera->SetTrakkingTarget(player->GetGazingPoint());
     camera->SetPlayerOrientation(player->GetOrientation());
@@ -80,7 +110,7 @@ void SceneGame::Update(float elapsedTime)
     float cameraElapsedTime = camera->HitStopUpdate(elapsedTime);
     //**********プレイヤーの更新**********//
     player->Update(cameraElapsedTime);
-    radialBlur->radial_blur_constant->DataSet(player->GetRadialBlur());
+    //radialBlur->radial_blur_constant->DataSet(player->GetRadialBlur());
     glitch_CA->glitch_CA_constant->DataSet(player->GetGlitch_CA());
 
     //**********ボスの更新**********//
@@ -111,7 +141,7 @@ void SceneGame::Update(float elapsedTime)
 
     if (player->GetIsDead() || boss->GetIsDead())
     {
-        SceneManager::Instance().ChangeScene(new SceneTitle);
+        isEnd = true;
     }
 
     Mouse& mouse = Device::Instance().GetMouse();
@@ -159,26 +189,12 @@ void SceneGame::Render(float elapsedTime)
 
     graphics.SetGraphicStatePriset(ST_DEPTH::DepthOFF_WriteOFF, ST_BLEND::ALPHA, ST_RASTERIZER::CULL_NONE);
     skymap->Blit(graphics.Get_DC().Get(), view_pro);
+    
     IBL_constant->Bind(Graphics::Instance().Get_DC().Get(), 11, CB_FLAG::ALL);
-    //***************************************************************//
-    ///						ディファ―ドレンダリング				  ///
-    //***************************************************************//
 
-    //deferred->Active();
-    graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::SOLID_COUNTERCLOCKWISE);
-    //graphics.ShaderActivate(SHADER_TYPE::PBR, RENDER_TYPE::Deferred);
+    graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::CULL_NONE);
     
     stageManager.Render(elapsedTime);
-    //プレイヤー描画
-    player->Render_d(elapsedTime);
-
-    //ここで各種ライティング（環境光、平行光、点光源）
-    //deferred->Deactive();
-
-    //レンダーターゲットを戻す
-    graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ADD, ST_RASTERIZER::CULL_NONE);
-
-    //deferred->Render();
 
     //***************************************************************//
     ///						フォワードレンダリング					///
@@ -219,6 +235,26 @@ void SceneGame::Render(float elapsedTime)
 
     framebuffers[2]->activate(graphics.Get_DC().Get());
     radialBlur->Blit(graphics.Get_DC().Get(), framebuffers[1]->get_color_map().GetAddressOf());
+    
+    if (isEnd)
+    {
+        if (boss->GetIsDead())
+        {
+            spriteVictory->begin(graphics.Get_DC().Get());
+            spriteVictory->render(graphics.Get_DC().Get(),
+                { 350,350 }, { 0.7f, 0.7f }, { 0.8f,0.8f,1.0f,1.0f }, 0);
+            spriteVictory->end(graphics.Get_DC().Get());
+        }
+        else
+        {
+            spriteLose->begin(graphics.Get_DC().Get());
+            spriteLose->render(graphics.Get_DC().Get(),
+                { 500,350 }, { 0.7f, 0.7f }, { 1.0f,0,1,1.0f }, 0);
+            spriteLose->end(graphics.Get_DC().Get());
+        }
+        //return;
+    }
+
     framebuffers[2]->deactivate(graphics.Get_DC().Get());
 
     glitch_CA->Blit(graphics.Get_DC().Get(), framebuffers[2]->get_color_map().GetAddressOf());
@@ -256,6 +292,33 @@ void SceneGame::Render(float elapsedTime)
         }
         ImGui::End();
     }
+    //// フレーム表示
+    //{
+    //    ImGui::Begin("##frame stage_rate");
+    //
+    //    static float temp_value = 0;
+    //    static float values[90] = {};
+    //    static int values_offset = 0;
+    //    static float refresh_time = 0.0f;
+    //    static const float PLOT_SENSE = 0.2f;
+    //
+    //    refresh_time += elapsedTime;
+    //    if (static_cast<int>(refresh_time / PLOT_SENSE) >= 1)
+    //    {
+    //        values_offset = values_offset >= IM_ARRAYSIZE(values) ? 0 : values_offset;
+    //        values[values_offset] = temp_value = elapsedTime * 1000.0f;
+    //
+    //        ++values_offset;
+    //        refresh_time = 0;
+    //    }
+    //
+    //    char overlay[32];
+    //    sprintf_s(overlay, "now: %d fps  %.3f ms", static_cast<int>(1000.0f / temp_value), temp_value);
+    //    ImGui::PlotLines("##frame", values, IM_ARRAYSIZE(values), values_offset, overlay, 0, 20, ImVec2(ImGui::GetWindowSize().x * 0.75f, ImGui::GetWindowSize().y * 0.5f));
+    //
+    //    ImGui::End();
+    //}
+
 #endif
 
 }

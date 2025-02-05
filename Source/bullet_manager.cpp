@@ -178,6 +178,7 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
                 boss->GetBodyCollision().height))
         {
             AttackParam attackParam = P_param.attackParam;
+
             //UŒ‚‘ÎÛ‚É—^‚¦‚éƒ_ƒ[ƒW—Ê‚Æ–³“GŽžŠÔ
             if (boss->damagedFunction(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::SMALL))
             {
