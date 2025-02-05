@@ -94,6 +94,9 @@ void Boss::Update(float elapsedTime)
 	bossBodyCollision.capsule.end = bossBodyCollision.capsule.start;
 	bossBodyCollision.capsule.end.y = bossBodyCollision.capsule.start.y + bossBodyCollision.height;
 
+	if (position.y < -10.0f)
+		position = { 0.0f,50.0f,0.0f };
+
 	stateTimer += elapsedTime;
 
 	DebugPrimitiveUpdate();

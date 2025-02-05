@@ -120,6 +120,9 @@ void Player::Update(float elapsedTime)
 	collider.end = { position.x,position.y + charaParam.height, position.z };
 	collider.radius = 1.0f;
 
+	if (position.y < -10.0f)
+		position = { 0.0f,50.0f,0.0f };
+
 	ShaderUpdate(elapsedTime);
 
 	ui->SetHPPercent(GetHpPercent());
