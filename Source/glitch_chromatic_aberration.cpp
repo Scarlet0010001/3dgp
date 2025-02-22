@@ -56,6 +56,8 @@ void Glitch_CA::DebugGUI()
 
 		if (ImGui::Begin("Chromatic Aberration", nullptr, ImGuiWindowFlags_None))
 		{
+			ImGui::Checkbox("isDebug", &isDebug);
+
 			if (ImGui::CollapsingHeader("Paramator", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::InputFloat("time", &glitch_CA_constant->data.time);

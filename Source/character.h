@@ -59,6 +59,8 @@ public:
 	const DirectX::XMFLOAT3& GetPosition() const { return position; }
 	//ˆÊ’uİ’è
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
+	//“·‘Ì•”•ªˆÊ’uæ“¾
+	const DirectX::XMFLOAT3& GetTargetPosition() const { return { position.x, position.y + charaParam.height,position.z }; }
 	// ‰ñ“]æ“¾
 	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
 	//‰ñ“]İ’è

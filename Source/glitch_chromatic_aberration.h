@@ -17,6 +17,8 @@ public:
 
 	void Blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView** shader_resource_view);
 
+	bool GetIsDebug() { return isDebug; }
+
 	struct glitch_CA_constants
 	{
 		float				time = 0.0f; //経過時間
@@ -38,13 +40,15 @@ public:
 	};
 	std::unique_ptr<Constants<glitch_CA_constants>> glitch_CA_constant{};
 private:
-	//	ラジアルブラー
+	//	色収差
 	Microsoft::WRL::ComPtr<ID3D11Buffer> glitch_CA_constant_buffer;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> glitch_CA_sampler_state;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> glitch_CA_pixel_shader;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> glitch_CA_shader_resource_view[2];
 
 	std::unique_ptr<fullscreen_quad> glitch_CA_quad;
+
+	bool isDebug = false;
 
 	bool displayGlitch_CA_Imgui = false;
 };

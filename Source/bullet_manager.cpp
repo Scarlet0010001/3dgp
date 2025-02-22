@@ -268,7 +268,6 @@ void BulletManager::DebugGUI()
 
                     ImGui::Text("hit_stop");
                     ImGui::DragFloat("stop_time", &P_param.attackParam.hitStop.time, 0.1f);
-                    ImGui::DragFloat("stopping_strength", &P_param.attackParam.hitStop.stoppingStrength, 0.1f);
                     //ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
                     //ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
                     //ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
@@ -305,7 +304,6 @@ void BulletManager::DebugGUI()
 
                     ImGui::Text("hit_stop");
                     ImGui::DragFloat("stop_time", &E_param.attackParam.hitStop.time, 0.1f);
-                    ImGui::DragFloat("stopping_strength", &E_param.attackParam.hitStop.stoppingStrength, 0.1f);
                     //ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
                     //ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
                     //ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);

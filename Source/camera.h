@@ -63,14 +63,12 @@ public:
     struct HitStopParam
     {
         float time = 0.0f;//止める時間
-        float stoppingStrength = 5.0f;//止める強度（完全に0にしてしまうとバグるため）
         // シリアライズ
         template<class Archive>
         void serialize(Archive& archive)
         {
             archive(
-                cereal::make_nvp("time", time),
-                cereal::make_nvp("stopping_strength", stoppingStrength)
+                cereal::make_nvp("time", time)
             );
         }
     };
@@ -100,7 +98,7 @@ public:
 
     void DebugGui();
     //ヒットストップ関数
-    float HitStopUpdate(float elapsedTime);
+    bool HitStopUpdate(float elapsedTime);
 
     //--------<getter/setter>--------//
 // 対象との距離
@@ -170,6 +168,7 @@ public:
     void SetOnDistanceShake(bool onDistance) { cameraShakeParam.onDistanceShake = onDistance; }
 
     void SetHitStop(HitStopParam param);
+    bool GetHitStop() { return isHitStop; }
 
     const DirectX::XMFLOAT4& Getcamera_position() { return sceneConstant.get()->data.camera_position; }
 

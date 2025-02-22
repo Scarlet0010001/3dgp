@@ -12,6 +12,7 @@
 #include "primitive.h"
 #include <cereal/cereal.hpp>
 
+//ブーストゲージ最大量
 #define BOOST_TIMER_MAX (10.0f)
 
 //プレイヤー :final このクラスの継承ができないことを明示する
@@ -42,15 +43,20 @@ public:
 	DirectX::XMFLOAT3 GetWaistPosition() { return DirectX::XMFLOAT3(position.x, position.y + charaParam.height / 2, position.z); }
 	//カメラがプレイヤーを見るときに注視するポイント
 	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 1.5f), position.z); }
+	
+	//攻撃パラメータ取得
 	AttackParam GetAttackParam() { return attackParam; }
 
-	//HPパーセンテージ
+	//HPパーセンテージ取得
 	float GetBoostPercent() const { return param.boostTimer <= 0 ? 0.0f : static_cast<float>(param.boostTimer) / BOOST_TIMER_MAX; }
 
-	//ラジアルブラー
+	//ボス座標設定
+	void SetBossPosition(DirectX::XMFLOAT3 p) { bossPosition = p; }
+
+	//ラジアルブラー取得
 	RadialBlur::radial_blur_constants GetRadialBlur() { return player_radialBlur_constant; }
 	
-	//色収差
+	//色収差取得
 	Glitch_CA::glitch_CA_constants GetGlitch_CA() { return player_glitch_CA_constant; }
 	
 	//プレイヤーのコリジョンと敵の当たり判定
@@ -59,49 +65,50 @@ public:
 	//プレイヤーの攻撃と敵の当たり判定
 	void CalcAttack_vs_Enemy(Capsule capsule_collider, float colider_height, AddDamageFunc damaged_func);
 
-	//スキルと敵の当たり判定
-	void JudgeSkillCollision(Capsule object_colider, AddDamageFunc damaged_func);
-
 private:
 	//-------------構造体、列挙型--------------//
 	//アニメーション
-	enum  PlayerAnimation
+	enum PlayerAnimation
 	{
-		PLAYER_IDLE,//待機
+		PLAYER_IDLE,							//待機
 
-		PLAYER_MOVE_FORWARD,//走り前
-		PLAYER_MOVE_LEFT,//走り左
-		PLAYER_MOVE_RIGHT,//走り右
-		PLAYER_MOVE_BACK,//走り後ろ
+		PLAYER_MOVE_FORWARD,		//走り前
+		PLAYER_MOVE_LEFT,				//走り左
+		PLAYER_MOVE_RIGHT,			//走り右
+		PLAYER_MOVE_BACK,				//走り後ろ
 
-		PLAYER_JUMP_START,//ジャンプ始め
-		PLAYER_JUMP,//ジャンプ途中
-		PLAYER_JUMP_END,//ジャンプ終わり
+		PLAYER_JUMP_START,				//ジャンプ始め
+		PLAYER_JUMP,							//ジャンプ途中
+		PLAYER_JUMP_END,					//ジャンプ終わり
 
-		PLAYER_WING_START,//飛行変形
-		PLAYER_WING,//飛行
-		PLAYER_WING_END,//地上変形
+		PLAYER_WING_START,				//飛行変形
+		PLAYER_WING,							//飛行
+		PLAYER_WING_END,				//地上変形
 
-		PLAYER_SHOT_IDLE, //射撃前
-		PLAYER_SHOT_FORWARD,//射撃前
-		PLAYER_SHOT_LEFT,//射撃左
-		PLAYER_SHOT_RIGHT,//射撃右
-		PLAYER_SHOT_BACK,//射撃後ろ
+		PLAYER_SHOT_IDLE,				//射撃前
+		PLAYER_SHOT_FORWARD,		//射撃前
+		PLAYER_SHOT_LEFT,				//射撃左
+		PLAYER_SHOT_RIGHT,				//射撃右
+		PLAYER_SHOT_BACK,				//射撃後ろ
 
-		PLAYER_ATTACK_01,//近接01
-		PLAYER_ATTACK_02,//近接02
-		PLAYER_ATTACK_03,//近接03
-		PLAYER_POWER_L,//強攻撃左
-		PLAYER_POWER_R,//強攻撃右
+		PLAYER_ATTACK_01,					//コンボ01
+		PLAYER_ATTACK_02,				//コンボ02
+		PLAYER_ATTACK_03,				//コンボ03
+		PLAYER_POWER_L,					//強攻撃左
+		PLAYER_POWER_R,					//強攻撃右
 
-		PLAYER_DAMAGE,
-		PLAYER_DEAD,
+		PLAYER_DAMAGE,						//被弾
+		PLAYER_DEAD,							//死亡
 
-		PLAYER_ANIME_COUNT,
+		PLAYER_ANIME_COUNT,			//アニメーションの個数
 	};
-	PlayerAnimation playerAnimation = PLAYER_IDLE;
-	PlayerAnimation playerAnimation_transition = PLAYER_IDLE;
-	PlayerAnimation playerAnimation_old = PLAYER_IDLE;
+
+	//アニメーションの現在の状態
+	PlayerAnimation playerAnimation = PlayerAnimation::PLAYER_IDLE;
+	//アニメーションの遷移先の状態
+	PlayerAnimation playerAnimation_transition = PlayerAnimation::PLAYER_IDLE;
+	//直前のアニメーションの状態
+	PlayerAnimation playerAnimation_old = PlayerAnimation::PLAYER_IDLE;
 
 	//ループアニメーションの検索
 	bool FindLoopAnimation(PlayerAnimation playerAnimation);
@@ -109,20 +116,17 @@ private:
 	//ステート
 	enum class STATE
 	{
-		IDLE,
-		MOVE,
-		JUMP,
-		BOOST,
-		WING,
-		SHOT,
-		LEFT_ATTACK,
-		RIGHT_ATTACK,
-		DAMAGE,
-		DEAD,
-
+		IDLE,						//待機
+		MOVE,						//走り
+		JUMP,						//ジャンプ
+		BOOST,					//ブースト
+		WING,						//飛行
+		SHOT,						//射撃
+		LEFT_ATTACK,		//左手攻撃
+		RIGHT_ATTACK,		//右手攻撃
+		DAMAGE,				//被弾
+		DEAD,						//死亡
 	};
-
-	const float MAX_BOOST_TIMER = 10.0f;
 
 	struct PlayerParam
 	{
@@ -132,7 +136,7 @@ private:
 		float jumpSpeed = 21;
 		//回避速度
 		float avoidanceSpeed = 50;
-		//debug用タイマー
+		//回避用タイマー
 		float avoidanceTimer = 0.0f;
 		//飛行速度
 		float wingSpeed = 40;
@@ -140,11 +144,9 @@ private:
 		float boostTimer = BOOST_TIMER_MAX;
 		//浮遊度
 		float floatingValue = 1.5f;
-		//浮遊度
+		//攻撃時の移動速度
 		float attackMoveSpeed =10.0f;
-		//剣エフェクトの速度
-		float swordSwingSpeed = 1500.0f;
-		//コンボ1攻撃のパラメーター
+		//コンボ1のパラメーター
 		AttackParam combo_1;
 		//コンボ2のパラメーター
 		AttackParam combo_2;
@@ -163,7 +165,6 @@ private:
 				cereal::make_nvp("boostTimer", boostTimer),
 				cereal::make_nvp("floatingValue", floatingValue),
 				cereal::make_nvp("attackMoveSpeed", attackMoveSpeed),
-				cereal::make_nvp("swordSwingSpeed", swordSwingSpeed),
 				cereal::make_nvp("attack_combo_1", combo_1),
 				cereal::make_nvp("attack_combo_2", combo_2),
 				cereal::make_nvp("attack_combo_3", combo_3)
@@ -174,45 +175,47 @@ private:
 private:
 
 	//------------遷移--------------//
-	void TransitionIdleState();//待機
-	void TransitionMoveState();//走り
-	void TransitionWingState();//飛行
-	void TransitionAvoidanceState();//回避
-	void TransitionJumpState();//ジャンプ
-	void TransitionLandingState();//着地
-	void TransitionShotState();//射撃
-	void TransitionCombo_01_01_State();//近接コンボ１
-	void TransitionCombo_01_02_State();//近接コンボ２
-	void TransitionCombo_01_03_State();//近接コンボ３
-	void TransitionCombo_PowerL_State();//強攻撃左
-	void TransitionCombo_PowerR_State();//強攻撃右
-	void TransitionDamageState();//ダメージ
-	void TransitionDeadState();//死亡
+	void TransitionIdleState();							//待機
+	void TransitionMoveState();						//走り
+	void TransitionWingState();						//飛行
+	void TransitionAvoidanceState();				//回避
+	void TransitionJumpState();						//ジャンプ
+	void TransitionLandingState();					//着地
+	void TransitionShotState();						//射撃
+	void TransitionCombo_01_01_State();		//近接コンボ１
+	void TransitionCombo_01_02_State();		//近接コンボ２
+	void TransitionCombo_01_03_State();		//近接コンボ３
+	void TransitionCombo_PowerL_State();	//強攻撃左
+	void TransitionCombo_PowerR_State();	//強攻撃右
+	void TransitionDamageState();					//ダメージ
+	void TransitionDeadState();						//死亡
 
 
-	//--------各ステートのアップデート--------//r_はルートモーション付き
-	void UpdateIdleState(float elapsedTime);//待機
-	void UpdateMoveState(float elapsedTime);//走り
-	void UpdateWingState(float elapsedTime);//飛行
-	void UpdateAvoidanceState(float elapsedTime);//回避
-	void UpdateJumpState(float elapsedTime);//ジャンプ
-	void UpdateLandingState(float elapsedTime);//着地
-	void UpdateShotState(float elapsedTime);//射撃
-	void UpdateCombo_01_01_State(float elapsedTime);//近接コンボ１
-	void UpdateCombo_01_02_State(float elapsedTime);//近接コンボ２
-	void UpdateCombo_01_03_State(float elapsedTime);//近接コンボ３
-	void UpdateCombo_PowerL_State(float elapsedTime);//強攻撃左
-	void UpdateCombo_PowerR_State(float elapsedTime);//強攻撃右
-	void UpdateDamageState(float elapsedTime);//ダメージ
-	void UpdateDeadState(float elapsedTime);//死亡
+	//--------各ステートのアップデート--------//
+	void UpdateIdleState(float elapsedTime);							//待機
+	void UpdateMoveState(float elapsedTime);						//走り
+	void UpdateWingState(float elapsedTime);							//飛行
+	void UpdateAvoidanceState(float elapsedTime);				//回避
+	void UpdateJumpState(float elapsedTime);						//ジャンプ
+	void UpdateLandingState(float elapsedTime);					//着地
+	void UpdateShotState(float elapsedTime);							//射撃
+	void UpdateCombo_01_01_State(float elapsedTime);		//近接コンボ１
+	void UpdateCombo_01_02_State(float elapsedTime);		//近接コンボ２
+	void UpdateCombo_01_03_State(float elapsedTime);		//近接コンボ３
+	void UpdateCombo_PowerL_State(float elapsedTime);		//強攻撃左
+	void UpdateCombo_PowerR_State(float elapsedTime);	//強攻撃右
+	void UpdateDamageState(float elapsedTime);					//ダメージ
+	void UpdateDeadState(float elapsedTime);							//死亡
 
 
 	//更新関数の関数ポインタの定義
 	typedef void (Player::* ActUpdate)(float elapsedTime);
 
+	//移動ベクトルと速度設定
 	void Move(float vx, float vz, float speed)override;
 	void Move(float vx, float vy, float vz, float speed);
 
+	//ブーストの更新処理
 	void BoostUpdate(float elapsedTime);
 
 	//プレイヤーの移動入力処理
@@ -225,6 +228,7 @@ private:
 	
 	bool InputMove(float elapsedTime, float move_speed);
 	
+	//入力ベクトル算出
 	const DirectX::XMFLOAT3 GetMoveVec(Camera* camera, bool wing = false) const;
 
 	//ラジアルブラー
@@ -232,6 +236,7 @@ private:
 
 	//ジャンプ入力処理
 	void InputJump();
+
 	//回避入力
 	void InputAvoidance();
 
@@ -249,9 +254,6 @@ private:
 	void OnDamaged(WINCE_TYPE type) override;
 	//ダメージを受ける処理
 	bool ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)override;
-	//ルートモーション
-	//void RootMotion(DirectX::XMFLOAT3 dir, float speed);
-	//void RootMotionManual(DirectX::XMFLOAT3 dir, float speed);
 
 	//落下速度を落とす
 	bool Floating();
@@ -272,62 +274,72 @@ private:
 	//関数ポインタの宣言
 	ActUpdate p_update = &Player::UpdateIdleState;
 
+	//プレイヤーパラメーター
 	PlayerParam param;
+
+	//現在の状態
 	STATE state;
 
+	//それぞれのインスタンス保存用
 	GamePad* gamePad;
 	Mouse* mouse;
 	Camera* camera;
 
+	//SE
 	enum PLAYER_SE
 	{
-		SE_SABER = 0,
-		SE_LASER = 1,
-		SE_BOOST =2,
-		SE_DAMAGE = 3,
+		SE_SABER = 0,		//サーベル音
+		SE_LASER = 1,		//射撃音
+		SE_BOOST =2,		//ブースト音
+		SE_DAMAGE = 3,	//被弾音
 	};
 	std::shared_ptr<audio> audios[8];
 
 	//UI
 	std::unique_ptr<PlayerUI> ui;
 
+	//モデル
 	std::unique_ptr <gltf_model> model;
 
 	//ラジアルブラー
 	RadialBlur::radial_blur_constants player_radialBlur_constant{}; 
-	float radialTimer = 0.0f;
-	bool isRadialBlur = false;
+	float radialTimer = 0.0f;	//ラジアルブラータイマー
 
-	//ラジアルブラー
+	//色収差
 	Glitch_CA::glitch_CA_constants player_glitch_CA_constant{};
-	float glitch_CATimer = 0.0f;
-	bool isGlitch_CA = false;
+	float glitch_CATimer = 0.0f;//色収差タイマー
+	bool isGlitch_CA = false;		//色収差オンオフ
 
-	//当たり判定ノード
+	//左手右手
 	enum LR
 	{
 		LEFT,
 		RIGHT,
 		COUNT,
 	};
-	gltf_model::node beamSaber[LR::COUNT];
-	gltf_model::node lowerArm[LR::COUNT];
-	DirectX::XMFLOAT3 beamSaber_position[LR::COUNT]{};
-	DirectX::XMFLOAT3 lowerArm_position[LR::COUNT]{};
-	DirectX::XMFLOAT3 attackCollision_position[LR::COUNT]{};
+	//当たり判定ノード
+	gltf_model::node beamSaber[LR::COUNT];	//サーベルの先端
+	gltf_model::node lowerArm[LR::COUNT];		//腕の先端
 
-	//float anime_time = 0.0f;
+	DirectX::XMFLOAT3 beamSaber_position[LR::COUNT]{};		//サーベルの先端位置
+	DirectX::XMFLOAT3 lowerArm_position[LR::COUNT]{};			//腕の先端位置
+	DirectX::XMFLOAT3 attackCollision_position[LR::COUNT]{};	//サーベルの当たり判定位置
+
+	//ボス座標
+	DirectX::XMFLOAT3 bossPosition{};
+
+	//加速度状態
 	enum ACCELERATION_STATE
 	{
-		MOVE,
-		AVOIDANCE,
-		WING,
+		MOVE,					//走り
+		AVOIDANCE,		//ブースト
+		WING,					//飛行
 		ACCELERATION_COUNT,
 	};
 	float accelerationState[ACCELERATION_STATE::ACCELERATION_COUNT]{
-		1.5f,
-		50.0f,
-		25.0f
+		1.5f,				//走り
+		50.0f,			//ブースト
+		25.0f			//飛行
 	};
 
 	//現何回ジャンプしてるか
@@ -335,19 +347,23 @@ private:
 	//ジャンプ可能回数
 	const int jumpLimit = 1;
 
-	bool isHover = false;
+	//ブーストのオンオフ
 	bool isBoost = false;
 
 	//エフェクト
 	std::unique_ptr<Effect> slashEffect = nullptr;
 
+	//Imguiのオンオフ
 	bool displayPlayerImgui = false;
 
 	//------------------攻撃関連--------------------------
 
 	AttackParam attackParam;
+
+	//先行入力判定
 	bool nextCombo = false;
 
+	//前方方向
 	DirectX::XMFLOAT3 forward;
 
 
@@ -355,9 +371,13 @@ private:
 public:
 	//ダメージを受けたときに呼ばれる *関数を呼ぶのはダメージを与えたオブジェクト
 	AddDamageFunc damagedFunction;
+	
+	//当たり判定用カプセル
 	Capsule collider;
 
 private:
+
+	//デバッグプリミティブ更新
 	void DebugPrimitiveUpdate();
 
 };

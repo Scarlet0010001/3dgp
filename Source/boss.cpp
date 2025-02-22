@@ -95,7 +95,7 @@ void Boss::Update(float elapsedTime)
 	bossBodyCollision.capsule.end.y = bossBodyCollision.capsule.start.y + bossBodyCollision.height;
 
 	if (position.y < -10.0f)
-		position = { 0.0f,50.0f,0.0f };
+		position.y = 50.0f;
 
 	stateTimer += elapsedTime;
 
@@ -448,30 +448,6 @@ void Boss::DebugDUI()
 			ImGui::Separator();
 			ImGui::Checkbox("is_render", &isRender);
 #endif
-			//if (ImGui::CollapsingHeader("Skill", ImGuiTreeNodeFlags_DefaultOpen))
-			//{
-			//	if (ImGui::Button("skill_1"))
-			//	{
-			//		transition_skill_1_state();
-			//	}
-			//	if (ImGui::Button("skill_2"))
-			//	{
-			//		transition_skill_2_start_state();
-			//	}
-			//	if (ImGui::Button("skill_3"))
-			//	{
-			//		transition_skill_3_state();
-			//	}
-			//}
-			//if (ImGui::Button("load"))
-			//{
-			//	LoadDataFile();
-			//}
-			//ImGui::Separator();
-			//if (ImGui::Button("save"))
-			//{
-			//	SaveDataFile();
-			//}
 			//トランスフォーム
 			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -482,24 +458,6 @@ void Boss::DebugDUI()
 				//速度
 				ImGui::DragFloat3("velocity:", &velocity.x);
 			}
-			//トランスフォーム
-			//if (ImGui::CollapsingHeader("Turret_Head_Transform", ImGuiTreeNodeFlags_DefaultOpen))
-			//{
-			//	//回転
-			//	ImGui::DragFloat4("Rotation", &lookAt_nodes.at(42).rotation.x);
-			//	//回転				
-			//	ImGui::DragFloat4("global_transform0:", &lookAt_nodes.at(42).global_transform._11);
-			//	ImGui::DragFloat4("global_transform1:", &lookAt_nodes.at(42).global_transform._21);
-			//	ImGui::DragFloat4("global_transform2:", &lookAt_nodes.at(42).global_transform._31);
-			//	ImGui::DragFloat4("global_transform3:", &lookAt_nodes.at(42).global_transform._41);
-			//	//回転
-			//	ImGui::DragFloat4("Rotation", &model->nodes.at(42).rotation.x);
-			//	//回転				
-			//	ImGui::DragFloat4("global_transform0:", &model->nodes.at(42).global_transform._11);
-			//	ImGui::DragFloat4("global_transform1:", &model->nodes.at(42).global_transform._21);
-			//	ImGui::DragFloat4("global_transform2:", &model->nodes.at(42).global_transform._31);
-			//	ImGui::DragFloat4("global_transform3:", &model->nodes.at(42).global_transform._41);
-			//}
 			if (ImGui::CollapsingHeader("Param", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				std::string state_name;
@@ -540,7 +498,6 @@ void Boss::DebugDUI()
 
 					ImGui::Text("hit_stop");
 					ImGui::DragFloat("tackle_stop_time", &param.tackleParam.hitStop.time, 0.1f);
-					ImGui::DragFloat("tackle_stopping_strength", &param.tackleParam.hitStop.stoppingStrength, 0.1f);
 					//ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
 					//ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
 					//ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
@@ -557,7 +514,6 @@ void Boss::DebugDUI()
 					ImGui::DragFloat("stomp_smmoth", &param.stompParam.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
 					ImGui::Text("hit_stop");
 					ImGui::DragFloat("stomp_stop_time", &param.stompParam.hitStop.time, 0.1f);
-					ImGui::DragFloat("stomp_stopping_strengthy", &param.stompParam.hitStop.stoppingStrength, 0.1f);
 					//ImGui::DragFloat("combo2_hit_viberation.l_moter", &param.combo_2.hitViberation.L_moter, 0.1f);
 					//ImGui::DragFloat("combo2_hit_viberation.r_moter", &param.combo_2.hitViberation.R_moter, 0.1f);
 					//ImGui::DragFloat("combo2_vibe_time", &param.combo_2.hitViberation.VibeTime, 0.1f);
@@ -592,7 +548,39 @@ void Boss::DebugDUI()
 				}
 				ImGui::SliderFloat("transition_time", &transition_time, 0.0f, 5.0f);
 
-			}		
+			}
+			if (ImGui::CollapsingHeader("StateMachine", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				const char* stateItem[] = {
+					"PLAYER_Idle",
+					"PLAYER_Move",
+					"PLAYER_Tackle",
+					"PLAYER_Jump",
+					"PLAYER_ShotStraight",
+					"PLAYER_ShotHoming",
+					"PLAYER_Damage",
+					"PLAYER_Dead",
+					"PLAYER_Down",
+				};
+				using StateUpdateFunc = void (Boss::*)();
+				StateUpdateFunc stateUpdate[] = {
+					&Boss::TransitionIdleState,
+					&Boss::TransitionWalkState,
+					&Boss::TransitionAttack_Tackle_State,
+					&Boss::TransitionAttack_Jump_State,
+					&Boss::TransitionAttack_ShotStraight_State,
+					&Boss::TransitionAttack_ShotHoming_State,
+					&Boss::TransitionDamageState,
+					&Boss::TransitionDeadState,
+					&Boss::TransitionDownState,
+				};
+				static int item_current = 0;
+				if (ImGui::Combo("state", &item_current, stateItem, IM_ARRAYSIZE(stateItem)))
+				{
+					(this->*stateUpdate[item_current])();
+				}
+			}
+
 		}
 		ImGui::End();
 	}

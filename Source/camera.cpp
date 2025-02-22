@@ -112,6 +112,8 @@ void Camera::Update(float elapsedTime)
     {
         //ロックオン時のカメラの挙動
         UpdateWithLockOn(elapsedTime);
+        ControlByGamePadStick(elapsedTime);
+
     }
     else
     {
@@ -202,14 +204,12 @@ void Camera::UpdateWithTracking(float elapsedTime)
     hit.distance = (std::max)(hit.distance, 0.5f);
     hit.distance = (std::min)(hit.distance, range);
 
-    hit.distance = range;
-
     //注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
     DirectX::XMFLOAT3 pos;
     pos.x = trakkingTarget.x - forward.x * hit.distance;
     pos.y = trakkingTarget.y - forward.y * hit.distance;
     pos.z = trakkingTarget.z - forward.z * hit.distance;
-    //eye = Math::Lerp(eye, pos, attendRate * elapsedTime);
+
     eye = Math::Lerp(eye, pos, std::min(attendRate * elapsedTime, 1.0f));
 
 }
@@ -323,12 +323,14 @@ void Camera::UpdateWithWing(float elapsedTime)
     DirectX::XMFLOAT3 ray_target = trakkingTarget + DirectX::XMFLOAT3{ 0,-0.5,0 };//めり込まないよう少し下に下げる
     DirectX::XMFLOAT3 start = ray_target;
     DirectX::XMFLOAT3 end = ray_target - forward * DirectX::XMFLOAT3(range, range, range);
+    
+    //地形にめり込んだ際に補正
     HitResult hit;
+    StageManager::Instance().RayCast(start, end, hit);
 
-    //hit.distance = (std::max)(hit.distance, 0.5f);
-    //hit.distance = (std::min)(hit.distance, range);
     range = 5.0f;
-    hit.distance = range;
+    hit.distance = (std::max)(hit.distance, 0.5f);
+    hit.distance = (std::min)(hit.distance, range);
 
     //注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
     DirectX::XMFLOAT3 pos;
@@ -346,7 +348,7 @@ void Camera::ControlByGamePadStick(float elapsedTime)
     //カメラ縦操作
     if (ay > 0.1f || ay < 0.1f)
     {
-        angle.x = -ay * DirectX::XMConvertToRadians(stickRollSpeed * 0.5f) * elapsedTime;
+        angle.x = ay * DirectX::XMConvertToRadians(stickRollSpeed * 0.5f) * elapsedTime;
     }
     //カメラ横操作
     if (ax > 0.1f || ax < 0.1f)
@@ -684,7 +686,6 @@ void Camera::DebugGui()
             static HitStopParam debug_param;
 
             ImGui::DragFloat("time", &debug_param.time, 0.1f);
-            ImGui::DragFloat("stopping_strength", &debug_param.stoppingStrength, 0.1f);
             if (ImGui::Button("hit_stop"))
             {
                 SetHitStop(debug_param);
@@ -736,13 +737,10 @@ void Camera::DebugGui()
 
 }
 
-float Camera::HitStopUpdate(float elapsedTime)
+bool Camera::HitStopUpdate(float elapsedTime)
 {
-    float resultElapsedTime = elapsedTime;
     if (isHitStop)
     {
-        //ヒットストップ時の経過時間処理(0だとバグるので処理はスロー)
-        resultElapsedTime /= hitStopParam.stoppingStrength;
 
         //タイマー処理
         hitStopParam.time -= elapsedTime;
@@ -751,8 +749,7 @@ float Camera::HitStopUpdate(float elapsedTime)
             isHitStop = false;
         }
     }
-
-    return resultElapsedTime;
+    return isHitStop;
 }
 
 void Camera::SetCameraShake(CameraShakeParam param)

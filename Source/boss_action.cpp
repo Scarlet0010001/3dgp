@@ -22,22 +22,11 @@ void Boss::TransitionWalkState()
 	stateDuration = 3.0f;
 }
 
-void Boss::TransitionRunState()
-{
-	act_update = &Boss::UpdateRunState;
-	state = STATE::RUN;
-	charaParam.moveSpeed = RUN_SPEED;
-	//bossAnimation = BossAnimation::BOSS_IDLE;
-	stateTimer = 0;
-	stateDuration = 3.0f;
-}
-
 void Boss::TransitionAttack_Tackle_State()
 {
 	act_update = &Boss::UpdateAttack_Tackle_State;
 	state = STATE::TACKLE;
 	tackleCameraShake.onDistanceShake = true;
-	Camera::Instance().SetCameraShake(tackleCameraShake);
 	attackParam = param.tackleParam;
 	bossAnimation = BossAnimation::BOSS_RUN;
 	stateTimer = 0;
@@ -102,15 +91,7 @@ void Boss::UpdateIdleState(float elapsedTime)
 {
 	if (stateTimer > stateDuration)
 	{
-		//if (health < charaParam.maxHealth / 2)
-		//{
-		//	//HP半分以下なら走る
-		//	TransitionRunState();
-		//}
-		//else
-		{
-			TransitionWalkState();
-		}
+		TransitionWalkState();
 	}
 	//速度更新
 	UpdateVelocity(elapsedTime, position);
@@ -132,19 +113,6 @@ void Boss::UpdateWalkState(float elapsedTime)
 	//速度更新
 	UpdateVelocity(elapsedTime, position);
 
-}
-
-void Boss::UpdateRunState(float elapsedTime)
-{
-	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, target_pos);
-	Move(dir_target_vec.x, dir_target_vec.z, charaParam.moveSpeed);
-	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);
-
-	//攻撃のルーチン
-	AttackRoutine(elapsedTime);
-
-	//速度更新
-	UpdateVelocity(elapsedTime, position);
 }
 
 void Boss::UpdateAttack_Tackle_State(float elapsedTime)
@@ -174,7 +142,6 @@ void Boss::UpdateAttack_Tackle_State(float elapsedTime)
 		TransitionIdleState();
 		stateDuration = NORMAL_ATTACK_COOLTIME;
 		attackParam.isAttack = false;
-		Camera::Instance().SetOnDistanceShake(false);
 	}
 	//速度更新
 	UpdateVelocity(elapsedTime, position);
@@ -211,7 +178,7 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	DirectX::XMFLOAT3 dir_target_vec{};
 	attackParam.isAttack = true;
 
-	const float radius = 1.0f;
+	const float radius = 3.0f;
 	if (distSq < radius * radius)
 	{
 		if (model->GetIsEndAnimation())

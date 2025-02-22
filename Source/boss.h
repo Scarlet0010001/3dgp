@@ -35,7 +35,6 @@ private:
 	{
 		IDLE,
 		WALK,
-		RUN,
 		JUMP,
 		TACKLE,
 		SHOT_S,
@@ -104,12 +103,8 @@ public:
 	void Update(float elapsedTime);
 
 	//描画処理
-	//ディファードでレンダリングするオブジェクト
-	//void render_d(float elapsed_time, Camera* camera);
 	//フォワードレンダリングするオブジェクト
 	void Render_f(float elapsedTime);
-	//シャドウレンダリングするオブジェクト
-	//void render_s(float elapsed_time, Camera* camera);
 	//UIの描画
 	void Render_ui(float elapsedTime);
 
@@ -141,7 +136,6 @@ private:
 	//			移動系				//
 	void TransitionIdleState();//待機
 	void TransitionWalkState();//歩行
-	void TransitionRunState();//走り
 
 	//			攻撃系				//
 	void TransitionAttack_Tackle_State();//近接攻撃
@@ -159,7 +153,6 @@ private:
 	//			移動系				//
 	void UpdateIdleState(float elapsedTime);//待機
 	void UpdateWalkState(float elapsedTime);//歩行
-	void UpdateRunState(float elapsedTime);//走り
 
 	//			攻撃系				//
 	void UpdateAttack_Tackle_State(float elapsedTime);//近接攻撃
@@ -281,7 +274,7 @@ private:
 	const float CHARGE_JUMP_TIME = 2.5f;
 
 	//ダメージを受けたときのスタン時間
-	const float DAMAGE_STUN_DURATION = 0.7f;
+	const float DAMAGE_STUN_DURATION = 3.0f;
 
 	public:
 		AddDamageFunc damagedFunction;

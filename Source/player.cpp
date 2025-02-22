@@ -68,7 +68,7 @@ void Player::Initialize()
 	charaParam = param.charaInitParam;
 
 	//体力初期化
-	charaParam.maxHealth = 200.0f;
+	charaParam.maxHealth = 150.0f;
 	health = charaParam.maxHealth;
 	stepOffset = 2.0f;
 	jumpCount = jumpLimit;
@@ -84,13 +84,10 @@ void Player::Initialize()
 	attackParam.cameraShake.time = 0.5f;
 
 	attackParam.hitStop.time = 0.005f;
-	attackParam.hitStop.stoppingStrength = 3.0f;
 }
 
 Player::~Player()
 {
-	//delete beamSaber;
-	//delete lowerArm;
 }
 
 void Player::Update(float elapsedTime)
@@ -120,8 +117,16 @@ void Player::Update(float elapsedTime)
 	collider.end = { position.x,position.y + charaParam.height, position.z };
 	collider.radius = 1.0f;
 
+	if (state != STATE::LEFT_ATTACK && state != STATE::RIGHT_ATTACK)
+	{
+		attackParam.isAttack = false;
+	}
+
+	//画面外に行った場合初期位置に戻す
 	if (position.y < -10.0f)
+	{
 		position = { 0.0f,50.0f,0.0f };
+	}
 
 	ShaderUpdate(elapsedTime);
 
@@ -241,13 +246,9 @@ void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 			//game_pad->set_vibration(attack_sword_param.hit_viberation.l_moter, attack_sword_param.hit_viberation.r_moter, attack_sword_param.hit_viberation.vibe_time);
 
 			//ヒットエフェクト再生
-			slashEffect->Play(attackCollision_position[side], 0.5f);
+			slashEffect->Play(attackCollision_position[side], 1.5f);
 		}
 	}
-}
-
-void Player::JudgeSkillCollision(Capsule object_colider, AddDamageFunc damaged_func)
-{
 }
 
 bool Player::FindLoopAnimation(PlayerAnimation PA)
@@ -307,14 +308,14 @@ void Player::BoostUpdate(float elapsedTime)
 {
 	if (isGround && STATE::BOOST != state)
 		param.boostTimer += elapsedTime * 3.0f;
-	if (isHover)
+	if (isBoost)
 		param.boostTimer -= 0.7f * elapsedTime;
-	if (param.boostTimer >= MAX_BOOST_TIMER)
-		param.boostTimer = MAX_BOOST_TIMER;
+	if (param.boostTimer >= BOOST_TIMER_MAX)
+		param.boostTimer = BOOST_TIMER_MAX;
 	
-	if (param.boostTimer < 0 && isHover)
+	if (param.boostTimer < 0 && isBoost)
 	{
-		isHover = false;
+		isBoost = false;
 		TransitionJumpState();
 	}
 
@@ -326,7 +327,7 @@ void Player::BoostUpdate(float elapsedTime)
 		if (!isGround
 			&& gamePad->GetButtonDown() & GamePad::BTN_A)
 		{
-			isHover = !isHover;
+			isBoost = !isBoost;
 		}
 	}
 }
@@ -527,16 +528,25 @@ void Player::InputShot()
 	model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
 	model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
 
-	//前方向
-	DirectX::XMFLOAT3 dir = Math::get_posture_forward(transform);
+	DirectX::XMFLOAT3 dir{};
+	DirectX::XMFLOAT3 pos{};
+
 	//発射位置(プレイヤーの腰あたり)
-	DirectX::XMFLOAT3 pos;
-	if(playerAnimation == PlayerAnimation::PLAYER_SHOT_RIGHT
+	if (playerAnimation == PlayerAnimation::PLAYER_SHOT_RIGHT
 		|| playerAnimation == PlayerAnimation::PLAYER_SHOT_BACK)
 		pos = beamSaber_position[LR::RIGHT];
 	else pos = beamSaber_position[LR::LEFT];
-
-	BulletStraight* bullet = 
+	//ロックオンしていなかったらカメラの前方方向に発射
+	if (!camera->GetLockOn())
+	{
+		//前方向
+		dir = Math::get_posture_forward(transform);
+	}
+	else
+	{
+		dir = Math::calc_vector_AtoB_normalize(pos, bossPosition);
+	}
+	BulletStraight* bullet =
 		new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Player);
 	bullet->Launch(dir, pos);
 
@@ -816,7 +826,6 @@ void Player::DebugGUI()
 
 				ImGui::Text("hit_stop");
 				ImGui::DragFloat("combo1_stop_time", &param.combo_1.hitStop.time, 0.1f);
-				ImGui::DragFloat("combo1_stopping_strength", &param.combo_1.hitStop.stoppingStrength, 0.1f);
 				//ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
 				//ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
 				//ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
@@ -833,7 +842,6 @@ void Player::DebugGUI()
 				ImGui::DragFloat("combo2_smmoth", &param.combo_2.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
 				ImGui::Text("hit_stop");
 				ImGui::DragFloat("combo2_stop_time", &param.combo_2.hitStop.time, 0.1f);
-				ImGui::DragFloat("combo2_stopping_strengthy", &param.combo_2.hitStop.stoppingStrength, 0.1f);
 				//ImGui::DragFloat("combo2_hit_viberation.l_moter", &param.combo_2.hitViberation.L_moter, 0.1f);
 				//ImGui::DragFloat("combo2_hit_viberation.r_moter", &param.combo_2.hitViberation.R_moter, 0.1f);
 				//ImGui::DragFloat("combo2_vibe_time", &param.combo_2.hitViberation.VibeTime, 0.1f);
@@ -851,7 +859,6 @@ void Player::DebugGUI()
 				ImGui::DragFloat("combo3_smmoth", &param.combo_3.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
 				ImGui::Text("hit_stop");
 				ImGui::DragFloat("combo3_stop_time", &param.combo_3.hitStop.time, 0.1f);
-				ImGui::DragFloat("combo3_stopping_strength", &param.combo_3.hitStop.stoppingStrength, 0.1f);
 				//ImGui::DragFloat("combo3_hit_viberation.l_moter", &param.combo_3.hitViberation.L_moter, 0.1f);
 				//ImGui::DragFloat("combo3_hit_viberation.r_moter", &param.combo_3.hitViberation.R_moter, 0.1f);
 				//ImGui::DragFloat("combo3_vibe_time", &param.combo_3.hitViberation.VibeTime, 0.1f);

@@ -88,13 +88,15 @@ public:
 	}
 
 private:
-	bool initialize();
-	void update(float elapsedTime/*Elapsed seconds from last frame*/);
-	void render(float elapsedTime/*Elapsed seconds from last frame*/);
-	bool uninitialize();
+	bool Initialize();
+	void Update(float elapsedTime/*Elapsed seconds from last frame*/);
+	void Render(float elapsedTime/*Elapsed seconds from last frame*/);
+	bool Uninitialize();
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[8];
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
+
+	bool isShowCursor = false;
 
 private:
 	high_resolution_timer tictoc;

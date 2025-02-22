@@ -51,6 +51,8 @@ void RadialBlur::DebugGUI()
 
 		if (ImGui::Begin("radial_blur", nullptr, ImGuiWindowFlags_None))
 		{
+			ImGui::Checkbox("isDebug", &isDebug);
+
 			ImGui::DragFloat2("blurCenter", &radial_blur_constant->data.blurCenter.x, 0.01f);
 			ImGui::SliderFloat("blurStrength", &radial_blur_constant->data.blurStrength, +0.0f, +1.0f);
 			ImGui::SliderFloat("blurRadius", &radial_blur_constant->data.blurRadius, +0.0f, +1.0f);

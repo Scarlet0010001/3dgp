@@ -23,7 +23,7 @@ void Player::TransitionWingState()
 	playerAnimation = PlayerAnimation::PLAYER_WING_START;
 	state = STATE::WING;
 	charaParam.acceleration = accelerationState[ACCELERATION_STATE::WING];
-	isHover = false;
+	isBoost = false;
 }
 
 void Player::TransitionAvoidanceState()
@@ -262,8 +262,6 @@ void Player::UpdateWingState(float elapsedTime)
 			TransitionIdleState();
 		}
 	}
-	//回避入力
-	//InputAvoidance();
 
 	//速力処理更新
 	UpdateVelocity(elapsedTime, position);
@@ -319,11 +317,15 @@ void Player::UpdateJumpState(float elapsedTime)
 
 	InputMove(elapsedTime);
 
-	if (isHover)
+	if (isBoost)
 		TransitionIdleState();
 
 	//飛行入力
 	InputWing();
+
+	//回避入力
+	InputAvoidance();
+
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X
 		|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
@@ -366,9 +368,9 @@ void Player::UpdateShotState(float elapsedTime)
 	InputMove(elapsedTime, param.floatingValue, 1);
 
 	//ジャンプ入力
-	//InputJump();
+	InputJump();
 	//回避入力
-	//InputAvoidance();
+	InputAvoidance();
 	//飛行入力
 	InputWing();
 	//攻撃入力
@@ -414,9 +416,11 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 	{
 		TransitionIdleState();
 		attackParam.isAttack = false;
-
 	}
 	InputMove(elapsedTime, param.attackMoveSpeed, 1);
+
+	//回避入力
+	InputAvoidance();
 
 	UpdateVelocity(elapsedTime, position);
 }
@@ -456,6 +460,9 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 
 	InputMove(elapsedTime, param.attackMoveSpeed, 1);
 
+	//回避入力
+	InputAvoidance();
+
 	UpdateVelocity(elapsedTime, position);
 }
 
@@ -485,6 +492,9 @@ void Player::UpdateCombo_01_03_State(float elapsedTime)
 	}
 	InputMove(elapsedTime, param.attackMoveSpeed, 1);
 
+	//回避入力
+	InputAvoidance();
+
 	UpdateVelocity(elapsedTime, position);
 }
 
@@ -503,6 +513,10 @@ void Player::UpdateCombo_PowerL_State(float elapsedTime)
 	{
 		TransitionIdleState();
 	}
+
+	//回避入力
+	InputAvoidance();
+
 	UpdateVelocity(elapsedTime, position);
 }
 

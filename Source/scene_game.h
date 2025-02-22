@@ -17,6 +17,7 @@ class SceneGame :
     public Scene
 {
 public:
+    //コンストラクタ
     SceneGame();
     ~SceneGame()override {}
     //シーン初期化
@@ -32,16 +33,13 @@ public:
     void JudgeCollision();
 
     //クリ時の更新
-    //void clear_update(float elapsedTime);
+    //void ClearUpdate(float elapsedTime);
 
     //デバッグ描画
     void DebugGui();
 
     //シーンリセット
     void SceneReset();
-
-protected:
-
 
 private:
 
@@ -58,46 +56,52 @@ private:
     //ディファードレンダー
     std::unique_ptr<DeferredRenderer> deferred = nullptr;
 
+    //IBL
     struct IBL_constants
     {
         DirectX::XMFLOAT4 lightRoti = { 3.0f,3.0f,3.0f,0.0f }; //光の輝き
         DirectX::XMFLOAT4 iblIntencity = { 2.0f,0.0f,0.0f,0.0f };
     };
     std::unique_ptr<Constants<IBL_constants>> IBL_constant{};
+
+    //トーンマップ
     Microsoft::WRL::ComPtr<ID3D11PixelShader> toneMapPixelShader;
 
-    /*
-    //スカイボックス
-    std::unique_ptr<SkyBox> skybox = nullptr;
     //操作説明UI（仮）
-    std::unique_ptr<SpriteBatch> operation_ui = nullptr;
+    //std::unique_ptr<SpriteBatch> operation_ui = nullptr;
 
-    std::unique_ptr<Tutorial> tutorial = nullptr;
-    */
+    //std::unique_ptr<Tutorial> tutorial = nullptr;
 
+    //BGM
     std::shared_ptr<audio> audios[8];
-
 
     //スカイマップ
     std::unique_ptr<SkyMap> skymap;
 
+    //ラジアルブラー
     std::unique_ptr<RadialBlur> radialBlur;
 
+    //色収差
     std::unique_ptr<Glitch_CA> glitch_CA;
 
+    //フレームバッファ
     std::unique_ptr<framebuffer> framebuffers[8];
 
+    //画面転送用フルスクリーンクワッド
     std::unique_ptr<fullscreen_quad> bit_block_transfer;
 
+    //勝利と敗北画像
     std::unique_ptr<SpriteBatch> spriteVictory = nullptr;
     std::unique_ptr<SpriteBatch> spriteLose = nullptr;
 
+    //ゲーム終了判定
     bool isEnd = false;
 
-    //タイトルに戻る　※テスト用
+    //ヒットストップのオンオフ
+    bool isHitStop = false;
+
+    //Imguiのオンオフ　※テスト用
     bool displayImgui = false;
     bool IBLImgui = false;
-
-    float cameraElapsedTime_ = 0.0f;
 };
 

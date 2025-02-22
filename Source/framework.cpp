@@ -13,7 +13,7 @@ framework::framework(HWND hwnd) : hwnd(hwnd)
 {
 }
 
-bool framework::initialize()
+bool framework::Initialize()
 {
 	Graphics::Instance().Initialize(hwnd);
 	Device::Instance().GetMouse().Set_do_show(true);
@@ -30,7 +30,7 @@ bool framework::initialize()
 	return true;
 }
 
-void framework::update(float elapsedTime/*Elapsed seconds from last frame*/)
+void framework::Update(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 #ifdef USE_IMGUI
 	ImGui_ImplDX11_NewFrame();
@@ -38,9 +38,10 @@ void framework::update(float elapsedTime/*Elapsed seconds from last frame*/)
 	ImGui::NewFrame();
 #endif
 	//デバイス
-	Device::Instance().Update(hwnd, elapsedTime);
-	Device::Instance().GetMouse().OperationActivation();
-	Device::Instance().GetGamePad().OperationActivation();
+	Device& device = Device::Instance();
+	device.Update(hwnd, elapsedTime);
+	device.GetMouse().OperationActivation();
+	device.GetGamePad().OperationActivation();
 
 	Graphics::Instance().SetHwnd(hwnd);
 
@@ -48,11 +49,18 @@ void framework::update(float elapsedTime/*Elapsed seconds from last frame*/)
 	SceneManager::Instance().Update(elapsedTime);
 	Graphics::Instance().DebugGui();
 
+	//カーソル表示切り替え
+	if (device.GetMouse().GetButton() & device.GetMouse().BTN_F2)
+	{
+		isShowCursor = !isShowCursor;
+		device.GetMouse().Set_do_show(isShowCursor);
+	}
+
 #ifdef USE_IMGUI
 #endif
 }
 
-void framework::render(float elapsedTime/*Elapsed seconds from last frame*/)
+void framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 {
 	//別スレッド中にデバイスコンテキストが使われていた場合に
 	//同時アクセスしないように排他制御する
@@ -101,7 +109,7 @@ void framework::render(float elapsedTime/*Elapsed seconds from last frame*/)
 
 }
 
-bool framework::uninitialize()
+bool framework::Uninitialize()
 {
 	//Sprite オブジェクトを解放する
 	SceneManager::Instance().Clear();
@@ -123,7 +131,7 @@ int framework::run()
 {
 	MSG msg{};
 
-	if (!initialize())
+	if (!Initialize())
 	{
 		return 0;
 	}
@@ -148,8 +156,8 @@ int framework::run()
 		{
 			tictoc.tick();
 			calculate_frame_stats();
-			update(tictoc.time_interval());
-			render(tictoc.time_interval());
+			Update(tictoc.time_interval());
+			Render(tictoc.time_interval());
 		}
 	}
 
@@ -168,5 +176,5 @@ int framework::run()
 	}
 #endif
 
-	return uninitialize() ? static_cast<int>(msg.wParam) : 0;
+	return Uninitialize() ? static_cast<int>(msg.wParam) : 0;
 }

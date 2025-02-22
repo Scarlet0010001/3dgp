@@ -5,7 +5,7 @@
 #include "constant.h"
 #include "fullscreen_quad.h"
 
-class RadialBlur//fullscreen_quadを親クラスにする
+class RadialBlur
 {
 public:
 	RadialBlur(ID3D11Device* device);
@@ -15,15 +15,16 @@ public:
 
 	void Blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView** shader_resource_view);
 
+	bool GetIsDebug() { return isDebug; }
+
 	struct radial_blur_constants
 	{
-		DirectX::XMFLOAT2 blurCenter = { 0.5, 0.5 }; // center point where the blur is applied
-		float blurStrength = 0.0f; // blurring strength
-		float blurRadius = 0.5f; // blurred radius
-		float blurDecay = 0.2f; // ratio of distance to decay to radius
-		float blurTimer = 0.0f;
-		float pads[2];
-
+		DirectX::XMFLOAT2 blurCenter = { 0.5, 0.5 };		// 中心点
+		float blurStrength = 0.0f;									// ぼかし強度
+		float blurRadius = 0.5f;										// ぼかし半径
+		float blurDecay = 0.2f;											// 減衰率
+		float blurTimer = 0.0f;											// 時間制御用
+		float pads[2];															// 調整
 	};
 	std::unique_ptr<Constants<radial_blur_constants>> radial_blur_constant{};
 private:
@@ -34,6 +35,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> radial_blur_shader_resource_view;
 
 	std::unique_ptr<fullscreen_quad> radial_quad;
+
+	bool isDebug = false;
 
 	bool displayRadialBlurImgui = false;
 };

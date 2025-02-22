@@ -129,9 +129,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\resource_manager.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="Source\camera.cpp">
       <Filter>Sources\Camera</Filter>
     </ClCompile>
@@ -218,9 +215,6 @@
     </ClCompile>
     <ClCompile Include="Source\sky_map.cpp">
       <Filter>Sources\Skymap</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\model_resource.cpp">
-      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Source\sprite.cpp">
       <Filter>Sources\Sprite</Filter>
@@ -324,12 +318,6 @@
       <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="Source\interval.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\model_resource.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\resource_manager.h">
       <Filter>Sources</Filter>
     </ClInclude>
     <ClInclude Include="Source\character.h">
@@ -547,9 +535,6 @@
     <FxCompile Include="HLSL\blur_ps.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\cast_shadow_csm_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="HLSL\disco_tunnel_ps.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
@@ -571,9 +556,6 @@
     <FxCompile Include="HLSL\tone_map_ps.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\water_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="HLSL\debug_renderer_ps.hlsl">
       <Filter>Shaders\Debug</Filter>
     </FxCompile>
@@ -592,16 +574,10 @@
     <FxCompile Include="HLSL\gltf_model_vs.hlsl">
       <Filter>Shaders\Model</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\skinned_mesh_csm_vs.hlsl">
-      <Filter>Shaders\Model</Filter>
-    </FxCompile>
     <FxCompile Include="HLSL\skinned_mesh_ps.hlsl">
       <Filter>Shaders\Model</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\skinned_mesh_vs.hlsl">
-      <Filter>Shaders\Model</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\static_mesh_csm_vs.hlsl">
       <Filter>Shaders\Model</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\static_mesh_ps.hlsl">
@@ -687,9 +663,6 @@
     </FxCompile>
     <FxCompile Include="HLSL\radial_blur_ps.hlsl">
       <Filter>Shaders\Radial_Blur</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\accumulate_husk_particles_ps.hlsl">
-      <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\glitch_chromatic_aberration.hlsl">
       <Filter>Shaders\glitch</Filter>

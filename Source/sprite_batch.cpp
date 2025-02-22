@@ -315,7 +315,6 @@ void SpriteBatch::render(ID3D11DeviceContext* dc,
 {
     render(dc, { position }, { scale }, { 1.0f, 1.0f, 1.0f, 1.0f }, 0.0f,
         { 0.0f, 0.0f }, { static_cast<float>(texture2d_desc.Width), static_cast<float>(texture2d_desc.Height) });
-
 }
 
 void SpriteBatch::render(ID3D11DeviceContext* dc,
