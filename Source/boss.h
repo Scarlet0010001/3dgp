@@ -5,6 +5,7 @@
 
 #include "audio.h"
 #include "effect.h"
+#include "Boss_UI.h"
 
 #include "primitive.h"
 #include <cereal/cereal.hpp>
@@ -56,8 +57,8 @@ private:
 	struct BossParam
 	{
 		//基底クラスのパラメーター
-		CharacterParam chara_init_param;
-		float run_speed;
+		CharacterParam charaInitParam;
+		float runSpeed;
 
 		//タックル攻撃のパラメーター
 		AttackParam tackleParam;
@@ -68,8 +69,8 @@ private:
 		void serialize(Archive& archive)
 		{
 			archive(
-				cereal::make_nvp("chara_param", chara_init_param),
-				cereal::make_nvp("run_speed", run_speed),
+				cereal::make_nvp("charaParam", charaInitParam),
+				cereal::make_nvp("runSpeed", runSpeed),
 				cereal::make_nvp("tackleParam", tackleParam),
 				cereal::make_nvp("stompParam", stompParam)
 			);
@@ -106,8 +107,7 @@ public:
 	//フォワードレンダリングするオブジェクト
 	void Render_f(float elapsedTime);
 	//UIの描画
-	void Render_ui(float elapsedTime);
-
+	void RenderUI(float elapsedTime);
 	//デバッグ用GUI描画
 	void DebugDUI();
 
@@ -191,7 +191,7 @@ private:
 	typedef void (Boss::* ActUpdate)(float elapsedTime);
 	ActUpdate act_update = &Boss::UpdateIdleState;
 	std::unique_ptr<gltf_model> model;
-	//std::unique_ptr<BossUi> ui;
+	std::unique_ptr<BossUI> ui;
 
 	gltf_model::node doorNode;
 	gltf_model::node turretNode;

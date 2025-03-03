@@ -133,7 +133,7 @@ void Boss::UpdateAttack_Tackle_State(float elapsedTime)
 	DirectX::XMFLOAT3 pos = { position.x ,0.0f,position.z };
 	DirectX::XMFLOAT3 pointPos = { targetPoint_pos.x ,0.0f,targetPoint_pos.z };
 	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(pos, pointPos);
-	Move(dir_target_vec.x, dir_target_vec.z, param.run_speed);
+	Move(dir_target_vec.x, dir_target_vec.z, param.runSpeed);
 	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);	
 
 	const float radius = 2.0f;

@@ -13,7 +13,7 @@
 #include <cereal/cereal.hpp>
 
 //ブーストゲージ最大量
-#define BOOST_TIMER_MAX (10.0f)
+#define BOOST_MAX (10.0f)
 
 //プレイヤー :final このクラスの継承ができないことを明示する
 class Player final :
@@ -27,8 +27,9 @@ public:
 	void Initialize();
 	//更新処理
 	void Update(float elapsedTime);
+
 	//描画処理
-//ディファードでレンダリングするオブジェクト
+	//ディファードでレンダリングするオブジェクト
 	void Render_d(float elapsedTime);
 	//フォワードレンダリングするオブジェクト
 	void Render_f(float elapsedTime);
@@ -38,6 +39,8 @@ public:
 	void RenderUI(float elapsedTime);
 	//デバッグ用GUI描画
 	void DebugGUI();
+	//デバッグプリミティブ更新
+	void DebugPrimitiveUpdate();
 
 	//プレイヤーの腰当たりの位置
 	DirectX::XMFLOAT3 GetWaistPosition() { return DirectX::XMFLOAT3(position.x, position.y + charaParam.height / 2, position.z); }
@@ -48,7 +51,7 @@ public:
 	AttackParam GetAttackParam() { return attackParam; }
 
 	//HPパーセンテージ取得
-	float GetBoostPercent() const { return param.boostTimer <= 0 ? 0.0f : static_cast<float>(param.boostTimer) / BOOST_TIMER_MAX; }
+	float GetBoostPercent() const { return param.boostTimer <= 0 ? 0.0f : static_cast<float>(param.boostTimer) / BOOST_MAX; }
 
 	//ボス座標設定
 	void SetBossPosition(DirectX::XMFLOAT3 p) { bossPosition = p; }
@@ -141,7 +144,7 @@ private:
 		//飛行速度
 		float wingSpeed = 40;
 		//ブースト
-		float boostTimer = BOOST_TIMER_MAX;
+		float boostTimer = BOOST_MAX;
 		//浮遊度
 		float floatingValue = 1.5f;
 		//攻撃時の移動速度
@@ -374,11 +377,10 @@ public:
 	
 	//当たり判定用カプセル
 	Capsule collider;
-
+	
 private:
-
-	//デバッグプリミティブ更新
-	void DebugPrimitiveUpdate();
-
+	//--------------------定数--------------------------//
+	//着地ステートに偏移する速度
+	const float LANDING_SPEED = 30.0f;
 };
 

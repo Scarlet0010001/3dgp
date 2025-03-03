@@ -19,6 +19,7 @@ public:
         MASTER_NONE = -1,
         Player = 0,
         Enemy,
+        Count,
     };
 
     Bullet(BulletManager* manager);

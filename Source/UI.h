@@ -10,6 +10,7 @@ public:
     //--------< ŠÖ” >--------//
     virtual void Update(float elapsed_time) = 0;
     virtual void Render(ID3D11DeviceContext* dc) = 0;
+    virtual void DebugGUI() = 0;
     //--------< \‘¢‘Ì >--------//
     struct Element
     {
@@ -21,4 +22,7 @@ public:
         DirectX::XMFLOAT2 texpos{};
         DirectX::XMFLOAT2 texsize{};
     };
+protected:
+    bool displayImgui = false;
+
 };

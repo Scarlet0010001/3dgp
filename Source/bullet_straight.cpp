@@ -8,11 +8,20 @@ BulletStraight::BulletStraight(BulletManager* manager, BULLET_MASTER MasterType)
     Graphics& graphics = Graphics::Instance();
     model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
         "Resources/Bullet/Bullet.glb");
-    bulletEffect = 
-        std::make_unique<Effect>("Resources/Effect/Bullet/playerBullet.efkefc");
+    masterType = MasterType;
+
+    if (masterType == BULLET_MASTER::Player)
+    {
+        bulletEffect =
+            std::make_unique<Effect>("Resources/Effect/Bullet/playerBullet.efkefc");
+    }
+    else
+    {
+        bulletEffect =
+            std::make_unique<Effect>("Resources/Effect/Bullet/bossBullet.efkefc");
+    }
 
     type = BULLET_TYPE::Straight;
-    masterType = MasterType;
     //表示サイズを調整
     scale.x = scale.y = scale.z = 1.0f;
 

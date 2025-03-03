@@ -1,9 +1,10 @@
 #include "player_UI.h"
+#include "camera.h"
 #include "user.h"
 
 PlayerHpGauge::PlayerHpGauge() :
-	GaugeUI(L"Resources/Sprite/UI/Player/Player_HPframe.png",
-		L"Resources/Sprite/UI/Player/Player_HP.png",
+	GaugeUI(L"Resources/Sprite/UI/Gauge/HPframeGauge.png",
+		L"Resources/Sprite/UI/Gauge/HPGauge.png",
 		nullptr)
 {
 	gauge.position = { 50.0f,45.0f };
@@ -17,8 +18,9 @@ PlayerHpGauge::PlayerHpGauge() :
 	diffColor = { 1.0f,0.0f, 0.0f, 1.0f };
 }
 
-PlayerBoostGauge::PlayerBoostGauge(): GaugeUI(L"Resources/Sprite/UI/Player/Player_Gauge.png",
-	L"Resources/Sprite/UI/Player/Player_Gauge.png",
+PlayerBoostGauge::PlayerBoostGauge():
+	GaugeUI(L"Resources/Sprite/UI/Gauge/BoostGauge.png",
+	L"Resources/Sprite/UI/Gauge/BoostGauge.png",
 	nullptr)
 {
 	gauge.position = { 40.0f,835.0f };
@@ -32,6 +34,59 @@ PlayerBoostGauge::PlayerBoostGauge(): GaugeUI(L"Resources/Sprite/UI/Player/Playe
 	gaugeBack.angle = -90;
 
 	diffColor = { 1.0f,0.0f, 0.0f, 1.0f };
+}
+
+PlayerLockon::PlayerLockon(const wchar_t* filename)
+{
+	Graphics& graphics = Graphics::Instance();
+	sprite = std::make_unique<SpriteBatch>(graphics.GetDevice().Get(), filename, 1);
+
+	element.position = {};
+	element.scale = { 0.2f,0.2f };
+	element.color = { 1.0f,1.0f,1.0f,1.0f };
+	element.angle = 0.0f;
+
+	element.texpos = {};
+	element.texsize = { sprite->GetTexWidth(), sprite->GetTexHeight() };
+	element.pivot = { sprite->GetTexWidth() * 0.5f, sprite->GetTexHeight() * 0.5f };
+}
+
+void PlayerLockon::Update(float elapsed_time)
+{
+	//ロックオンしてたら表示
+	isDisplay = Camera::Instance().GetLockOn();
+
+	//距離に応じて大きさを変える
+	if (distance < minDistance)
+	{
+		//最低距離未満だった場合サイズをmaxScaleにする
+		element.scale = maxScale;
+	}
+	else if (distance >= maxDistance)
+	{
+		//最大距離以上だった場合サイズをminScaleにする
+		element.scale = minScale;
+	}
+	else
+	{
+		//現在のプレイヤーとボスの距離と最低距離から大きさを計算する
+		float calcScale = (minDistance / distance) * 0.2f;
+		element.scale = { calcScale,calcScale };
+	}
+}
+
+void PlayerLockon::Render(ID3D11DeviceContext* dc)
+{
+	//ロックオンじゃなければ表示しない
+	if (!isDisplay)return;
+
+	//--ロックオン描画--//
+	sprite->begin(dc);
+	sprite->render(dc, element.position, element.scale,
+		element.pivot, element.color, element.angle,
+		element.texpos, element.texsize);
+	sprite->end(dc);
+
 }
 
 void PlayerHpGauge::DebugGUI()
@@ -128,16 +183,94 @@ void PlayerBoostGauge::DebugGUI()
 #endif
 }
 
+void PlayerLockon::DebugGUI()
+{
+#ifdef USE_IMGUI
+	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	imguiMenuBar("UI", "Lockon", displayImgui);
+
+	if (displayImgui)
+	{
+		if (ImGui::Begin("Lockon", nullptr, ImGuiWindowFlags_None))
+		{
+			//エレメント
+			if (ImGui::CollapsingHeader("Element", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::DragFloat2("Position", &element.position.x);
+				ImGui::DragFloat2("Scale", &element.scale.x);
+				ImGui::DragFloat2("Pivot", &element.pivot.x);
+				if (ImGui::CollapsingHeader("color_picker", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::ColorPicker4("Color", &element.color.x);
+				}
+				ImGui::DragFloat("Angle", &element.angle);
+				ImGui::DragFloat2("Texpos", &element.texpos.x);
+				ImGui::DragFloat2("Texsize", &element.texsize.x);
+			}
+			if (ImGui::CollapsingHeader("Others", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::DragFloat("distance", &distance);
+			}
+		}
+		ImGui::End();
+	}
+#endif
+}
+
+void PlayerLockon::SetPosition(DirectX::XMFLOAT3 p)
+{
+	Graphics& graphics = Graphics::Instance();
+	Camera& camera = Camera::Instance();
+
+	//ビューポート
+	D3D11_VIEWPORT viewport;
+	UINT numViewports = 1;
+	graphics.Get_DC()->RSGetViewports(&numViewports, &viewport);
+
+	//変換行列
+	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&camera.GetView());
+	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&camera.GetProjection());
+	DirectX::XMMATRIX Worid = DirectX::XMMatrixIdentity();
+
+	DirectX::XMVECTOR lockPosition = DirectX::XMLoadFloat3(&p);
+	DirectX::XMVECTOR ScreenPosition =
+		DirectX::XMVector3Project(
+			lockPosition,
+			viewport.TopLeftX,
+			viewport.TopLeftY,
+			viewport.Width,
+			viewport.Height,
+			viewport.MinDepth,
+			viewport.MaxDepth,
+			Projection,
+			View,
+			Worid
+		);
+
+	DirectX::XMFLOAT3 scrPos;
+	DirectX::XMStoreFloat3(&scrPos, ScreenPosition);
+
+	//z深度の範囲が0～1だからそれ以外を省く
+	if (scrPos.z > 1.0f || scrPos.z < 0)return;
+
+	element.position.x = scrPos.x;
+	element.position.y = scrPos.y;
+}
+
 PlayerUI::PlayerUI()
 {
+	//UIの生成
 	hpGauge = std::make_unique <PlayerHpGauge>();
 	boostGauge = std::make_unique <PlayerBoostGauge>();
+	lockon = std::make_unique<PlayerLockon>(L"Resources/Sprite/UI/lockon.PNG");
 }
 
 void PlayerUI::Update(float elapsed_time)
 {
 	hpGauge->Update(elapsed_time);
 	boostGauge->Update(elapsed_time);
+	lockon->Update(elapsed_time);
 }
 
 void PlayerUI::Render()
@@ -145,11 +278,12 @@ void PlayerUI::Render()
 	Graphics& graphics = Graphics::Instance();
 	hpGauge->Render(graphics.Get_DC().Get());
 	boostGauge->Render(graphics.Get_DC().Get());
+	lockon->Render(graphics.Get_DC().Get());
 }
 
 void PlayerUI::DebugGUI()
 {
 	hpGauge->DebugGUI();
 	boostGauge->DebugGUI();
+	lockon->DebugGUI();
 }
-

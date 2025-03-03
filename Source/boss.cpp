@@ -34,8 +34,8 @@ Boss::Boss()
 	turretNode = model->find_nodes("Bone_MGun_Main");
 	doorNode = model->find_nodes("Bone_PowerDoor");
 
-	//UI 
-	//ui = std::make_unique<PlayerUI>();
+	// UIを初期化
+	ui = std::make_unique<BossUI>();
 
 	Initialize();
 
@@ -52,7 +52,7 @@ void Boss::Initialize()
 	scale.x = scale.y = scale.z = 10.0f;
 
 	//Charactorクラスのパラメーター初期化
-	charaParam = param.chara_init_param;
+	charaParam = param.charaInitParam;
 	charaParam.maxHealth = 1000;
 	lineHealth = 700;
 
@@ -68,7 +68,7 @@ void Boss::Initialize()
 
 	charaParam.moveSpeed = WALK_SPEED;
 	stateDuration = 2.0f;
-	param.run_speed = RUN_SPEED;
+	param.runSpeed = RUN_SPEED;
 	bossBodyCollision.capsule.start = position;
 	bossBodyCollision.capsule.radius = 5;
 	bossBodyCollision.height = 10;
@@ -95,9 +95,15 @@ void Boss::Update(float elapsedTime)
 	bossBodyCollision.capsule.end.y = bossBodyCollision.capsule.start.y + bossBodyCollision.height;
 
 	if (position.y < -10.0f)
+	{
 		position.y = 50.0f;
+	}
 
 	stateTimer += elapsedTime;
+
+	//-----------------UI更新-----------------//
+	ui->SetHPPercent(GetHpPercent());
+	ui->Update(elapsedTime);
 
 	DebugPrimitiveUpdate();
 }
@@ -170,9 +176,10 @@ void Boss::Render_f(float elapsedTime)
 
 }
 
-void Boss::Render_ui(float elapsedTime)
+void Boss::RenderUI(float elapsedTime)
 {
-
+	//ボスのUI
+	ui->Render();
 }
 
 void Boss::ShotBullet(ATTACK_TYPE type)
@@ -413,6 +420,7 @@ void Boss::LoadDataFile()
 void Boss::SaveDataFile()
 {
 	//ベースクラスの初期化パラメーター情報を更新
+	param.charaInitParam = charaParam;
 	// Jsonファイルから値を取得
 	std::filesystem::path path = filePath;
 	path.replace_extension(".json");
@@ -584,6 +592,10 @@ void Boss::DebugDUI()
 		}
 		ImGui::End();
 	}
+
+	//UIの描画
+	ui->DebugGUI();
+
 #endif
 }
 

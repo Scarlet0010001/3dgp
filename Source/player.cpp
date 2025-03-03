@@ -17,40 +17,46 @@
 
 Player::Player()
 {
+	//インスタンス取得
 	Graphics& graphics = Graphics::Instance();
-	//キャラクターモデル
+	//キャラクターモデルを読み込む
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
 		"Resources/Character/Player/glb/white_crow.glb", true);
 	
+	//エフェクト作成（斬撃エフェクト）
 	slashEffect = std::make_unique<Effect>("Resources/Effect/Slash/slash.efkefc");
 
+	// 効果音の読み込み
 	audios[PLAYER_SE::SE_SABER] = audio::_emplace(L"Resources/Sound/SE/saber.wav");
 	audios[PLAYER_SE::SE_LASER] = audio::_emplace(L"Resources/Sound/SE/laser.wav");
 	audios[PLAYER_SE::SE_BOOST] = audio::_emplace(L"Resources/Sound/SE/boost.wav");
 	audios[PLAYER_SE::SE_DAMAGE] = audio::_emplace(L"Resources/Sound/SE/Damage.wav");
 
+	// モデルのトランスフォームデータを累積
 	model->cumulate_transforms(model->nodes, transform);
+
+	// アニメーションノードを初期化
 	for (auto& node : animated_nodes)
 	{
 		node = model->nodes;
 	}
 	blended_animated_nodes = model->nodes;
 
-	//skill_manager = std::make_unique<SkillManager>();
-	//キャラが持つ剣
-	//sword = std::make_unique<Sword>();
-	//UI
+	// UIを初期化
 	ui = std::make_unique<PlayerUI>();
 
+	// 武器ノードの取得
 	beamSaber[LR::LEFT] = model->find_nodes("Left_wep1");
 	beamSaber[LR::RIGHT] = model->find_nodes("Right_wep1");
 	lowerArm[LR::LEFT] = model->find_nodes("lowerarm_l");
 	lowerArm[LR::RIGHT] = model->find_nodes("lowerarm_r");
 
+	// 入力デバイスの取得
 	mouse = &Device::Instance().GetMouse();
 	gamePad = &Device::Instance().GetGamePad();
 	camera = &Camera::Instance();
 
+	// 初期化処理を実行
 	Initialize();
 
 }
@@ -67,23 +73,31 @@ void Player::Initialize()
 	//Charactorクラスのパラメーター初期化
 	charaParam = param.charaInitParam;
 
-	//体力初期化
+	//当たり判定半径設定
+	collider.radius = 1.0f;
+
+	//体力を設定
 	charaParam.maxHealth = 150.0f;
 	health = charaParam.maxHealth;
+
+	// 移動速度とジャンプ回数を設定
 	stepOffset = 2.0f;
 	jumpCount = jumpLimit;
-
 	charaParam.moveSpeed = 15.0f;
 
+	// 移動速度とジャンプ回数を設定
 	TransitionIdleState();
 
+	// 被ダメージ時の処理を設定
 	damagedFunction = [=](int damage, float invincible, WINCE_TYPE type)->bool {return ApplyDamage(damage, invincible, type); };
 
+	// 攻撃時のカメラ揺れパラメータ設定
 	attackParam.cameraShake.max_X_shake = 3.0f;
 	attackParam.cameraShake.max_Y_shake = 7.0f;
 	attackParam.cameraShake.time = 0.5f;
 
-	attackParam.hitStop.time = 0.005f;
+	// ヒットストップの設定
+	attackParam.hitStop.time = 0.1f;
 }
 
 Player::~Player()
@@ -92,31 +106,40 @@ Player::~Player()
 
 void Player::Update(float elapsedTime)
 {
+	//インスタンス取得
 	Graphics& graphics = Graphics::Instance();
 
-	//滞空処理
+	//-----------------ブースト更新-----------------//
 	BoostUpdate(elapsedTime);
-	//更新処理
+
+	//-----------------ステート更新処理-----------------//
 	(this->*p_update)(elapsedTime);
 
+	//Yボタンを押すとロックオンする
 	if (gamePad->GetButtonDown() & GamePad::BTN_Y)//V
 	{
 		camera->SetLockOn();
 	}
-	if (state == STATE::WING || state == STATE::SHOT) orientation = camera->GetOrientation();
+	//飛行と射撃状態の時はカメラの姿勢を使う
+	if (state == STATE::WING || state == STATE::SHOT)
+	{
+		orientation = camera->GetOrientation();
+	}
 
 	//プレイヤーの正面情報を更新
 	forward = Math::get_posture_forward(orientation);
 	
-	//無敵時間の更新
+	//-----------------無敵時間の更新-----------------//
 	UpdateInvicibleTimer(elapsedTime);
 
+	//-----------------デバッグプリミティブ更新-----------------//
 	DebugPrimitiveUpdate();
 
+	//-----------------当たり判定カプセル更新-----------------//
 	collider.start = position;
 	collider.end = { position.x,position.y + charaParam.height, position.z };
-	collider.radius = 1.0f;
 
+	//攻撃モーションじゃない場合攻撃当たり判定オフ
 	if (state != STATE::LEFT_ATTACK && state != STATE::RIGHT_ATTACK)
 	{
 		attackParam.isAttack = false;
@@ -128,10 +151,17 @@ void Player::Update(float elapsedTime)
 		position = { 0.0f,50.0f,0.0f };
 	}
 
+	//-----------------シェーダー更新-----------------//
 	ShaderUpdate(elapsedTime);
 
+	//-----------------UI更新-----------------//
 	ui->SetHPPercent(GetHpPercent());
 	ui->SetBoostPercent(GetBoostPercent());
+	if (camera->GetLockOn())
+	{
+		ui->SetLockonPosition(bossPosition);
+		ui->SetLockonDistance(Math::calc_vector_AtoB_length(position, bossPosition));
+	}
 	ui->Update(elapsedTime);
 }
 
@@ -141,67 +171,101 @@ void Player::Render_d(float elapsedTime)
 
 void Player::Render_f(float elapsedTime)
 {
+	// グラフィックスインスタンスを取得
 	Graphics& graphics = Graphics::Instance();
 
-	//自機モデルのトランスフォーム更新
+	// 自機モデルのトランスフォームを更新（ワールド行列を計算）
 	transform = Math::calc_world_matrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
+
+	// アニメーションの遷移チェック
 	if (playerAnimation_transition != playerAnimation)
 	{
 		if (transition_state != TRANSITION_STATE::NONE)
 		{
+			// 現在の遷移アニメーションを保存
 			playerAnimation_old = playerAnimation_transition;
 			animated_nodes[ANIME_NODE::OLD_ANIMATION] = blended_animated_nodes;
 			transitionToTransition = true;
 		}
+		// 新しいアニメーションへの遷移開始
 		playerAnimation_transition = playerAnimation;
 		transition_state = TRANSITION_STATE::START;
 	}
+
+	// 現在のアニメーションがループするか判定
 	bool isLoop = FindLoopAnimation(playerAnimation);
-	//ブレンドアニメーション
+
+	// アニメーションブレンド処理
 	if (transition_state > 0 && transition_time > 0.0f)
 	{
 		switch (transition_state)
 		{
 		case TRANSITION_STATE::NONE:
 			break;
+
 		case TRANSITION_STATE::START:
 			if (!transitionToTransition)
-				model->animate(playerAnimation_old, time, animated_nodes[ANIME_NODE::OLD_ANIMATION], FindLoopAnimation(playerAnimation_old));
+			{
+				// 直前のアニメーションを設定
+				model->animate(playerAnimation_old, time, animated_nodes[ANIME_NODE::OLD_ANIMATION],
+					FindLoopAnimation(playerAnimation_old));
+			}
+			// 新しいアニメーションを0秒の状態から設定
 			model->animate(playerAnimation, 0.0f, animated_nodes[ANIME_NODE::NOW_ANIMATION], isLoop);
+
+			// 遷移ステートを「移行中」に設定
 			transition_state = TRANSITION_STATE::TRANSITION;
 			time = 0.0f;
 			factor = 0.0f;
 
 		case TRANSITION_STATE::TRANSITION:
+			// アニメーション遷移のブレンド率を計算
 			factor = time / transition_time;
-			model->blend_animations(animated_nodes[ANIME_NODE::OLD_ANIMATION], animated_nodes[ANIME_NODE::NOW_ANIMATION], factor, blended_animated_nodes);
+
+			// 旧アニメーションと新アニメーションをブレンド
+			model->blend_animations(animated_nodes[ANIME_NODE::OLD_ANIMATION],
+				animated_nodes[ANIME_NODE::NOW_ANIMATION],
+				factor, blended_animated_nodes);
+
+			// 経過時間を加算
 			time += elapsedTime;
+
+			// 遷移完了判定
 			if (factor > 1.0f)
 			{
-				 //End of transition
+				// 遷移終了処理
 				transitionToTransition = false;
 				transition_state = TRANSITION_STATE::NONE;
 				time = 0;
 			}
 			break;
 		}
+		// ブレンド後のアニメーションを描画
 		model->render(graphics.Get_DC().Get(), transform, blended_animated_nodes);
 	}
 	else
 	{
+		// 通常アニメーションの更新
 		time += elapsedTime;
+
+		// アニメーションが終了した場合の処理
 		if (model->animations.at(playerAnimation).duration < time)
 		{
 			if (isLoop)
-				time = 0;
-			else time = model->animations.at(playerAnimation).duration;
+				time = 0;  // ループする場合は最初に戻す
+			else
+				time = model->animations.at(playerAnimation).duration; // ループしない場合は最後のフレームで停止
 		}
+
+		// アニメーションを適用
 		model->animate(playerAnimation, time, animated_nodes[ANIME_NODE::NOW_ANIMATION], isLoop);
+
+		// モデルを描画
 		model->render(graphics.Get_DC().Get(), transform, animated_nodes[ANIME_NODE::NOW_ANIMATION]);
+
+		// 前回のアニメーションを更新
 		playerAnimation_old = playerAnimation;
-
 	}
-
 }
 
 void Player::Render_s(float elapsedTime)
@@ -217,6 +281,7 @@ void Player::RenderUI(float elapsed_time)
 
 void Player::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_height)
 {
+	//身体の押し出し判定
 	Collision::CylinderVsCylinder(
 		capsule_collider.start, capsule_collider.radius, collider_height,
 		position, charaParam.radius, charaParam.height, &position);
@@ -225,12 +290,15 @@ void Player::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_hei
 
 void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height, AddDamageFunc damaged_func)
 {
+	//攻撃フラグがオフなら終わる
 	if (!attackParam.isAttack) return;
 
+	//どっちの腕で攻撃するか
 	int side = 0;
 	if (state == STATE::LEFT_ATTACK) side = LR::LEFT;
 	else if (state == STATE::RIGHT_ATTACK) side = LR::RIGHT;
 
+	//攻撃時の当たり判定
 	if (Collision::SphereVsCylinder(attackCollision_position[side], 1.0f,
 		capsule_collider.start, capsule_collider.radius,collider_height))
 	{
@@ -243,8 +311,6 @@ void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 			//ヒットストップ
 			camera->SetHitStop(attackParam.hitStop);
 
-			//game_pad->set_vibration(attack_sword_param.hit_viberation.l_moter, attack_sword_param.hit_viberation.r_moter, attack_sword_param.hit_viberation.vibe_time);
-
 			//ヒットエフェクト再生
 			slashEffect->Play(attackCollision_position[side], 1.5f);
 		}
@@ -253,20 +319,20 @@ void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 
 bool Player::FindLoopAnimation(PlayerAnimation PA)
 {
-	if (PA == PlayerAnimation::PLAYER_IDLE
-		|| PA == PlayerAnimation::PLAYER_MOVE_FORWARD
-		|| PA == PlayerAnimation::PLAYER_MOVE_LEFT
-		|| PA == PlayerAnimation::PLAYER_MOVE_RIGHT
-		|| PA == PlayerAnimation::PLAYER_MOVE_BACK
-		|| PA == PlayerAnimation::PLAYER_WING
-		|| PA == PlayerAnimation::PLAYER_JUMP
-		|| PA == PlayerAnimation::PLAYER_SHOT_IDLE
-		|| PA == PlayerAnimation::PLAYER_SHOT_FORWARD
-		|| PA == PlayerAnimation::PLAYER_SHOT_LEFT
-		|| PA == PlayerAnimation::PLAYER_SHOT_RIGHT
-		|| PA == PlayerAnimation::PLAYER_SHOT_BACK
-		) return true;
-	return false;
+	//ループさせたいアニメーションじゃなかったらfalse
+	if (PA == PlayerAnimation::PLAYER_ATTACK_01
+		|| PA == PlayerAnimation::PLAYER_ATTACK_02
+		|| PA == PlayerAnimation::PLAYER_ATTACK_03
+		|| PA == PlayerAnimation::PLAYER_DAMAGE
+		|| PA == PlayerAnimation::PLAYER_DEAD
+		|| PA == PlayerAnimation::PLAYER_JUMP_START
+		|| PA == PlayerAnimation::PLAYER_JUMP_END
+		|| PA == PlayerAnimation::PLAYER_POWER_L
+		|| PA == PlayerAnimation::PLAYER_POWER_R
+		|| PA == PlayerAnimation::PLAYER_WING_START
+		|| PA == PlayerAnimation::PLAYER_WING_END
+		) return false;
+	return true;
 }
 
 void Player::Move(float vx, float vz, float speed)
@@ -275,6 +341,7 @@ void Player::Move(float vx, float vz, float speed)
 	moveVec_x = vx;
 	moveVec_z = vz;
 
+	//飛行ステートだったら最大速度を飛行用に設定
 	if (state == STATE::WING)
 	{
 		charaParam.maxMoveSpeed = param.wingSpeed;
@@ -292,7 +359,8 @@ void Player::Move(float vx, float vy, float vz, float speed)
 	moveVec_x = vx;
 	moveVec_y = vy;
 	moveVec_z = vz;
-
+	
+	//飛行ステートだったら最大速度を飛行用に設定
 	if (state == STATE::WING)
 	{
 		charaParam.maxMoveSpeed = param.wingSpeed;
@@ -306,29 +374,23 @@ void Player::Move(float vx, float vy, float vz, float speed)
 
 void Player::BoostUpdate(float elapsedTime)
 {
+	//ブーストステートじゃないかつ地面に接していたらブーストゲージを回復する
 	if (isGround && STATE::BOOST != state)
+	{
 		param.boostTimer += elapsedTime * 3.0f;
-	if (isBoost)
-		param.boostTimer -= 0.7f * elapsedTime;
-	if (param.boostTimer >= BOOST_TIMER_MAX)
-		param.boostTimer = BOOST_TIMER_MAX;
+	}
+
+	//ブースト最大設定
+	if (param.boostTimer >= BOOST_MAX)
+	{
+		param.boostTimer = BOOST_MAX;
+	}
 	
+	//ブーストゲージがなくなったら強制解除
 	if (param.boostTimer < 0 && isBoost)
 	{
 		isBoost = false;
 		TransitionJumpState();
-	}
-
-	if (state != STATE::WING
-		&& state != STATE::DAMAGE
-		&& state != STATE::DEAD
-		)
-	{
-		if (!isGround
-			&& gamePad->GetButtonDown() & GamePad::BTN_A)
-		{
-			isBoost = !isBoost;
-		}
 	}
 }
 
@@ -351,7 +413,6 @@ bool Player::InputMove(float elapsedTime, float restrictionMove, float restricti
 
 	//移動処理
 	Move(move_vec.x, move_vec.z, charaParam.moveSpeed / restrictionMove);
-	//Turn(elapsedTime, move_vec, charaParam.turnSpeed / restrictionTurn, orientation);
 	Turn(elapsedTime, camera->GetForward(), charaParam.turnSpeed / restrictionTurn, orientation);
 
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
@@ -387,48 +448,58 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
 	float ax = gamePad->GetAxis_LX();
 	float ay = gamePad->GetAxis_LY();
 
-	//コントローラーのスティック入力値が一定以下なら入力をはじく
-	//if (fabs(ax) > 0.0f && fabs(ax) < 0.5f)  ax += -1.4f * (ax * ax) + 0.5f;
-	//if (fabs(ay) > 0.0f && fabs(ay) < 0.5f)  ay += -1.4f * (ay * ay) + 0.5f;
+	// コントローラーのスティック入力値が一定以下なら入力を無効化
 	if (fabs(ax) < 0.3f)  ax = 0.0f;
 	if (fabs(ay) < 0.3f)  ay = 0.0f;
-	//カメラ右方向ベクトルをXZ単位ベクトルに変換
+
+	// カメラの前方向ベクトルを取得（XZ平面に変換）
 	float camera_forward_x = camera->GetForward().x;
-	float camera_forward_y = wing ? camera->GetForward().y : 0.0f;
+	float camera_forward_y = wing ? camera->GetForward().y : 0.0f; // "wing" が有効ならY方向も考慮
 	float camera_forward_z = camera->GetForward().z;
 
-	float camera_forward_lengh = sqrtf(camera_forward_x * camera_forward_x + camera_forward_y * camera_forward_y + camera_forward_z * camera_forward_z);
-	if (camera_forward_lengh > 0.0f)
+	// カメラの前方向ベクトルを正規化
+	float camera_forward_length = sqrtf(camera_forward_x * camera_forward_x +
+		camera_forward_y * camera_forward_y +
+		camera_forward_z * camera_forward_z);
+	if (camera_forward_length > 0.0f)
 	{
-		camera_forward_x /= camera_forward_lengh;
-		camera_forward_y /= camera_forward_lengh;
-		camera_forward_z /= camera_forward_lengh;
+		camera_forward_x /= camera_forward_length;
+		camera_forward_y /= camera_forward_length;
+		camera_forward_z /= camera_forward_length;
 	}
 
+	// カメラの右方向ベクトルを取得（XZ平面に変換）
 	float camera_right_x = camera->GetRight().x;
-	float camera_right_y = wing ? camera->GetRight().y : 0.0f;
+	float camera_right_y = wing ? camera->GetRight().y : 0.0f; // "wing" が有効ならY方向も考慮
 	float camera_right_z = camera->GetRight().z;
-	float camera_right_lengh = sqrtf(camera_right_x * camera_right_x + camera_right_y * camera_right_y + camera_right_z * camera_right_z);
 
-	if (camera_right_lengh > 0.0f)
+	// カメラの右方向ベクトルを正規化
+	float camera_right_length = sqrtf(camera_right_x * camera_right_x +
+		camera_right_y * camera_right_y +
+		camera_right_z * camera_right_z);
+	if (camera_right_length > 0.0f)
 	{
-		camera_right_x /= camera_right_lengh;
-		camera_right_y /= camera_right_lengh;
-		camera_right_z /= camera_right_lengh;
+		camera_right_x /= camera_right_length;
+		camera_right_y /= camera_right_length;
+		camera_right_z /= camera_right_length;
 	}
 
+	// 移動方向の計算（カメラの向きに基づいて移動ベクトルを作成）
 	DirectX::XMFLOAT3 vec{};
 	vec.x = (camera_forward_x * ay) + (camera_right_x * ax);
 	vec.y = (camera_forward_y * ay) + (camera_right_y * ax);
 	vec.z = (camera_forward_z * ay) + (camera_right_z * ax);
+
+	// 移動ベクトルを正規化
 	DirectX::XMVECTOR v = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&vec));
 	DirectX::XMStoreFloat3(&vec, v);
+
 	return vec;
 }
 
 void Player::ShaderUpdate(float elapsedTime)
 {
-	//ラジアルブラー
+	//ラジアルブラータイマーがオフの場合
 	if (player_radialBlur_constant.blurStrength <= 0 
 		|| radialTimer <= 0) {
 		player_radialBlur_constant.blurStrength = 0.0f;
@@ -436,13 +507,13 @@ void Player::ShaderUpdate(float elapsedTime)
 	}
 	else
 	{
-		//飛行モードの時
+		//飛行モード時
 		if (state == STATE::WING)
 		{
 			player_radialBlur_constant.blurStrength -= elapsedTime;
 			player_radialBlur_constant.blurRadius -= elapsedTime;
 		}
-		//ブーストの時
+		//ブースト時
 		else
 		{
 			float factor = radialTimer / player_radialBlur_constant.blurTimer;
@@ -467,7 +538,6 @@ void Player::ShaderUpdate(float elapsedTime)
 	//平常時
 	else
 	{
-		//player_glitch_CA_constant.time = 0.0f;
 		player_glitch_CA_constant.center = { 0.5f,0.5f };
 		player_glitch_CA_constant.brightness = 0.0f;
 		player_glitch_CA_constant.density = 0.0f;
@@ -487,16 +557,19 @@ void Player::ShaderUpdate(float elapsedTime)
 
 void Player::InputJump()
 {
-	if (gamePad->GetButtonDown() & GamePad::BTN_A
-		) //スペースを押したらジャンプ
+	//スペースを押したらジャンプ
+	if (gamePad->GetButtonDown() & GamePad::BTN_A)
 	{
+		//ジャンプ回数が最大になったらジャンプしない
 		if (jumpCount < jumpLimit)
 		{
 			{
 				TransitionJumpState();
 				Jump(param.jumpSpeed);
 			}
-			isGround = false;//ジャンプしても地面についているというありえない状況を回避するため
+
+			//ジャンプしても地面についているというありえない状況を回避するため
+			isGround = false;
 
 			++jumpCount;
 		}
@@ -505,7 +578,10 @@ void Player::InputJump()
 
 void Player::InputAvoidance()
 {
+	//ブースト量が25%以下だと出来ない
 	if (param.boostTimer < 2.5f)return;
+
+	//右トリガーを押したら回避
 	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_SHOULDER)
 	{
 		TransitionAvoidanceState();
@@ -515,7 +591,8 @@ void Player::InputAvoidance()
 
 void Player::InputWing()
 {
-	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)//Q
+	//Xボタン押すと飛行モードになる
+	if (gamePad->GetButtonDown() & GamePad::BTN_X)
 	{
 		TransitionWingState();
 	}
@@ -523,31 +600,46 @@ void Player::InputWing()
 
 void Player::InputShot()
 {
+	// 弾管理クラスのインスタンス取得
 	BulletManager& bulletManager = BulletManager::Instance();
 
+	// 剣（ビームサーベル）の位置をアニメーションのボーン情報から取得
 	model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
 	model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
 
-	DirectX::XMFLOAT3 dir{};
-	DirectX::XMFLOAT3 pos{};
+	DirectX::XMFLOAT3 dir{}; // 発射方向
+	DirectX::XMFLOAT3 pos{}; // 発射位置
 
-	//発射位置(プレイヤーの腰あたり)
+	// 発射位置の決定（プレイヤーの腰あたりのビームサーベル位置）
 	if (playerAnimation == PlayerAnimation::PLAYER_SHOT_RIGHT
 		|| playerAnimation == PlayerAnimation::PLAYER_SHOT_BACK)
+	{
+		// 右手側のビームサーベル位置
 		pos = beamSaber_position[LR::RIGHT];
-	else pos = beamSaber_position[LR::LEFT];
-	//ロックオンしていなかったらカメラの前方方向に発射
+	}
+	else
+	{
+		// 左手側のビームサーベル位置
+		pos = beamSaber_position[LR::LEFT];
+	}
+
+	// ロックオンしていなかったらカメラの前方方向に発射
 	if (!camera->GetLockOn())
 	{
-		//前方向
+		// プレイヤーの向いている方向を取得
 		dir = Math::get_posture_forward(transform);
 	}
 	else
 	{
+		// ロックオン対象（ボス）に向かう方向を計算
 		dir = Math::calc_vector_AtoB_normalize(pos, bossPosition);
 	}
+
+	// 直線弾（BulletStraight）の生成
 	BulletStraight* bullet =
 		new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Player);
+
+	// 弾を発射
 	bullet->Launch(dir, pos);
 
 	//射撃音
@@ -557,30 +649,35 @@ void Player::InputShot()
 
 void Player::OnLanding()
 {
+	// ジャンプ回数をリセット（地面に着地したと判断）
 	jumpCount = 0;
-	//transition_landing_state();
-	if (velocity.y < gravity * 30.0f)// 坂道歩いているときは遷移しない程度に調整
+
+	// 落下速度が一定以上なら着地ステートへ遷移
+	// 坂道を歩いているときに不要な遷移が起こらないように調整
+	if (velocity.y < gravity * LANDING_SPEED)
 	{
 		// 着地ステートへ遷移
 		TransitionLandingState();
+
+		// 速度をゼロにリセット（着地したため）
 		velocity = { 0,0,0 };
 	}
 	else
 	{
-		if (state != STATE::SHOT 
+		// 攻撃やダメージ状態でなければ、待機ステート（Idle）へ遷移
+		if (state != STATE::SHOT
 			&& state != STATE::LEFT_ATTACK
 			&& state != STATE::RIGHT_ATTACK
-			&& state != STATE::DAMAGE
-			)
+			&& state != STATE::DAMAGE)
+		{
 			TransitionIdleState();
+		}
 	}
-
 }
 
 void Player::OnDead()
 {
 	TransitionDeadState();
-
 }
 
 void Player::OnDamaged(WINCE_TYPE type)
@@ -796,13 +893,6 @@ void Player::DebugGUI()
 				ImGui::DragFloat("control_y", &control_y);
 
 			}
-			//if (ImGui::CollapsingHeader("AttackCameraShake", ImGuiTreeNodeFlags_DefaultOpen))
-			//{
-			//	if (ImGui::Button("set_vibration"))
-			//	{
-			//		gamePad->SetVibration(1, 1, 0.5);
-			//
-			//	}
 			if (ImGui::Button("load"))
 			{
 				LoadDataFile();
@@ -826,9 +916,9 @@ void Player::DebugGUI()
 
 				ImGui::Text("hit_stop");
 				ImGui::DragFloat("combo1_stop_time", &param.combo_1.hitStop.time, 0.1f);
-				//ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
-				//ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
-				//ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
+				ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
+				ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
+				ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
 			}
 			if (ImGui::CollapsingHeader("combo2"))
 			{
@@ -842,9 +932,9 @@ void Player::DebugGUI()
 				ImGui::DragFloat("combo2_smmoth", &param.combo_2.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
 				ImGui::Text("hit_stop");
 				ImGui::DragFloat("combo2_stop_time", &param.combo_2.hitStop.time, 0.1f);
-				//ImGui::DragFloat("combo2_hit_viberation.l_moter", &param.combo_2.hitViberation.L_moter, 0.1f);
-				//ImGui::DragFloat("combo2_hit_viberation.r_moter", &param.combo_2.hitViberation.R_moter, 0.1f);
-				//ImGui::DragFloat("combo2_vibe_time", &param.combo_2.hitViberation.VibeTime, 0.1f);
+				ImGui::DragFloat("combo2_hit_viberation.l_moter", &param.combo_2.hitViberation.L_moter, 0.1f);
+				ImGui::DragFloat("combo2_hit_viberation.r_moter", &param.combo_2.hitViberation.R_moter, 0.1f);
+				ImGui::DragFloat("combo2_vibe_time", &param.combo_2.hitViberation.VibeTime, 0.1f);
 			}
 
 			if (ImGui::CollapsingHeader("combo3"))
@@ -859,9 +949,9 @@ void Player::DebugGUI()
 				ImGui::DragFloat("combo3_smmoth", &param.combo_3.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
 				ImGui::Text("hit_stop");
 				ImGui::DragFloat("combo3_stop_time", &param.combo_3.hitStop.time, 0.1f);
-				//ImGui::DragFloat("combo3_hit_viberation.l_moter", &param.combo_3.hitViberation.L_moter, 0.1f);
-				//ImGui::DragFloat("combo3_hit_viberation.r_moter", &param.combo_3.hitViberation.R_moter, 0.1f);
-				//ImGui::DragFloat("combo3_vibe_time", &param.combo_3.hitViberation.VibeTime, 0.1f);
+				ImGui::DragFloat("combo3_hit_viberation.l_moter", &param.combo_3.hitViberation.L_moter, 0.1f);
+				ImGui::DragFloat("combo3_hit_viberation.r_moter", &param.combo_3.hitViberation.R_moter, 0.1f);
+				ImGui::DragFloat("combo3_vibe_time", &param.combo_3.hitViberation.VibeTime, 0.1f);
 			}
 
 			if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
@@ -898,6 +988,7 @@ void Player::DebugGUI()
 
 	}
 
+	//UIの描画
 	ui->DebugGUI();
 #endif // USE_IMGUI
 

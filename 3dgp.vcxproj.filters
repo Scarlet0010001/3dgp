@@ -312,6 +312,9 @@
     <ClCompile Include="Source\effect.cpp">
       <Filter>Sources\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Boss_UI.cpp">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\inline.h">
@@ -529,6 +532,9 @@
     </ClInclude>
     <ClInclude Include="Source\effect.h">
       <Filter>Sources\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Boss_UI.h">
+      <Filter>Sources\Character\Boss</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

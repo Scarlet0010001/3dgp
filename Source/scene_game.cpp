@@ -240,7 +240,6 @@ void SceneGame::Render(float elapsedTime)
         //***************************************************************//
         ///						フォワードレンダリング					///
         //***************************************************************//
-        //graphics.ShaderActivate(Graphics::SHADER_TYPES::LAMBERT, RENDER_TYPE::Forward);
         graphics.SetGraphicStatePriset(
             ST_DEPTH::DepthON_WriteON,
             ST_BLEND::ALPHA,
@@ -306,6 +305,7 @@ void SceneGame::Render(float elapsedTime)
 
     //---------------------------UI----------------------------//
     player->RenderUI(elapsedTime);
+    boss->RenderUI(elapsedTime);
 
     //ImGui描画
 #if USE_IMGUI
@@ -373,14 +373,19 @@ void SceneGame::Render(float elapsedTime)
 
 void SceneGame::JudgeCollision()
 {
+    //ボスの攻撃当たり判定
     boss->CalcAttack_vs_Player(player->collider, player->GetHeight(), 
         player->damagedFunction);
 
+    //プレイヤーとボスの当たり判定
     player->CalcCollision_vs_Enemy(boss->GetBodyCollision().capsule,
         boss->GetBodyCollision().height);
+
+    //プレイヤーの攻撃当たり判定
     player->CalcAttack_vs_Enemy(boss->GetBodyCollision().capsule,
         boss->GetBodyCollision().height, boss->damagedFunction);
 
+    //弾丸の当たり判定
     BulletManager::Instance().CollisionBullet(player.get(), boss.get());
 }
 
