@@ -279,24 +279,6 @@ void SceneGame::Render(float elapsedTime)
         framebuffers[2]->activate(graphics.Get_DC().Get());
         radialBlur->Blit(graphics.Get_DC().Get(), framebuffers[1]->get_color_map().GetAddressOf());
 
-        // ƒQ[ƒ€‚ÌI—¹ŽžAŸ”s‚Ì•\Ž¦ˆ—
-        if (isEnd)
-        {
-            if (boss->GetIsDead())
-            {
-                spriteVictory->begin(graphics.Get_DC().Get());
-                spriteVictory->render(graphics.Get_DC().Get(),
-                    { 350,350 }, { 0.7f, 0.7f }, { 0.8f,0.8f,1.0f,1.0f }, 0);
-                spriteVictory->end(graphics.Get_DC().Get());
-            }
-            else
-            {
-                spriteLose->begin(graphics.Get_DC().Get());
-                spriteLose->render(graphics.Get_DC().Get(),
-                    { 500,350 }, { 0.7f, 0.7f }, { 1.0f,0,1,1.0f }, 0);
-                spriteLose->end(graphics.Get_DC().Get());
-            }
-        }
         framebuffers[2]->deactivate(graphics.Get_DC().Get());
     }
 
@@ -306,6 +288,25 @@ void SceneGame::Render(float elapsedTime)
     //---------------------------UI----------------------------//
     player->RenderUI(elapsedTime);
     boss->RenderUI(elapsedTime);
+
+    // ƒQ[ƒ€‚ÌI—¹ŽžAŸ”s‚Ì•\Ž¦ˆ—
+    if (isEnd)
+    {
+        if (boss->GetIsDead())
+        {
+            spriteVictory->begin(graphics.Get_DC().Get());
+            spriteVictory->render(graphics.Get_DC().Get(),
+                { 350,350 }, { 0.7f, 0.7f }, { 0.8f,0.8f,1.0f,1.0f }, 0);
+            spriteVictory->end(graphics.Get_DC().Get());
+        }
+        else
+        {
+            spriteLose->begin(graphics.Get_DC().Get());
+            spriteLose->render(graphics.Get_DC().Get(),
+                { 500,350 }, { 0.7f, 0.7f }, { 1.0f,0,1,1.0f }, 0);
+            spriteLose->end(graphics.Get_DC().Get());
+        }
+    }
 
     //ImGui•`‰æ
 #if USE_IMGUI

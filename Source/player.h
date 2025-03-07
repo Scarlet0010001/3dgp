@@ -103,7 +103,7 @@ private:
 		PLAYER_DAMAGE,						//被弾
 		PLAYER_DEAD,							//死亡
 
-		PLAYER_ANIME_COUNT,			//アニメーションの個数
+		PLAYER_ANIME_COUNT,			//アニメーションの総数
 	};
 
 	//アニメーションの現在の状態
@@ -156,7 +156,7 @@ private:
 		//コンボ3のパラメーター
 		AttackParam combo_3;
 
-
+		//シリアライズ
 		template<class Archive>
 		void serialize(Archive& archive)
 		{
@@ -181,15 +181,18 @@ private:
 	void TransitionIdleState();							//待機
 	void TransitionMoveState();						//走り
 	void TransitionWingState();						//飛行
+
 	void TransitionAvoidanceState();				//回避
 	void TransitionJumpState();						//ジャンプ
 	void TransitionLandingState();					//着地
+
 	void TransitionShotState();						//射撃
 	void TransitionCombo_01_01_State();		//近接コンボ１
 	void TransitionCombo_01_02_State();		//近接コンボ２
 	void TransitionCombo_01_03_State();		//近接コンボ３
 	void TransitionCombo_PowerL_State();	//強攻撃左
 	void TransitionCombo_PowerR_State();	//強攻撃右
+
 	void TransitionDamageState();					//ダメージ
 	void TransitionDeadState();						//死亡
 
@@ -198,15 +201,18 @@ private:
 	void UpdateIdleState(float elapsedTime);							//待機
 	void UpdateMoveState(float elapsedTime);						//走り
 	void UpdateWingState(float elapsedTime);							//飛行
+
 	void UpdateAvoidanceState(float elapsedTime);				//回避
 	void UpdateJumpState(float elapsedTime);						//ジャンプ
 	void UpdateLandingState(float elapsedTime);					//着地
+
 	void UpdateShotState(float elapsedTime);							//射撃
 	void UpdateCombo_01_01_State(float elapsedTime);		//近接コンボ１
 	void UpdateCombo_01_02_State(float elapsedTime);		//近接コンボ２
 	void UpdateCombo_01_03_State(float elapsedTime);		//近接コンボ３
 	void UpdateCombo_PowerL_State(float elapsedTime);		//強攻撃左
 	void UpdateCombo_PowerR_State(float elapsedTime);	//強攻撃右
+
 	void UpdateDamageState(float elapsedTime);					//ダメージ
 	void UpdateDeadState(float elapsedTime);							//死亡
 
@@ -316,9 +322,9 @@ private:
 	//左手右手
 	enum LR
 	{
-		LEFT,
-		RIGHT,
-		COUNT,
+		LEFT,		//左手
+		RIGHT,	//右手
+		COUNT,	//総数
 	};
 	//当たり判定ノード
 	gltf_model::node beamSaber[LR::COUNT];	//サーベルの先端
@@ -334,10 +340,10 @@ private:
 	//加速度状態
 	enum ACCELERATION_STATE
 	{
-		MOVE,					//走り
-		AVOIDANCE,		//ブースト
-		WING,					//飛行
-		ACCELERATION_COUNT,
+		MOVE,									//走り
+		AVOIDANCE,						//ブースト
+		WING,									//飛行
+		ACCELERATION_COUNT,	//総数
 	};
 	float accelerationState[ACCELERATION_STATE::ACCELERATION_COUNT]{
 		1.5f,				//走り

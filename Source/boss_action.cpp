@@ -56,15 +56,6 @@ void Boss::TransitionAttack_ShotStraight_State()
 	stateDuration = RAPIDFIRE_TIME;
 }
 
-void Boss::TransitionAttack_ShotHoming_State()
-{
-	act_update = &Boss::UpdateAttack_ShotHoming_State;
-	state = STATE::SHOT_H;
-	bossAnimation = BossAnimation::BOSS_MISSILE;
-	stateTimer = 0;
-	stateDuration = 3.0f;
-}
-
 void Boss::TransitionDamageState()
 {
 	act_update = &Boss::UpdateDamageState;
@@ -252,21 +243,6 @@ void Boss::UpdateAttack_ShotStraight_State(float elapsedTime)
 		charaParam.moveSpeed = WALK_SPEED;
 		charaParam.maxMoveSpeed = WALK_SPEED;
 		charaParam.acceleration = ACCELERATION_NORMAL_SPEED;
-	}
-
-	//速度更新
-	UpdateVelocity(elapsedTime, position);
-}
-
-void Boss::UpdateAttack_ShotHoming_State(float elapsedTime)
-{
-	ShotBullet(ATTACK_TYPE::SHOT_H);
-	TransitionIdleState();
-	if (model->GetIsEndAnimation())
-	{
-		TransitionIdleState();
-		stateDuration = NORMAL_ATTACK_COOLTIME;
-
 	}
 
 	//速度更新
