@@ -27,10 +27,10 @@ void BossHpGauge::DebugGUI()
 
 	if (displayImgui)
 	{
-		if (ImGui::Begin("HPGauge", nullptr, ImGuiWindowFlags_None))
+		if (ImGui::Begin("BossHPGauge", nullptr, ImGuiWindowFlags_None))
 		{
 			//ÉGÉåÉÅÉìÉg
-			if (ImGui::CollapsingHeader("Gauge", ImGuiTreeNodeFlags_DefaultOpen))
+			if (ImGui::CollapsingHeader("BossGauge", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::DragFloat2("Position", &gauge.position.x);
 				ImGui::DragFloat2("Scale", &gauge.scale.x);
@@ -43,7 +43,7 @@ void BossHpGauge::DebugGUI()
 				ImGui::DragFloat2("Texpos", &gauge.texpos.x);
 				ImGui::DragFloat2("Texsize", &gauge.texsize.x);
 			}
-			if (ImGui::CollapsingHeader("GaugeBack", ImGuiTreeNodeFlags_DefaultOpen))
+			if (ImGui::CollapsingHeader("BossGaugeBack", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::DragFloat2("BackPosition", &gaugeBack.position.x);
 				ImGui::DragFloat2("BackScale", &gaugeBack.scale.x);

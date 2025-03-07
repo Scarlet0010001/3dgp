@@ -19,6 +19,7 @@ private:
 	// 
 	//==============================================================
 
+	//アニメーション
 	enum  BossAnimation
 	{
 		BOSS_IDLE,
@@ -32,6 +33,8 @@ private:
 		BOSS_CHARGE,
 		BOSS_ANIME_COUNT,
 	};
+
+	//ステート
 	enum class STATE
 	{
 		IDLE,
@@ -45,6 +48,8 @@ private:
 		WAKEUP,
 		CHARGE,
 	};
+
+	//攻撃属性
 	enum class ATTACK_TYPE
 	{
 		TACKLE,
@@ -54,6 +59,7 @@ private:
 		MAX_COUNT
 	};
 
+	//ボスパラメータ
 	struct BossParam
 	{
 		//基底クラスのパラメーター
@@ -65,6 +71,7 @@ private:
 		//踏みつけ攻撃のパラメーター
 		AttackParam stompParam;
 
+		//シリアライズ
 		template<class Archive>
 		void serialize(Archive& archive)
 		{
@@ -78,6 +85,7 @@ private:
 	};
 
 public:
+	//ボスの当たり判定
 	struct BodyCollision
 	{
 		Capsule capsule;
@@ -94,7 +102,9 @@ public:
 	// 
 	//==============================================================
 
+	//コンストラクタ
 	Boss();
+	//デストラクタ
 	~Boss() {};
 
 	//初期化
@@ -122,6 +132,8 @@ public:
 
 	//攻撃対象の位置を取得
 	void SetLocationOfAttackTarget(DirectX::XMFLOAT3 target) { target_pos = target; }
+	
+	//攻撃対象の高さを取得
 	void SetAttackTarget_height(float target) { targetPoint_height = target; }
 
 	BodyCollision GetBodyCollision() { return bossBodyCollision; }

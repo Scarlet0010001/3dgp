@@ -22,14 +22,7 @@ void BulletManager::Initialize()
     LoadDataFile(Bullet::BULLET_MASTER::Player);
     LoadDataFile(Bullet::BULLET_MASTER::Enemy);
 
-    //P_param.attackParam.power = 10.0f;
-    //P_param.attackParam.invinsibleTime = 0.4f;
-    //
-    //E_param.attackParam.power = 10.0f;
-    //E_param.attackParam.invinsibleTime = 0.3f;
-    //E_param.attackParam.cameraShake.max_X_shake = 7.0f;
-    //E_param.attackParam.cameraShake.max_Y_shake = 10.0f;
-    //E_param.attackParam.cameraShake.time = 0.5f;
+    hitEffect = std::make_unique<Effect>("Resources/Effect/Hit/hit.efkefc");
 }
 
 void BulletManager::Update(float elapsedTime)
@@ -122,7 +115,9 @@ void BulletManager::Clear()
 
 void BulletManager::CollisionBullet(Player* player, Boss*boss)
 {
+    //インスタンス取得
     Camera& camera = Camera::Instance();
+
 
     size_t bulletCount = bullets.size();
     for (int i = 0; i < bulletCount; i++)
@@ -139,7 +134,7 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
                 bulletB->GetPosition(),
                 bulletB->GetRadius()))
             {
-                //miniexplosion->Play(projectileA->GetPosition());
+                //弾をどちらも削除
                 bulletA->Destroy();
                 bulletB->Destroy();
             }
@@ -163,12 +158,6 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
 
                 //ヒットストップ
                 camera.SetHitStop(attackParam.hitStop);
-
-                //game_pad->set_vibration(attack_sword_param.hit_viberation.l_moter, attack_sword_param.hit_viberation.r_moter, attack_sword_param.hit_viberation.vibe_time);
-
-                //ヒットエフェクト再生
-
-
             }
             bulletA->Destroy();
         }
@@ -191,6 +180,9 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
 
                 //ヒットストップ
                 camera.SetHitStop(attackParam.hitStop);
+
+                //ヒットエフェクト再生
+                hitEffect->Play(bulletA->GetPosition());
 
             }
             bulletA->Destroy();

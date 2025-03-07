@@ -3,6 +3,9 @@
 #include "bullet.h"
 #include "player.h"
 #include "Boss.h"
+
+#include "effect.h"
+
 #include <set>
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
@@ -158,8 +161,10 @@ private:
     BulletParam P_param;
     BulletParam E_param;
 
-
     Bullet* setting{};
+
+    //ヒットエフェクト
+    std::unique_ptr<Effect> hitEffect = nullptr;
 
     //--------------ImGui--------------//
     bool displayPlayerImgui = false;

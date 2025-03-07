@@ -98,10 +98,10 @@ void PlayerHpGauge::DebugGUI()
 
 	if (displayImgui)
 	{
-		if (ImGui::Begin("HPGauge", nullptr, ImGuiWindowFlags_None))
+		if (ImGui::Begin("PlayerHPGauge", nullptr, ImGuiWindowFlags_None))
 		{
 			//ÉGÉåÉÅÉìÉg
-			if (ImGui::CollapsingHeader("Gauge", ImGuiTreeNodeFlags_DefaultOpen))
+			if (ImGui::CollapsingHeader("PlayerGauge", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::DragFloat2("Position", &gauge.position.x);
 				ImGui::DragFloat2("Scale", &gauge.scale.x);
@@ -114,7 +114,8 @@ void PlayerHpGauge::DebugGUI()
 				ImGui::DragFloat2("Texpos", &gauge.texpos.x);
 				ImGui::DragFloat2("Texsize", &gauge.texsize.x);
 			}
-			if (ImGui::CollapsingHeader("GaugeBack", ImGuiTreeNodeFlags_DefaultOpen))
+
+			if (ImGui::CollapsingHeader("PlayerGaugeBack", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::DragFloat2("BackPosition", &gaugeBack.position.x);
 				ImGui::DragFloat2("BackScale", &gaugeBack.scale.x);
