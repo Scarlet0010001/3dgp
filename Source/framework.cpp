@@ -16,7 +16,7 @@ framework::framework(HWND hwnd) : hwnd(hwnd)
 bool framework::Initialize()
 {
 	Graphics::Instance().Initialize(hwnd);
-	Device::Instance().GetMouse().Set_do_show(true);
+	Device::Instance().GetMouse().Set_do_show(false);
 	SceneManager::Instance().ChangeScene(new SceneTitle());
 
 	// エフェクトマネージャー初期化
@@ -49,11 +49,12 @@ void framework::Update(float elapsedTime/*Elapsed seconds from last frame*/)
 	SceneManager::Instance().Update(elapsedTime);
 	Graphics::Instance().DebugGui();
 
-	//カーソル表示切り替え
+	//デバッグモード切り替え
 	if (device.GetMouse().GetButton() & device.GetMouse().BTN_F2)
 	{
-		isShowCursor = !isShowCursor;
-		device.GetMouse().Set_do_show(isShowCursor);
+		isDebug = !isDebug;
+		device.GetMouse().Set_do_show(isDebug);
+		//Graphics::Instance().SetisDisplayDebug(isDebug);
 	}
 
 #ifdef USE_IMGUI

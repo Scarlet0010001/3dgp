@@ -1,8 +1,6 @@
 #pragma once
 #include <d3d11.h>
 #include <wrl.h>
-//#include <string>
-//#include<map>
 #include "misc.h"
 #include <memory>
 

@@ -302,13 +302,3 @@ void Graphics::SetGraphicStatePriset(DEPTH_STATE z_stencil, BLEND_STATE blend, R
 
 }
 
-void Graphics::ShaderActivate(SHADER_TYPES sh, RENDER_TYPE rt)
-{
-	////指定したシェーダーに切り替える
-	//shader = shaders.at(sh);
-	////シェーダーをアクティブ状態に
-	////shader->active(immediate_context.Get());
-	//if (shaders.at(sh))
-	//	shaders.at(sh)->active(immediate_context.Get(), rt);
-
-}

@@ -8,7 +8,10 @@
 #include <mutex>
 #include "misc.h"
 #include "debug_renderer.h"
-#include "mesh_shader.h"
+#include "shader.h"
+#include "constant.h"
+#include "gltf_model.h"
+
 
 #if _DEBUG
 CONST LONG SCREEN_WIDTH{ 1920 };
@@ -25,7 +28,6 @@ CONST BOOL FULLSCREEN{ FALSE };
 #define ST_BLEND Graphics::BLEND_STATE
 #define ST_RASTERIZER Graphics::RASTERIZER_STATE
 #define SHADER_TYPE Graphics::SHADER_TYPES
-#define RENDER_TYPE MeshShader::RenderType
 
 class Graphics
 {
@@ -150,6 +152,10 @@ public:
     Microsoft::WRL::ComPtr<ID3D11RasterizerState> GetRasterizerRtate(RASTERIZER_STATE r) { return rasterizerStates[static_cast<int>(r)]; }
     Microsoft::WRL::ComPtr<ID3D11BlendState> GetBlendState(BLEND_STATE b) { return blendStates[static_cast<int>(b)]; }
 
+    //Imgui等のデバッグ切り替え
+    bool GetisDisplayDebug() { return isDisplayDebug; }
+    void SetisDisplayDebug(bool is) { isDisplayDebug = is; }
+
     // デバッグレンダラ取得
     DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
 
@@ -175,7 +181,6 @@ private:
     std::unique_ptr<DebugRenderer> debugRenderer;
 
     //--maps--//
-    //std::map<SHADER_TYPES, std::shared_ptr<MeshShader>> shaders;
 
 public:
     //std::shared_ptr<MeshShader> shader = nullptr;
@@ -183,7 +188,6 @@ public:
     void SetBlendState(BLEND_STATE blend);
     void SetRasterizerState(RASTERIZER_STATE rasterizer);
     void SetGraphicStatePriset(DEPTH_STATE z_stencil, BLEND_STATE blend, RASTERIZER_STATE rasterizer);
-    void ShaderActivate(SHADER_TYPES sh, RENDER_TYPE rt);
 
     inline void SetHwnd(HWND hwnd) { this->hwnd = hwnd; }
     inline HWND GetHwnd()const { return this->hwnd; }
@@ -193,8 +197,10 @@ public:
     //BOOL get_file_name(HWND hWnd, TCHAR* fname, int sz, TCHAR* initDir);
     //bool recompile_pixel_shader(ID3D11PixelShader** pixel_shader, std::string id);
 private:
-    std::
-        mutex mutex_;
+    std::mutex mutex_;
+
+    //Imgui等のデバッグ切り替えフラグ
+    bool isDisplayDebug = false;
 
     HWND hwnd;
 

@@ -96,7 +96,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[8];
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
 
-	bool isShowCursor = false;
+	bool isDebug = false;
 
 private:
 	high_resolution_timer tictoc;

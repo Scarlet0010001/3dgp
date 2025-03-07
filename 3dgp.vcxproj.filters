@@ -88,15 +88,6 @@
     <Filter Include="Shaders\gaussian_blur">
       <UniqueIdentifier>{a4b38cfd-7ead-446a-8970-915b1a8d2ce3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\grass">
-      <UniqueIdentifier>{28da763f-ec99-4163-bdf4-b44469e96e6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\husk_particles">
-      <UniqueIdentifier>{3e3165f3-89f2-4dc4-af5f-e0d322395f5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\snowfall_particles">
-      <UniqueIdentifier>{d0f857ff-448f-4a17-bfa2-0eb756215d04}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shaders\sprite">
       <UniqueIdentifier>{ec012e71-296e-427b-8d63-c9c49b124af6}</UniqueIdentifier>
     </Filter>
@@ -207,9 +198,6 @@
     <ClCompile Include="Source\scene_title.cpp">
       <Filter>Sources\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\mesh_shader.cpp">
-      <Filter>Sources\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\shader.cpp">
       <Filter>Sources\Shader</Filter>
     </ClCompile>
@@ -233,18 +221,6 @@
     </ClCompile>
     <ClCompile Include="Source\audio.cpp">
       <Filter>Sources\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\bloom.cpp">
-      <Filter>Sources\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\husk_particles.cpp">
-      <Filter>Sources\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\snowfall_particles.cpp">
-      <Filter>Sources\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\cascaded_shadow_map.cpp">
-      <Filter>Sources\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Source\gltf_model.cpp">
       <Filter>Sources\Model</Filter>
@@ -416,9 +392,6 @@
     <ClInclude Include="Source\scene_title.h">
       <Filter>Sources\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\mesh_shader.h">
-      <Filter>Sources\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Source\shader.h">
       <Filter>Sources\Shader</Filter>
     </ClInclude>
@@ -445,18 +418,6 @@
     </ClInclude>
     <ClInclude Include="Source\audio.h">
       <Filter>Sources\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\bloom.h">
-      <Filter>Sources\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\husk_particles.h">
-      <Filter>Sources\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\snowfall_particles.h">
-      <Filter>Sources\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\cascaded_shadow_map.h">
-      <Filter>Sources\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\par_shapes.h">
       <Filter>Sources\Collision</Filter>
@@ -541,16 +502,10 @@
     <FxCompile Include="HLSL\blur_ps.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\disco_tunnel_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="HLSL\glow_extraction_ps.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\luminance_extraction_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\post_effect_ps.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\resolve_depth_stencil_ps.hlsl">
@@ -619,48 +574,6 @@
     <FxCompile Include="HLSL\gaussian_blur_vertical_ps.hlsl">
       <Filter>Shaders\gaussian_blur</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\grass_ds.hlsl">
-      <Filter>Shaders\grass</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\grass_gs.hlsl">
-      <Filter>Shaders\grass</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\grass_hs.hlsl">
-      <Filter>Shaders\grass</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\grass_ps.hlsl">
-      <Filter>Shaders\grass</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\grass_vs.hlsl">
-      <Filter>Shaders\grass</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\husk_particles_copy_buffer_cs.hlsl">
-      <Filter>Shaders\husk_particles</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\husk_particles_cs.hlsl">
-      <Filter>Shaders\husk_particles</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\husk_particles_gs.hlsl">
-      <Filter>Shaders\husk_particles</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\husk_particles_ps.hlsl">
-      <Filter>Shaders\husk_particles</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\husk_particles_vs.hlsl">
-      <Filter>Shaders\husk_particles</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\snowfall_particles_cs.hlsl">
-      <Filter>Shaders\snowfall_particles</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\snowfall_particles_gs.hlsl">
-      <Filter>Shaders\snowfall_particles</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\snowfall_particles_ps.hlsl">
-      <Filter>Shaders\snowfall_particles</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\snowfall_particles_vs.hlsl">
-      <Filter>Shaders\snowfall_particles</Filter>
-    </FxCompile>
     <FxCompile Include="HLSL\sprite_ps.hlsl">
       <Filter>Shaders\sprite</Filter>
     </FxCompile>
@@ -713,15 +626,6 @@
     </None>
     <None Include="HLSL\constant_buffer.hlsli">
       <Filter>Shaders\Constant</Filter>
-    </None>
-    <None Include="HLSL\grass.hlsli">
-      <Filter>Shaders\grass</Filter>
-    </None>
-    <None Include="HLSL\husk_particles.hlsli">
-      <Filter>Shaders\husk_particles</Filter>
-    </None>
-    <None Include="HLSL\snowfall_particles.hlsli">
-      <Filter>Shaders\snowfall_particles</Filter>
     </None>
     <None Include="HLSL\sprite.hlsli">
       <Filter>Shaders\sprite</Filter>

@@ -32,15 +32,6 @@ public:
     //キャラクターの当たり判定
     void JudgeCollision();
 
-    //クリ時の更新
-    //void ClearUpdate(float elapsedTime);
-
-    //デバッグ描画
-    void DebugGui();
-
-    //シーンリセット
-    void SceneReset();
-
 private:
 
     //カメラ

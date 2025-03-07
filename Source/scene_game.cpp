@@ -308,64 +308,69 @@ void SceneGame::Render(float elapsedTime)
         }
     }
 
-    //ImGui描画
-#if USE_IMGUI
-//#if 0
-    stageManager.DebugGUI();
-    camera->DebugGui();
-    player->DebugGUI();
-    boss->DebugDUI();
-    bulletManager.DebugGUI();
-    radialBlur->DebugGUI();
-    glitch_CA->DebugGUI();
-    LightManager::Instance().DebugGUI();
+#if _DEBUG
+    {
 
-    imguiMenuBar("Game", "game_menu", displayImgui);
-    if (displayImgui)
-    {
-        if (ImGui::Button("back_title"))
-        {
-            //シーンリセット
-            SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle()));
-            return;
-        };
-    }
+    #if USE_IMGUI
+        //ImGui描画
+        stageManager.DebugGUI();
+        camera->DebugGui();
+        player->DebugGUI();
+        boss->DebugDUI();
+        bulletManager.DebugGUI();
+        radialBlur->DebugGUI();
+        glitch_CA->DebugGUI();
+        LightManager::Instance().DebugGUI();
 
-    imguiMenuBar("Game", "IBL", IBLImgui);
-    if (IBLImgui)
-    {
-        if (ImGui::Begin("IBL", nullptr, ImGuiWindowFlags_None))
+        imguiMenuBar("Game", "game_menu", displayImgui);
+        if (displayImgui)
         {
-            ImGui::DragFloat4("lightRoti", &IBL_constant->data.lightRoti.x);
-            ImGui::DragFloat4("iblIntencity", &IBL_constant->data.iblIntencity.x);
+            if (ImGui::Button("back_title"))
+            {
+                //シーンリセット
+                SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle()));
+                return;
+            };
         }
-        ImGui::End();
-    }
-    // フレーム表示
-    {
-        ImGui::Begin("##frame stage_rate");
-    
-        static float temp_value = 0;
-        static float values[90] = {};
-        static int values_offset = 0;
-        static float refresh_time = 0.0f;
-        static const float PLOT_SENSE = 0.2f;
-    
-        refresh_time += elapsedTime;
-        if (static_cast<int>(refresh_time / PLOT_SENSE) >= 1)
+
+        imguiMenuBar("Game", "IBL", IBLImgui);
+        if (IBLImgui)
         {
-            values_offset = values_offset >= IM_ARRAYSIZE(values) ? 0 : values_offset;
-            values[values_offset] = temp_value = elapsedTime * 1000.0f;
-    
-            ++values_offset;
-            refresh_time = 0;
+            if (ImGui::Begin("IBL", nullptr, ImGuiWindowFlags_None))
+            {
+                ImGui::DragFloat4("lightRoti", &IBL_constant->data.lightRoti.x);
+                ImGui::DragFloat4("iblIntencity", &IBL_constant->data.iblIntencity.x);
+            }
+            ImGui::End();
         }
-    
-        char overlay[32];
-        sprintf_s(overlay, "now: %d fps  %.3f ms", static_cast<int>(1000.0f / temp_value), temp_value);
-        ImGui::PlotLines("##frame", values, IM_ARRAYSIZE(values), values_offset, overlay, 0, 20, ImVec2(ImGui::GetWindowSize().x * 0.75f, ImGui::GetWindowSize().y * 0.5f));
-    
-        ImGui::End();
+        // フレーム表示
+        {
+            ImGui::Begin("##frame stage_rate");
+
+            static float temp_value = 0;
+            static float values[90] = {};
+            static int values_offset = 0;
+            static float refresh_time = 0.0f;
+            static const float PLOT_SENSE = 0.2f;
+
+            refresh_time += elapsedTime;
+            if (static_cast<int>(refresh_time / PLOT_SENSE) >= 1)
+            {
+                values_offset = values_offset >= IM_ARRAYSIZE(values) ? 0 : values_offset;
+                values[values_offset] = temp_value = elapsedTime * 1000.0f;
+
+                ++values_offset;
+                refresh_time = 0;
+            }
+
+            char overlay[32];
+            sprintf_s(overlay, "now: %d fps  %.3f ms", static_cast<int>(1000.0f / temp_value), temp_value);
+            ImGui::PlotLines("##frame", values, IM_ARRAYSIZE(values), values_offset, overlay, 0, 20, ImVec2(ImGui::GetWindowSize().x * 0.75f, ImGui::GetWindowSize().y * 0.5f));
+
+            ImGui::End();
+        }
+
+    #endif
     }
 
 #endif
@@ -390,10 +395,3 @@ void SceneGame::JudgeCollision()
     BulletManager::Instance().CollisionBullet(player.get(), boss.get());
 }
 
-void SceneGame::DebugGui()
-{
-}
-
-void SceneGame::SceneReset()
-{
-}

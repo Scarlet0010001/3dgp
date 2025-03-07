@@ -335,11 +335,10 @@ void Boss::DebugDUI()
 	{
 		if (ImGui::Begin("Boss", nullptr, ImGuiWindowFlags_None))
 		{
-#if _DEBUG
 			ImGui::Checkbox("is_update", &isUpdate);
 			ImGui::Separator();
 			ImGui::Checkbox("is_render", &isRender);
-#endif
+
 			//トランスフォーム
 			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 			{
