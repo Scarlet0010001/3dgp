@@ -18,26 +18,26 @@ private:
     //--------< 定数/構造体 >--------//
     struct SCENE_CONSTANTS
     {
-        DirectX::XMFLOAT4X4 view;                //ビュー行列
-        DirectX::XMFLOAT4X4 projection;          //プロジェクション行列
-        DirectX::XMFLOAT4X4 view_projection;     //ビュー・プロジェクション変換行列
-        DirectX::XMFLOAT4 light_color;       //ライトの色
-        DirectX::XMFLOAT4 light_direction;       //ライトの向き
-        DirectX::XMFLOAT4 camera_position;
-        DirectX::XMFLOAT4 avatar_position;
-        DirectX::XMFLOAT4 avatar_direction;
-        DirectX::XMFLOAT2 resolution;
-        float time;
-        float delta_time;
+        DirectX::XMFLOAT4X4 view;                           // ビュー行列（カメラの視点からシーンを表示するための変換行列）
+        DirectX::XMFLOAT4X4 projection;                 // プロジェクション行列（視野の設定や遠近感の調整を行うための変換行列）
+        DirectX::XMFLOAT4X4 view_projection;      // ビュー・プロジェクション変換行列（ビュー行列とプロジェクション行列を掛け合わせたもの）
+        DirectX::XMFLOAT4 light_color;                   // ライトの色（RGBA形式でライトの色を定義）
+        DirectX::XMFLOAT4 light_direction;            // ライトの向き（ライトがどの方向から照射されるかを示すベクトル）
+        DirectX::XMFLOAT4 camera_position;         // カメラの位置（シーン内でカメラがどこに配置されているか）
+        DirectX::XMFLOAT4 avatar_position;           // アバターの位置（アバターキャラクターの位置）
+        DirectX::XMFLOAT4 avatar_direction;          // アバターの向き（アバターキャラクターが向いている方向を示すベクトル）
+        DirectX::XMFLOAT2 resolution;                    // 解像度（スクリーンやビューの幅と高さ）
+        float time;                                                       // 経過時間（シーン内の時間の経過を保持）
+        float delta_time;                                            // 前フレームからの時間差（フレームごとの時間差を保持）
     };
+
 public:
     enum STATE
     {
-        Tracking = 0,
-        LockOn,
-        Wing,
-    }state;
-
+        Tracking = 0,   // トラッキング状態（ターゲットの追跡）
+        LockOn,           // ロックオン状態（ターゲットをロック）
+        Wing,               // ウィング状態（特殊な動作やアクションの状態）
+    } state;                // プレイヤーの状態（現在の状態を保持）
     //------カメラシェイク-------//
     struct CameraShakeParam
     {
@@ -75,10 +75,10 @@ public:
 
 public:
     //--------<constructor/destructor>--------//
-    //Camera(const char* post_effect_file_path);
     Camera();
     ~Camera() = default;
 
+    //初期化
     void Initialize();
 
     //--------< 関数 >--------//
@@ -109,6 +109,7 @@ public:
     // 見る対象
     void SetLockOnTarget(const DirectX::XMFLOAT3& t) { lockOnTarget = t; }
     const DirectX::XMFLOAT3& GetLockOnTarget() const { return lockOnTarget; }
+    
     // 追尾する対象
     DirectX::XMFLOAT3 newTrakkingTarget{};
     void SetTrakkingTarget(const DirectX::XMFLOAT3& t) {
@@ -118,6 +119,7 @@ public:
         trakkingTarget .y+= (newTrakkingTarget.y - trakkingTarget.y) * 0.2f;
         trakkingTarget.z += (newTrakkingTarget.z- trakkingTarget.z) * 0.2f;
     }
+    //追尾する対象を取得
     const DirectX::XMFLOAT3& GetTrakkingTarget() const { return trakkingTarget; }
 
     // 角度
@@ -153,9 +155,6 @@ public:
     //playerクォータニオン設定
     void SetPlayerOrientation(DirectX::XMFLOAT4 orientation) { playerOrientation = orientation; }
 
-
-    //ターゲットが移動しているかどうか
-    void SetIsMove(bool m) { this->isMove = m; }
     //視野角取得
     const float& GetCapeVision()const { return capeVision; }
 
@@ -167,14 +166,18 @@ public:
     void SetCameraShake(CameraShakeParam param);
     void SetOnDistanceShake(bool onDistance) { cameraShakeParam.onDistanceShake = onDistance; }
 
+    //ヒットストップの取得と設定
     void SetHitStop(HitStopParam param);
     bool GetHitStop() { return isHitStop; }
 
+    //カメラ位置の取得
     const DirectX::XMFLOAT4& Getcamera_position() { return sceneConstant.get()->data.camera_position; }
 
 private:
+    //自由カメラ
     void CalcFreeTarget();
 
+    //カメラシェイク更新
     void CameraShakeUpdate(float elapsedTime);
 
     //--------< 関数ポインタ >--------//
@@ -185,31 +188,31 @@ private:
     //--------< 変数 >--------//
     std::unique_ptr<Constants<SCENE_CONSTANTS>> sceneConstant{};
 
-    ////注視点からの距離
-    float range;
-    DirectX::XMFLOAT3 eye; //視点
-    DirectX::XMFLOAT3 trakkingTarget;//注視点
-    DirectX::XMFLOAT3 lockOnTarget;//注視点
-    DirectX::XMFLOAT3 oldLockOnTarget;//注視点
-    DirectX::XMFLOAT3 wingTarget;//注視点
-    DirectX::XMFLOAT3 angle;
-    DirectX::XMFLOAT4 orientation = { 0,0,0,1 };
-    DirectX::XMFLOAT4 standardOrientation = { 0,0,0,1 };
-    DirectX::XMFLOAT4 playerOrientation = { 0,0,0,1 };
+    //// 注視点からの距離
+    float range;                                                                            // 視点からターゲットまでの距離
+    DirectX::XMFLOAT3 eye;                                                       // 視点の位置（カメラやプレイヤーの位置）
+    DirectX::XMFLOAT3 trakkingTarget;                                   // 現在注視しているターゲット
+    DirectX::XMFLOAT3 lockOnTarget;                                     // ロックオンしているターゲット
+    DirectX::XMFLOAT3 oldLockOnTarget;                              // 前回ロックオンしていたターゲット
+    DirectX::XMFLOAT3 wingTarget;                                       // 翼などのターゲット（特定の対象）
+    DirectX::XMFLOAT3 angle;                                                 // 視点の角度（回転）
+    DirectX::XMFLOAT4 orientation = { 0,0,0,1 };                  // 現在の姿勢（クォータニオン）
+    DirectX::XMFLOAT4 standardOrientation = { 0,0,0,1 }; // 基準となる姿勢（クォータニオン）
+    DirectX::XMFLOAT4 playerOrientation = { 0,0,0,1 };      // プレイヤーの姿勢（クォータニオン）
 
-    float lockOnRate = 6.0f;
-    float sensitivityRate = 0.7f;
-    bool isMove;
-    float attendRate; // 減衰比率
-    float capeVision = 60.0f;//視野角
-    float mouseRollSpeed = 60;//回転速度
-    float stickRollSpeed = 300;//回転速度
+    float lockOnRate = 6.0f;                // ロックオンの速さ
+    float sensitivityRate = 0.7f;         // 操作感度
+    float attendRate;                          // 減衰比率
+    float capeVision = 60.0f;             //視野角
+    float mouseRollSpeed = 60;      //回転速度
+    float stickRollSpeed = 300;       //回転速度
 
     //垂直遅延
     float verticalRotationDegree = 0;
     //平行遅延
     float horizonRotationDegree = 0;
 
+    //rightの色と方向
     DirectX::XMFLOAT4 lightColor = { 1.0f,1.0f, 1.0f,1.0f };
     DirectX::XMFLOAT4 lightDirection{ 1.0f,1.0f, 1.0f,1.0f };
 

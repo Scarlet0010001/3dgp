@@ -299,7 +299,7 @@ void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 	else if (state == STATE::RIGHT_ATTACK) side = LR::RIGHT;
 
 	//攻撃時の当たり判定
-	if (Collision::SphereVsCylinder(attackCollision_position[side], 1.0f,
+	if (Collision::SphereVsCylinder(attackCollision_position[side], 1.5f,
 		capsule_collider.start, capsule_collider.radius,collider_height))
 	{
 		//攻撃対象に与えるダメージ量と無敵時間
@@ -592,7 +592,7 @@ void Player::InputAvoidance()
 void Player::InputWing()
 {
 	//Xボタン押すと飛行モードになる
-	if (gamePad->GetButtonDown() & GamePad::BTN_X)
+	if (gamePad->GetButtonDown() & GamePad::BTN_B)
 	{
 		TransitionWingState();
 	}
@@ -682,6 +682,7 @@ void Player::OnDead()
 
 void Player::OnDamaged(WINCE_TYPE type)
 {
+	//typeによって偏移する状態を変える
 	switch (type)
 	{
 	case WINCE_TYPE::NONE:
@@ -705,7 +706,7 @@ bool Player::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 	//死亡している場合は健康状態を変更しない
 	if (health <= 0)return false;
 
-
+	//無敵時間がある場合は変更しない
 	if (invincibleTimer > 0.0f)return false;
 
 	//無敵時間設定
@@ -723,6 +724,7 @@ bool Player::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 		OnDamaged(type);
 	}
 
+	//ダメージ効果音
 	audios[PLAYER_SE::SE_DAMAGE]->play();
 	audios[PLAYER_SE::SE_DAMAGE]->volume(0.5f);
 
@@ -751,9 +753,11 @@ bool Player::Flying()
 
 void Player::UpdateVerticalVelocity(float elapsed_frame)
 {
+	// プレイヤーのアニメーションがPLAYER_WING_STARTでない場合、重力を適用
 	if (playerAnimation != PlayerAnimation::PLAYER_WING_START)
 		velocity.y += gravity * elapsed_frame;
-	else if(playerAnimation == PlayerAnimation::PLAYER_WING_START)
+	// プレイヤーのアニメーションがPLAYER_WING_STARTの場合、重力の影響を20%に減少
+	else if (playerAnimation == PlayerAnimation::PLAYER_WING_START)
 		velocity.y += (gravity * 0.2f) * elapsed_frame;
 }
 
@@ -761,77 +765,83 @@ void Player::LoadDataFile()
 {
 	// Jsonファイルから値を取得
 	std::filesystem::path path = filePath;
-	path.replace_extension(".json");
-	if (std::filesystem::exists(path.c_str()))
+	path.replace_extension(".json");  // 拡張子を.jsonに変更
+	if (std::filesystem::exists(path.c_str()))  // ファイルが存在する場合
 	{
 		std::ifstream ifs;
-		ifs.open(path);
+		ifs.open(path);  // ファイルを開く
 		if (ifs)
 		{
-			cereal::JSONInputArchive o_archive(ifs);
-			o_archive(param);
+			cereal::JSONInputArchive o_archive(ifs);  // JSON形式でファイルを読み込み
+			o_archive(param);  // データをparamにデシリアライズ
 		}
 	}
 }
 
 void Player::SaveDataFile()
 {
-	//ベースクラスの初期化パラメーター情報を更新
+	// ベースクラスの初期化パラメーター情報を更新
 	param.charaInitParam = charaParam;
-	// Jsonファイルから値を取得
+	// Jsonファイルに値を保存
 	std::filesystem::path path = filePath;
-	path.replace_extension(".json");
+	path.replace_extension(".json");  // 拡張子を.jsonに変更
 	std::ofstream ifs;
-	ifs.open(path);
+	ifs.open(path);  // ファイルを開く
 	if (ifs)
 	{
-		cereal::JSONOutputArchive o_archive(ifs);
-		o_archive(param);
+		cereal::JSONOutputArchive o_archive(ifs);  // JSON形式でファイルに書き込み
+		o_archive(param);  // paramのデータをシリアライズして保存
 	}
-
 }
-
 void Player::DebugPrimitiveUpdate()
 {
+	// デバッグレンダラーのインスタンスを取得
 	DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
-	
-	//サーベルの当たり判定
+
+	// サーベルの当たり判定処理
 	{
+		// ボーン位置を取得して、サーベルや下腕の位置を更新
 		model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
 		model->fech_by_bone(playerAnimation, time, transform, lowerArm[LR::LEFT], lowerArm_position[LR::LEFT]);
 		model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
 		model->fech_by_bone(playerAnimation, time, transform, lowerArm[LR::RIGHT], lowerArm_position[LR::RIGHT]);
 
+		// サーベルの位置を求める関数（腕とサーベルの位置から中間点を計算）
 		std::function<DirectX::XMFLOAT3(DirectX::XMFLOAT3&, DirectX::XMFLOAT3&)> saber_position{
 			[](DirectX::XMFLOAT3& arm, DirectX::XMFLOAT3& saber)->DirectX::XMFLOAT3 {
 
 				DirectX::XMFLOAT3 Arm{ arm };
 				DirectX::XMFLOAT3 Saber{ saber };
 
+				// 腕とサーベルの方向ベクトルと距離を計算
 				DirectX::XMFLOAT3 direction = Math::calc_vector_AtoB_normalize(Arm, Saber);
 				float length = Math::calc_vector_AtoB_length(Arm, Saber);
 
+				// 腕の位置から方向ベクトルを使って、長さの半分の位置を計算
 				return Math::calc_designated_point(Arm, direction, length * 0.5f);
 		} };
+
+		// サーベルの衝突判定位置を計算
 		attackCollision_position[LR::LEFT] = saber_position(lowerArm_position[LR::LEFT], beamSaber_position[LR::LEFT]);
 		attackCollision_position[LR::RIGHT] = saber_position(lowerArm_position[LR::RIGHT], beamSaber_position[LR::RIGHT]);
 
+		// 攻撃が有効な場合、デバッグ用にサーベルの位置に球体を描画
 		if (attackParam.isAttack)
 		{
 			debugRender->CreateSphere(
 				attackCollision_position[LR::LEFT],
-				1.0f, { 1.0f,0.0f,0.0f,1.0f });
+				1.0f, { 1.0f,0.0f,0.0f,1.0f });  // 左側のサーベルの位置
 			debugRender->CreateSphere(
 				attackCollision_position[LR::RIGHT],
-				1.0f, { 1.0f,0.0f,0.0f,1.0f });
+				1.0f, { 1.0f,0.0f,0.0f,1.0f });  // 右側のサーベルの位置
 		}
 	}
 
-	//自分の当たり判定
+	// 自分の当たり判定を描画（円柱形状で表示）
 	debugRender->CreateCylinder(collider.start,
 		collider.radius,
 		charaParam.height,
-		{ 0.0f,1.0f,0.0f,1.0f });
+		{ 0.0f,1.0f,0.0f,1.0f });  // 自キャラの当たり判定を緑色で表示
 }
 
 void Player::DebugGUI()

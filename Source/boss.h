@@ -164,7 +164,6 @@ private:
 	//			ダメージ系			//
 	void TransitionDamageState();							//ダメージ
 	void TransitionDeadState();								//死亡
-	void TransitionDownState();								//ダウン 
 
 	/*---------------状態更新------------------------*/
 
@@ -180,7 +179,6 @@ private:
 	//			ダメージ系			//
 	void UpdateDamageState(float elapsedTime);							//ダメージ
 	void UpdateDeadState(float elapsedTime);									//死亡
-	void UpdateDownState(float elapsedTime);								//ダウン 
 
 	//攻撃方法判定
 	void AttackRoutine(float elapsedTime);
