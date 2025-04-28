@@ -208,7 +208,7 @@ void Boss::ShotBullet(ATTACK_TYPE type)
 	if (type == ATTACK_TYPE::SHOT_S)
 	{
 		targetPoint_pos = target_pos;
-		//発射位置(プレイヤーの腰あたり)
+		//発射位置(タレット部分)
 		model->fech_by_bone(bossAnimation, time, transform, turretNode, shotPos);
 		//目標
 		DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(shotPos,
@@ -217,6 +217,10 @@ void Boss::ShotBullet(ATTACK_TYPE type)
 		BulletStraight* bullet = 
 			new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy);
 		bullet->Launch(dir, shotPos);
+	}
+	else if (type == ATTACK_TYPE::SHOT_H)
+	{
+
 	}
 }
 

@@ -54,6 +54,7 @@ private:
 		TACKLE,
 		JUMP,
 		SHOT_S,
+		SHOT_H,
 		MAX_COUNT
 	};
 
@@ -160,6 +161,7 @@ private:
 	void TransitionAttack_Tackle_State();				//近接攻撃
 	void TransitionAttack_Jump_State();				//ジャンプ攻撃
 	void TransitionAttack_ShotStraight_State();	//射撃
+	void TransitionAttack_ShotHoming_State();	//誘導ミサイル
 
 	//			ダメージ系			//
 	void TransitionDamageState();							//ダメージ
@@ -175,6 +177,7 @@ private:
 	void UpdateAttack_Tackle_State(float elapsedTime);				//近接攻撃
 	void UpdateAttack_Jump_State(float elapsedTime);					//ジャンプ攻撃
 	void UpdateAttack_ShotStraight_State(float elapsedTime);	//射撃
+	void UpdateAttack_ShotHoming_State(float elapsedTime);	//誘導ミサイル
 
 	//			ダメージ系			//
 	void UpdateDamageState(float elapsedTime);							//ダメージ

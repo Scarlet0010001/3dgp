@@ -68,6 +68,10 @@ void Boss::TransitionAttack_ShotStraight_State()
 	stateDuration = RAPIDFIRE_TIME;  // 状態の持続時間を連射時間に設定
 }
 
+void Boss::TransitionAttack_ShotHoming_State()
+{
+}
+
 void Boss::TransitionDamageState()
 {
 	// ダメージ状態へ遷移
@@ -275,6 +279,10 @@ void Boss::UpdateAttack_ShotStraight_State(float elapsedTime)
 
 	// 速度更新
 	UpdateVelocity(elapsedTime, position);  // ボスの速度を更新
+}
+
+void Boss::UpdateAttack_ShotHoming_State(float elapsedTime)
+{
 }
 
 void Boss::UpdateDamageState(float elapsedTime)
