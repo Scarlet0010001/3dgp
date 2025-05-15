@@ -264,9 +264,6 @@ private:
 	//ダメージを受ける処理
 	bool ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)override;
 
-	//落下速度を落とす
-	bool Floating();
-
 	//浮遊する
 	bool Flying();
 

@@ -733,19 +733,6 @@ bool Player::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 
 }
 
-bool Player::Floating()
-{
-	//—Ž‰º’†‚È‚ç
-	if (velocity.y < 0)
-	{
-		//—Ž‰º‘¬“x‚ðŽã‚ß‚é
-		velocity.y /= param.floatingValue;
-		return true;
-	}
-	//•‚—V’†‚Å‚È‚¢
-	return false;
-}
-
 bool Player::Flying()
 {
     return false;

@@ -16,7 +16,7 @@ framework::framework(HWND hwnd) : hwnd(hwnd)
 bool framework::Initialize()
 {
 	Graphics::Instance().Initialize(hwnd);
-	Device::Instance().GetMouse().Set_do_show(true);
+	Device::Instance().GetMouse().Set_do_show(false);
 	SceneManager::Instance().ChangeScene(new SceneTitle());
 
 	// エフェクトマネージャー初期化
