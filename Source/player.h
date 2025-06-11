@@ -68,6 +68,9 @@ public:
 	//プレイヤーの攻撃と敵の当たり判定
 	void CalcAttack_vs_Enemy(Capsule capsule_collider, float colider_height, AddDamageFunc damaged_func);
 
+	//ステージ制限壁判定
+	void CalcLimitWall(float limit_xz, float y, bool isKill = false);
+
 private:
 	//-------------構造体、列挙型--------------//
 	//アニメーション

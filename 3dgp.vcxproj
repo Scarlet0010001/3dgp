@@ -220,6 +220,7 @@
     <ClCompile Include="Source\geometric_primitive.cpp" />
     <ClCompile Include="Source\glitch_chromatic_aberration.cpp" />
     <ClCompile Include="Source\gltf_model.cpp" />
+    <ClCompile Include="Source\gpu_resource_utils.cpp" />
     <ClCompile Include="Source\graphics.cpp" />
     <ClCompile Include="Source\g_buffer.cpp" />
     <ClCompile Include="Source\imgui\imgui.cpp" />
@@ -238,6 +239,7 @@
     <ClCompile Include="Source\player.cpp" />
     <ClCompile Include="Source\player_action.cpp" />
     <ClCompile Include="Source\player_UI.cpp" />
+    <ClCompile Include="Source\primitive_renderer.cpp" />
     <ClCompile Include="Source\radial_blur.cpp" />
     <ClCompile Include="Source\scene_game.cpp" />
     <ClCompile Include="Source\scene_loading.cpp" />
@@ -280,6 +282,7 @@
     <ClInclude Include="Source\geometric_primitive.h" />
     <ClInclude Include="Source\glitch_chromatic_aberration.h" />
     <ClInclude Include="Source\gltf_model.h" />
+    <ClInclude Include="Source\gpu_resource_utils.h" />
     <ClInclude Include="Source\graphics.h" />
     <ClInclude Include="Source\g_buffer.h" />
     <ClInclude Include="Source\high_resolution_timer.h" />
@@ -304,6 +307,7 @@
     <ClInclude Include="Source\player.h" />
     <ClInclude Include="Source\player_UI.h" />
     <ClInclude Include="Source\primitive.h" />
+    <ClInclude Include="Source\primitive_renderer.h" />
     <ClInclude Include="Source\radial_blur.h" />
     <ClInclude Include="Source\scene.h" />
     <ClInclude Include="Source\scene_game.h" />
@@ -390,6 +394,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="HLSL\primitive_renderer_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\primitive_renderer_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\radial_blur_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -454,6 +470,7 @@
     <None Include="HLSL\image_based_lighting.hlsli" />
     <None Include="HLSL\math_utils.hlsli" />
     <None Include="HLSL\noise.hlsli" />
+    <None Include="HLSL\primitive_renderer.hlsli" />
     <None Include="HLSL\rendering_equation.hlsli" />
     <None Include="HLSL\skinned_mesh.hlsli" />
     <None Include="HLSL\sky_map.hlsli" />

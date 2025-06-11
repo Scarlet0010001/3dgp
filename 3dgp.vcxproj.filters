@@ -85,15 +85,6 @@
     <Filter Include="Shaders\Constant">
       <UniqueIdentifier>{5e3ca3a9-3335-49d9-91eb-f53d54763e3a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\gaussian_blur">
-      <UniqueIdentifier>{a4b38cfd-7ead-446a-8970-915b1a8d2ce3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\sprite">
-      <UniqueIdentifier>{ec012e71-296e-427b-8d63-c9c49b124af6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\Radial_Blur">
-      <UniqueIdentifier>{ce50e5a8-49b1-4366-99bb-97cb529e880a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sources\Radial_Blur">
       <UniqueIdentifier>{bbfd806e-ff2b-41c1-b8bb-102b21337bb6}</UniqueIdentifier>
     </Filter>
@@ -109,14 +100,26 @@
     <Filter Include="Sources\UI">
       <UniqueIdentifier>{9152fc60-01f7-4e89-80c3-7265916b2975}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\glitch">
-      <UniqueIdentifier>{2451d0b6-5124-462e-8bac-36145415f678}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sources\Glitch">
       <UniqueIdentifier>{278a42f8-4623-410e-92e8-5f3da69f510f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sources\Effect">
       <UniqueIdentifier>{72a06be2-f71d-49d4-baab-d28c148e5e92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PrimitiveRenderer">
+      <UniqueIdentifier>{126764c4-f98b-456d-95fa-1844b98bd59b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\RadialBlur">
+      <UniqueIdentifier>{ce50e5a8-49b1-4366-99bb-97cb529e880a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Sprite">
+      <UniqueIdentifier>{ec012e71-296e-427b-8d63-c9c49b124af6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Glitch">
+      <UniqueIdentifier>{2451d0b6-5124-462e-8bac-36145415f678}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\GaussianBlur">
+      <UniqueIdentifier>{a4b38cfd-7ead-446a-8970-915b1a8d2ce3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -290,6 +293,12 @@
     </ClCompile>
     <ClCompile Include="Source\Boss_UI.cpp">
       <Filter>Sources\Character\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\primitive_renderer.cpp">
+      <Filter>Sources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\gpu_resource_utils.cpp">
+      <Filter>Sources\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -497,6 +506,12 @@
     <ClInclude Include="Source\Boss_UI.h">
       <Filter>Sources\Character\Boss</Filter>
     </ClInclude>
+    <ClInclude Include="Source\primitive_renderer.h">
+      <Filter>Sources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\gpu_resource_utils.h">
+      <Filter>Sources\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\blur_ps.hlsl">
@@ -563,28 +578,34 @@
       <Filter>Shaders\FullscreenQuad</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\gaussian_blur_downsampling_ps.hlsl">
-      <Filter>Shaders\gaussian_blur</Filter>
+      <Filter>Shaders\GaussianBlur</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\gaussian_blur_horizontal_ps.hlsl">
-      <Filter>Shaders\gaussian_blur</Filter>
+      <Filter>Shaders\GaussianBlur</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\gaussian_blur_upsampling_ps.hlsl">
-      <Filter>Shaders\gaussian_blur</Filter>
+      <Filter>Shaders\GaussianBlur</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\gaussian_blur_vertical_ps.hlsl">
-      <Filter>Shaders\gaussian_blur</Filter>
+      <Filter>Shaders\GaussianBlur</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\sprite_ps.hlsl">
-      <Filter>Shaders\sprite</Filter>
+      <Filter>Shaders\Sprite</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\sprite_vs.hlsl">
-      <Filter>Shaders\sprite</Filter>
+      <Filter>Shaders\Sprite</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\radial_blur_ps.hlsl">
-      <Filter>Shaders\Radial_Blur</Filter>
+      <Filter>Shaders\RadialBlur</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\glitch_chromatic_aberration.hlsl">
-      <Filter>Shaders\glitch</Filter>
+      <Filter>Shaders\Glitch</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\primitive_renderer_vs.hlsl">
+      <Filter>Shaders\PrimitiveRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\primitive_renderer_ps.hlsl">
+      <Filter>Shaders\PrimitiveRenderer</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -628,10 +649,13 @@
       <Filter>Shaders\Constant</Filter>
     </None>
     <None Include="HLSL\sprite.hlsli">
-      <Filter>Shaders\sprite</Filter>
+      <Filter>Shaders\Sprite</Filter>
     </None>
     <None Include="HLSL\math_utils.hlsli">
-      <Filter>Shaders\glitch</Filter>
+      <Filter>Shaders\Glitch</Filter>
+    </None>
+    <None Include="HLSL\primitive_renderer.hlsli">
+      <Filter>Shaders\PrimitiveRenderer</Filter>
     </None>
   </ItemGroup>
 </Project>

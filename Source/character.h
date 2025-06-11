@@ -3,6 +3,10 @@
 #include "damage_func.h"
 #include "gltf_model.h"
 
+#define LIMIT_X static_cast<int>(LIMIT::X)
+#define LIMIT_Y static_cast<int>(LIMIT::Y)
+#define LIMIT_Z static_cast<int>(LIMIT::Z)
+
 class Character
 {
 public:
@@ -69,6 +73,7 @@ public:
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
 	//スケール設定
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
+	
 	//velocity取得
 	const DirectX::XMFLOAT3& GetVelocity() const { return velocity; }
 	//velocityセット
@@ -93,10 +98,15 @@ public:
 	float GetHeight() const { return charaParam.height; }
 	//トランスフォームのゲッター
 	const DirectX::XMFLOAT4X4& GetTransform() const { return transform; }
+	
 	//衝撃を与える
 	void AddImpulse(const DirectX::XMFLOAT3& impulse);
 	//ダメージを与える
 	virtual bool ApplyDamage(int damage, float invincibleTime, WINCE_TYPE type);
+
+	//ステージ制限壁判定
+	//void CalcLimitWall(DirectX::XMFLOAT2& limit_x, DirectX::XMFLOAT2& limit_y, DirectX::XMFLOAT2& limit_z, bool isKill = false);
+	void CalcLimitWall(bool isKill = false);
 
 protected:
 	virtual void Move(float vx, float vz, float speed);
@@ -114,16 +124,27 @@ protected:
 
 	//-----------変数--------------//
 
-	DirectX::XMFLOAT3	position = { 0, 0, 0 };
-	DirectX::XMFLOAT3	angle = { 0, 0, 0 };
-	DirectX::XMFLOAT3	scale = { 1, 1, 1 };
-	DirectX::XMFLOAT4 orientation{ 0,0,0,1 };
-	DirectX::XMFLOAT4X4	transform = {
+	DirectX::XMFLOAT3	position = { 0, 0, 0 };		//座標
+	DirectX::XMFLOAT3	angle = { 0, 0, 0 };			//角度
+	DirectX::XMFLOAT3	scale = { 1, 1, 1 };			//サイズ
+	DirectX::XMFLOAT4 orientation{ 0,0,0,1 };		//
+	DirectX::XMFLOAT4X4	transform = {				//
 	1, 0, 0, 0,
 	0, 1, 0, 0,
 	0, 0, 1, 0,
 	0, 0, 0, 1
 	};
+
+	DirectX::XMFLOAT3 checkpointPosition = { 0, 0, 0 };		//チェックポイント座標
+	enum class LIMIT
+	{
+		X = 0,
+		Y,
+		Z,
+		Count
+	};
+	//
+	DirectX::XMFLOAT2 limitWall[static_cast<int>(LIMIT::Count)];
 
 	CharacterParam charaParam;
 

@@ -150,6 +150,9 @@ public:
 	//ループアニメーションの検索
 	bool FindLoopAnimation(BossAnimation BA);
 
+	//ステージ制限壁判定
+	void CalcLimitWall(float limit_xz, float y, bool isKill = false);
+
 private:
 	/*--------------------状態遷移------------------------*/
 

@@ -36,14 +36,13 @@ HRESULT create_vs_from_cso(Microsoft::WRL::ComPtr<ID3D11Device> device,
     hr = device->CreateVertexShader(cso_data.get(), cso_sz, nullptr, vertex_shader);
     _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
     
-     if (input_layout)
-        {
-            hr = device->CreateInputLayout(input_element_desc, num_elements,
-                cso_data.get(), cso_sz, input_layout);
-            _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-        }
-        return hr;
-
+    if (input_layout)
+    {
+        hr = device->CreateInputLayout(input_element_desc, num_elements,
+            cso_data.get(), cso_sz, input_layout);
+        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+    }
+    return hr;
 }
 
 HRESULT create_ps_from_cso(Microsoft::WRL::ComPtr<ID3D11Device> device,
