@@ -1,7 +1,10 @@
 #pragma once
 #include <vector>
 #include <DirectXMath.h>
-#include "graphics.h"
+#include <wrl.h>
+#include<d3d11.h>
+#include <sstream>
+#include "constant.h"
 
 class PrimitiveRenderer
 {

@@ -8,6 +8,7 @@
 #include <mutex>
 #include "misc.h"
 #include "debug_renderer.h"
+#include "primitive_renderer.h"
 #include "shader.h"
 #include "constant.h"
 #include "gltf_model.h"
@@ -159,6 +160,9 @@ public:
     // デバッグレンダラ取得
     DebugRenderer* GetDebugRenderer() const { return debugRenderer.get(); }
 
+    // デバッグレンダラ取得
+    PrimitiveRenderer* GetPrimitiveRenderer() const { return primitiveRenderer.get(); }
+
     //------------<関数>-----------//
 public:
     void Initialize(HWND hwnd);
@@ -179,6 +183,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[BLEND_STATE::BLEND_STATE_COUNT];
 
     std::unique_ptr<DebugRenderer> debugRenderer;
+
+    std::unique_ptr<PrimitiveRenderer> primitiveRenderer;
 
     //--maps--//
 

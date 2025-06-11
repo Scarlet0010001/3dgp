@@ -738,6 +738,78 @@ bool Player::Flying()
     return false;
 }
 
+void Player::TrailUpdate()
+{
+	if (state != STATE::LEFT_ATTACK && state != STATE::RIGHT_ATTACK)
+	{
+		return;
+	}
+
+	// 保存していた頂点バッファを１フレーム分ずらす
+	{
+		for (int i = MAX_POLYGON - 1; i > 0; --i)
+		{
+			trailPositions[ToInt(TRAIL::LOWER_ARM)][i] = trailPositions[ToInt(TRAIL::LOWER_ARM)][i - 1];
+			trailPositions[ToInt(TRAIL::BEAM_SABER)][i] = trailPositions[ToInt(TRAIL::BEAM_SABER)][i - 1];
+			//ここで一緒に不透明度も下げる
+
+		}
+	}
+
+	//どっちの腕で攻撃するか
+	int side = 0;
+	if (state == STATE::LEFT_ATTACK) side = LR::LEFT;
+	else if (state == STATE::RIGHT_ATTACK) side = LR::RIGHT;
+	
+	// 腕の先端とサーベルの先端の座標を取得し、頂点バッファに保存
+	trailPositions[ToInt(TRAIL::LOWER_ARM)][0] = lowerArm_position[side];
+	trailPositions[ToInt(TRAIL::BEAM_SABER)][0] = lowerArm_position[side];
+
+	//軌跡の色
+	DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
+
+	// ポリゴン作成
+	PrimitiveRenderer* primitiveRenderer = Graphics::Instance().GetPrimitiveRenderer();
+
+	// 保存していた頂点バッファを用いてスプライン補完処理を行い、滑らかなポリゴンを描画
+	for (int i = 0; i < MAX_POLYGON - 3; i++)
+	{
+		primitiveRenderer->AddVertex(trailPositions[ToInt(TRAIL::LOWER_ARM)][i], color);
+		primitiveRenderer->AddVertex(trailPositions[ToInt(TRAIL::BEAM_SABER)][i], color);
+		for (int j = 1; j < 9; j++)
+		{
+			DirectX::XMVECTOR Spline0 =
+				DirectX::XMVectorCatmullRom(
+					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::LOWER_ARM)][i - 1]),
+					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::LOWER_ARM)][i]),
+					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::LOWER_ARM)][i + 1]),
+					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::LOWER_ARM)][i + 2]),
+					j * 0.1f
+				);
+			DirectX::XMVECTOR Spline1 =
+				DirectX::XMVectorCatmullRom(
+					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::BEAM_SABER)][i - 1]),
+					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::BEAM_SABER)][i]),
+					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::BEAM_SABER)][i + 1]),
+					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::BEAM_SABER)][i + 2]),
+					j * 0.1f
+				);
+			DirectX::XMFLOAT3 splineposition0;
+			DirectX::XMStoreFloat3(&splineposition0, Spline0);
+			DirectX::XMFLOAT3 splineposition1;
+			DirectX::XMStoreFloat3(&splineposition1, Spline1);
+
+			if (i > 0)
+			{
+				primitiveRenderer->AddVertex(splineposition0, color);
+				primitiveRenderer->AddVertex(splineposition1, color);
+			}
+		}
+	}
+
+
+}
+
 void Player::UpdateVerticalVelocity(float elapsed_frame)
 {
 	// プレイヤーのアニメーションがPLAYER_WING_STARTでない場合、重力を適用

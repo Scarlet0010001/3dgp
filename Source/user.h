@@ -1120,6 +1120,15 @@ inline void ImguiMenuAndSubBar(std::string menu_label, std::string menu_item_lab
 #endif // USE_IMGUI
 }
 
+//enum classを使いやすくするためのstatic_cast簡略化テンプレート
+template <typename T>
+constexpr auto ToInt(T t) noexcept
+{
+    static_assert(std::is_enum<T>::value, "Only enum types allowed");
+    return static_cast<std::underlying_type_t<T>>(t);
+}
+
+
 template <typename T>
 inline void safe_delete(T*& p)
 {

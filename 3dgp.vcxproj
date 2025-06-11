@@ -220,7 +220,6 @@
     <ClCompile Include="Source\geometric_primitive.cpp" />
     <ClCompile Include="Source\glitch_chromatic_aberration.cpp" />
     <ClCompile Include="Source\gltf_model.cpp" />
-    <ClCompile Include="Source\gpu_resource_utils.cpp" />
     <ClCompile Include="Source\graphics.cpp" />
     <ClCompile Include="Source\g_buffer.cpp" />
     <ClCompile Include="Source\imgui\imgui.cpp" />
@@ -282,7 +281,6 @@
     <ClInclude Include="Source\geometric_primitive.h" />
     <ClInclude Include="Source\glitch_chromatic_aberration.h" />
     <ClInclude Include="Source\gltf_model.h" />
-    <ClInclude Include="Source\gpu_resource_utils.h" />
     <ClInclude Include="Source\graphics.h" />
     <ClInclude Include="Source\g_buffer.h" />
     <ClInclude Include="Source\high_resolution_timer.h" />

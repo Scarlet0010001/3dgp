@@ -297,9 +297,6 @@
     <ClCompile Include="Source\primitive_renderer.cpp">
       <Filter>Sources\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\gpu_resource_utils.cpp">
-      <Filter>Sources\Graphics</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\inline.h">
@@ -507,9 +504,6 @@
       <Filter>Sources\Character\Boss</Filter>
     </ClInclude>
     <ClInclude Include="Source\primitive_renderer.h">
-      <Filter>Sources\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\gpu_resource_utils.h">
       <Filter>Sources\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

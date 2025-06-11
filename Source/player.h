@@ -76,37 +76,37 @@ private:
 	//アニメーション
 	enum PlayerAnimation
 	{
-		PLAYER_IDLE,							//待機
+		PLAYER_IDLE,			//待機
 
-		PLAYER_MOVE_FORWARD,		//走り前
-		PLAYER_MOVE_LEFT,				//走り左
-		PLAYER_MOVE_RIGHT,			//走り右
-		PLAYER_MOVE_BACK,				//走り後ろ
+		PLAYER_MOVE_FORWARD,	//走り前
+		PLAYER_MOVE_LEFT,		//走り左
+		PLAYER_MOVE_RIGHT,		//走り右
+		PLAYER_MOVE_BACK,		//走り後ろ
 
-		PLAYER_JUMP_START,				//ジャンプ始め
-		PLAYER_JUMP,							//ジャンプ途中
-		PLAYER_JUMP_END,					//ジャンプ終わり
+		PLAYER_JUMP_START,		//ジャンプ始め
+		PLAYER_JUMP,			//ジャンプ途中
+		PLAYER_JUMP_END,		//ジャンプ終わり
 
-		PLAYER_WING_START,				//飛行変形
-		PLAYER_WING,							//飛行
-		PLAYER_WING_END,				//地上変形
+		PLAYER_WING_START,		//飛行変形
+		PLAYER_WING,			//飛行
+		PLAYER_WING_END,		//地上変形
 
-		PLAYER_SHOT_IDLE,				//射撃前
-		PLAYER_SHOT_FORWARD,		//射撃前
-		PLAYER_SHOT_LEFT,				//射撃左
-		PLAYER_SHOT_RIGHT,				//射撃右
-		PLAYER_SHOT_BACK,				//射撃後ろ
+		PLAYER_SHOT_IDLE,		//射撃前
+		PLAYER_SHOT_FORWARD,	//射撃前
+		PLAYER_SHOT_LEFT,		//射撃左
+		PLAYER_SHOT_RIGHT,		//射撃右
+		PLAYER_SHOT_BACK,		//射撃後ろ
 
-		PLAYER_ATTACK_01,					//コンボ01
-		PLAYER_ATTACK_02,				//コンボ02
-		PLAYER_ATTACK_03,				//コンボ03
-		PLAYER_POWER_L,					//強攻撃左
-		PLAYER_POWER_R,					//強攻撃右
+		PLAYER_ATTACK_01,		//コンボ01
+		PLAYER_ATTACK_02,		//コンボ02
+		PLAYER_ATTACK_03,		//コンボ03
+		PLAYER_POWER_L,			//強攻撃左
+		PLAYER_POWER_R,			//強攻撃右
 
-		PLAYER_DAMAGE,						//被弾
-		PLAYER_DEAD,							//死亡
+		PLAYER_DAMAGE,			//被弾
+		PLAYER_DEAD,			//死亡
 
-		PLAYER_ANIME_COUNT,			//アニメーションの総数
+		PLAYER_ANIME_COUNT,		//アニメーションの総数
 	};
 
 	//アニメーションの現在の状態
@@ -122,16 +122,16 @@ private:
 	//ステート
 	enum class STATE
 	{
-		IDLE,						//待機
-		MOVE,						//走り
-		JUMP,						//ジャンプ
-		BOOST,					//ブースト
-		WING,						//飛行
-		SHOT,						//射撃
-		LEFT_ATTACK,		//左手攻撃
-		RIGHT_ATTACK,		//右手攻撃
-		DAMAGE,				//被弾
-		DEAD,						//死亡
+		IDLE,			//待機
+		MOVE,			//走り
+		JUMP,			//ジャンプ
+		BOOST,			//ブースト
+		WING,			//飛行
+		SHOT,			//射撃
+		LEFT_ATTACK,	//左手攻撃
+		RIGHT_ATTACK,	//右手攻撃
+		DAMAGE,			//被弾
+		DEAD,			//死亡
 	};
 
 	struct PlayerParam
@@ -181,43 +181,43 @@ private:
 private:
 
 	//------------遷移--------------//
-	void TransitionIdleState();							//待機
-	void TransitionMoveState();						//走り
-	void TransitionWingState();						//飛行
+	void TransitionIdleState();				//待機
+	void TransitionMoveState();				//走り
+	void TransitionWingState();				//飛行
 
-	void TransitionAvoidanceState();				//回避
-	void TransitionJumpState();						//ジャンプ
-	void TransitionLandingState();					//着地
+	void TransitionAvoidanceState();		//回避
+	void TransitionJumpState();				//ジャンプ
+	void TransitionLandingState();			//着地
 
-	void TransitionShotState();						//射撃
+	void TransitionShotState();				//射撃
 	void TransitionCombo_01_01_State();		//近接コンボ１
 	void TransitionCombo_01_02_State();		//近接コンボ２
 	void TransitionCombo_01_03_State();		//近接コンボ３
 	void TransitionCombo_PowerL_State();	//強攻撃左
 	void TransitionCombo_PowerR_State();	//強攻撃右
 
-	void TransitionDamageState();					//ダメージ
-	void TransitionDeadState();						//死亡
+	void TransitionDamageState();			//ダメージ
+	void TransitionDeadState();				//死亡
 
 
 	//--------各ステートのアップデート--------//
-	void UpdateIdleState(float elapsedTime);							//待機
-	void UpdateMoveState(float elapsedTime);						//走り
-	void UpdateWingState(float elapsedTime);							//飛行
+	void UpdateIdleState(float elapsedTime);			//待機
+	void UpdateMoveState(float elapsedTime);			//走り
+	void UpdateWingState(float elapsedTime);			//飛行
 
-	void UpdateAvoidanceState(float elapsedTime);				//回避
-	void UpdateJumpState(float elapsedTime);						//ジャンプ
-	void UpdateLandingState(float elapsedTime);					//着地
+	void UpdateAvoidanceState(float elapsedTime);		//回避
+	void UpdateJumpState(float elapsedTime);			//ジャンプ
+	void UpdateLandingState(float elapsedTime);			//着地
 
-	void UpdateShotState(float elapsedTime);							//射撃
-	void UpdateCombo_01_01_State(float elapsedTime);		//近接コンボ１
-	void UpdateCombo_01_02_State(float elapsedTime);		//近接コンボ２
-	void UpdateCombo_01_03_State(float elapsedTime);		//近接コンボ３
-	void UpdateCombo_PowerL_State(float elapsedTime);		//強攻撃左
+	void UpdateShotState(float elapsedTime);			//射撃
+	void UpdateCombo_01_01_State(float elapsedTime);	//近接コンボ１
+	void UpdateCombo_01_02_State(float elapsedTime);	//近接コンボ２
+	void UpdateCombo_01_03_State(float elapsedTime);	//近接コンボ３
+	void UpdateCombo_PowerL_State(float elapsedTime);	//強攻撃左
 	void UpdateCombo_PowerR_State(float elapsedTime);	//強攻撃右
 
-	void UpdateDamageState(float elapsedTime);					//ダメージ
-	void UpdateDeadState(float elapsedTime);							//死亡
+	void UpdateDamageState(float elapsedTime);			//ダメージ
+	void UpdateDeadState(float elapsedTime);			//死亡
 
 
 	//更新関数の関数ポインタの定義
@@ -269,6 +269,9 @@ private:
 
 	//浮遊する
 	bool Flying();
+
+	//軌跡更新処理
+	void TrailUpdate();
 
 	//垂直速力更新処理
 	 void UpdateVerticalVelocity(float elapsed_frame)override;
@@ -322,17 +325,27 @@ private:
 	//左手右手
 	enum LR
 	{
-		LEFT,		//左手
+		LEFT,	//左手
 		RIGHT,	//右手
-		COUNT,	//総数
+		COUNT,	//要素の数（enumの終端）
 	};
 	//当たり判定ノード
 	gltf_model::node beamSaber[LR::COUNT];	//サーベルの先端
-	gltf_model::node lowerArm[LR::COUNT];		//腕の先端
+	gltf_model::node lowerArm[LR::COUNT];	//腕の先端
 
-	DirectX::XMFLOAT3 beamSaber_position[LR::COUNT]{};		//サーベルの先端位置
+	DirectX::XMFLOAT3 beamSaber_position[LR::COUNT]{};			//サーベルの先端位置
 	DirectX::XMFLOAT3 lowerArm_position[LR::COUNT]{};			//腕の先端位置
 	DirectX::XMFLOAT3 attackCollision_position[LR::COUNT]{};	//サーベルの当たり判定位置
+	
+	//軌跡
+	enum class TRAIL
+	{
+		LOWER_ARM,	//腕の先端
+		BEAM_SABER,	//サーベルの先端
+		COUNT,		//要素の数（enumの終端）
+	};
+	static const int MAX_POLYGON = 32;
+	DirectX::XMFLOAT3 trailPositions[static_cast<int>(TRAIL::COUNT)][MAX_POLYGON];	//軌跡の保存座標
 
 	//ボス座標
 	DirectX::XMFLOAT3 bossPosition{};
@@ -340,13 +353,13 @@ private:
 	//加速度状態
 	enum ACCELERATION_STATE
 	{
-		MOVE,									//走り
-		AVOIDANCE,						//ブースト
-		WING,									//飛行
-		ACCELERATION_COUNT,	//総数
+		MOVE,					//走り
+		AVOIDANCE,				//ブースト
+		WING,					//飛行
+		ACCELERATION_COUNT,		//総数
 	};
 	float accelerationState[ACCELERATION_STATE::ACCELERATION_COUNT]{
-		1.5f,				//走り
+		1.5f,			//走り
 		50.0f,			//ブースト
 		25.0f			//飛行
 	};
@@ -374,7 +387,6 @@ private:
 
 	//前方方向
 	DirectX::XMFLOAT3 forward;
-
 
 	//------------------デバッグ-------------------------
 public:
