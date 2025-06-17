@@ -125,17 +125,19 @@ protected:
 	//-----------変数--------------//
 
 	DirectX::XMFLOAT3	position = { 0, 0, 0 };		//座標
-	DirectX::XMFLOAT3	angle = { 0, 0, 0 };			//角度
-	DirectX::XMFLOAT3	scale = { 1, 1, 1 };			//サイズ
-	DirectX::XMFLOAT4 orientation{ 0,0,0,1 };		//
-	DirectX::XMFLOAT4X4	transform = {				//
+	DirectX::XMFLOAT3	angle = { 0, 0, 0 };		//角度
+	DirectX::XMFLOAT3	scale = { 1, 1, 1 };		//サイズ
+	DirectX::XMFLOAT4 orientation{ 0,0,0,1 };		//クォータニオンで表した回転
+	DirectX::XMFLOAT4X4	transform = {				//ワールド行列
 	1, 0, 0, 0,
 	0, 1, 0, 0,
 	0, 0, 1, 0,
 	0, 0, 0, 1
 	};
 
-	DirectX::XMFLOAT3 checkpointPosition = { 0, 0, 0 };		//チェックポイント座標
+	DirectX::XMFLOAT3 checkpointPosition = { 0, 0, 0 };	//チェックポイント座標
+	
+	//軸の種類
 	enum class LIMIT
 	{
 		X = 0,
@@ -143,11 +145,14 @@ protected:
 		Z,
 		Count
 	};
-	//
+
+	//各軸における制限（壁）の最小値と最大値
 	DirectX::XMFLOAT2 limitWall[static_cast<int>(LIMIT::Count)];
 
+	//キャラクターのパラメータ
 	CharacterParam charaParam;
 
+	//段差を乗り越えられる最大の高さ
 	float stepOffset = 0.7f;
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };
 	//地面に当たっているか

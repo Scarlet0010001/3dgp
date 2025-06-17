@@ -40,8 +40,6 @@ void SceneGame::Initialize()
 
         BulletManager::Instance().Initialize();
 
-        deferred = std::make_unique<DeferredRenderer>();
-
         LightManager::Instance().Initialize();
         dirLight = std::make_shared<DirLight>(
             DirectX::XMFLOAT3(0.6f, -0.6f, 1.6f),
@@ -188,6 +186,7 @@ void SceneGame::Render(float elapsedTime)
     Graphics& graphics = Graphics::Instance();
     StageManager& stageManager = StageManager::Instance();
     BulletManager& bulletManager = BulletManager::Instance();
+    PrimitiveRenderer* primitiveRenderer = Graphics::Instance().GetPrimitiveRenderer();
 
     //ヒットストップしていない場合に各描画を更新する
     if (!isHitStop)
@@ -203,9 +202,7 @@ void SceneGame::Render(float elapsedTime)
         //フレームバッファ0アクティブ
         framebuffers[0]->activate(graphics.Get_DC().Get(),
             FB_FLAG::COLOR_DEPTH_STENCIL);
-        //***************************************************************//
-        ///		    	            			スカイマップ		                             	  ///
-        //***************************************************************//
+        //-------------------スカイマップ---------------------		                             	  ///
 
         // 現在のビューポート情報を取得
         D3D11_VIEWPORT viewport;
@@ -235,11 +232,10 @@ void SceneGame::Render(float elapsedTime)
         skymap->Blit(graphics.Get_DC().Get(), view_pro);
 
         // IBL（Image-Based Lighting）の定数バッファをバインド
-        IBL_constant->Bind(Graphics::Instance().Get_DC().Get(), 11, CB_FLAG::ALL);
+        IBL_constant->Bind(graphics.Get_DC().Get(), 11, CB_FLAG::ALL);
 
-        //***************************************************************//
-        ///						フォワードレンダリング					///
-        //***************************************************************//
+        //-----------------フォワードレンダリング-----------------
+
         graphics.SetGraphicStatePriset(
             ST_DEPTH::DepthON_WriteON,
             ST_BLEND::ALPHA,
@@ -255,6 +251,9 @@ void SceneGame::Render(float elapsedTime)
         {
             EffectManager::Instance().Render(camera->GetView(), camera->GetProjection());
         }
+
+        // ポリゴン描画
+        primitiveRenderer->Render(graphics.Get_DC().Get(), camera->GetView(), camera->GetProjection(), D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
         //-------------------DebugPrimitive----------------------//
         graphics.SetGraphicStatePriset(ST_DEPTH::DepthON_WriteON, ST_BLEND::ALPHA, ST_RASTERIZER::WIREFRAME_CULL_BACK);

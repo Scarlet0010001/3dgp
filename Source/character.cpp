@@ -265,7 +265,6 @@ void Character::UpdateVerticalMove(float elapsedTime, DirectX::XMFLOAT3& positio
 		{
 			//地面に設置している
 			position = hit.position;
-
 			//angle.y += hit.rotation.y;
 			// 法線ベクトル取得
 			normal = hit.normal;

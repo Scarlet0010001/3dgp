@@ -13,4 +13,5 @@ struct VS_OUT
 cbuffer PRIMITIVE_CONSTANT_BUFFER : register(b0)
 {
 	row_major float4x4	viewProjection;
+	float4 color;
 };

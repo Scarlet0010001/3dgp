@@ -8,6 +8,7 @@
 // {
 //
 //   row_major float4x4 viewProjection; // Offset:    0 Size:    64
+//   float4 color;                      // Offset:   64 Size:    16 [unused]
 //
 // }
 //

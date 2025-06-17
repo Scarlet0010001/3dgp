@@ -43,9 +43,6 @@
     <Filter Include="Sources\Scene">
       <UniqueIdentifier>{edbf23f4-c94d-4bec-8600-9d074572d638}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\Shader">
-      <UniqueIdentifier>{4bd81f76-773e-45f1-83d3-8a3d50a25d7c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sources\Skymap">
       <UniqueIdentifier>{fbedf5f6-4d8a-4858-ae25-a5280ceb5245}</UniqueIdentifier>
     </Filter>
@@ -121,6 +118,9 @@
     <Filter Include="Shaders\GaussianBlur">
       <UniqueIdentifier>{a4b38cfd-7ead-446a-8970-915b1a8d2ce3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Shader">
+      <UniqueIdentifier>{4bd81f76-773e-45f1-83d3-8a3d50a25d7c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\camera.cpp">
@@ -150,16 +150,10 @@
     <ClCompile Include="Source\main.cpp">
       <Filter>Sources\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Source\deferred_renderer.cpp">
-      <Filter>Sources\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\framebuffer.cpp">
       <Filter>Sources\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\fullscreen_quad.cpp">
-      <Filter>Sources\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\g_buffer.cpp">
       <Filter>Sources\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\graphics.cpp">
@@ -344,16 +338,10 @@
     <ClInclude Include="Source\misc.h">
       <Filter>Sources\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="Source\deferred_renderer.h">
-      <Filter>Sources\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\framebuffer.h">
       <Filter>Sources\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\fullscreen_quad.h">
-      <Filter>Sources\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\g_buffer.h">
       <Filter>Sources\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\graphics.h">

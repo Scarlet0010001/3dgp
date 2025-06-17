@@ -34,7 +34,7 @@ void Graphics::Initialize(HWND hwnd)
 		swapChain.GetAddressOf(), device.GetAddressOf(), NULL, immediateContext.GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
-	//②レンダーターゲットビューの作成
+	//レンダーターゲットビューの作成
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer{};		//2D テクスチャー インターフェイス:、構造化されたメモリーであるテクセル データを管理 https://docs.microsoft.com/ja-jp/previous-versions/direct-x/ee420038(v=vs.85)
 	hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<LPVOID*>(backBuffer.GetAddressOf()));
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
@@ -44,7 +44,7 @@ void Graphics::Initialize(HWND hwnd)
 
 
 
-	//②深層ステンシルビューの作成
+	//深層ステンシルビューの作成
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer{};	//
 	D3D11_TEXTURE2D_DESC texture2dDesc{};	//
@@ -71,8 +71,6 @@ void Graphics::Initialize(HWND hwnd)
 	depthStencilVewDesc.Texture2D.MipSlice = 0;								//1Dテクスチャサブリソースを指定します（D3D11_TEX1D_DSVを参照）。
 	hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), &depthStencilVewDesc, depthStencilView.GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	//depthStencilBuffer->Release();	
 
 
 	//ビューポートの作成
@@ -193,6 +191,8 @@ void Graphics::Initialize(HWND hwnd)
 	depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 	hr = device->CreateDepthStencilState(&depth_stencil_desc, depthStencilStates[static_cast<size_t>(DEPTH_STATE::DepthOFF_WriteOFF)].GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+
 	// ブレンディングステートオブジェクト
 	{
 		auto r_set_blend_mode = [&](int blend_enable, const D3D11_BLEND& src_blend, const D3D11_BLEND& dest_blend,
@@ -217,7 +217,7 @@ void Graphics::Initialize(HWND hwnd)
 			D3D11_BLEND_OP_ADD, D3D11_BLEND_ONE, D3D11_BLEND_ZERO, BLEND_STATE::NORMAL);
 		// 通常（アルファブレンド)
 		r_set_blend_mode(TRUE, D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_INV_SRC_ALPHA,
-			D3D11_BLEND_OP_ADD, D3D11_BLEND_ONE, D3D11_BLEND_INV_SRC_ALPHA, BLEND_STATE::ALPHA);
+			D3D11_BLEND_OP_ADD, D3D11_BLEND_ONE, D3D11_BLEND_ZERO, BLEND_STATE::ALPHA);
 		// 加算(透過あり)
 		r_set_blend_mode(TRUE, D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_ONE,
 			D3D11_BLEND_OP_ADD, D3D11_BLEND_ZERO, D3D11_BLEND_ONE, BLEND_STATE::ADD);
@@ -264,7 +264,7 @@ void Graphics::Initialize(HWND hwnd)
 	//レンダラー
 	{
 		debugRenderer = std::make_unique<DebugRenderer>(device.Get());
-
+		primitiveRenderer = std::make_unique<PrimitiveRenderer>(device.Get());
 	}
 }
 

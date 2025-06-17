@@ -29,12 +29,8 @@ public:
 	void Update(float elapsedTime);
 
 	//描画処理
-	//ディファードでレンダリングするオブジェクト
-	void Render_d(float elapsedTime);
 	//フォワードレンダリングするオブジェクト
 	void Render_f(float elapsedTime);
-	//シャドウレンダリングするオブジェクト
-	void Render_s(float elapsedTime);
 	//UI描画
 	void RenderUI(float elapsedTime);
 	//デバッグ用GUI描画
@@ -193,8 +189,6 @@ private:
 	void TransitionCombo_01_01_State();		//近接コンボ１
 	void TransitionCombo_01_02_State();		//近接コンボ２
 	void TransitionCombo_01_03_State();		//近接コンボ３
-	void TransitionCombo_PowerL_State();	//強攻撃左
-	void TransitionCombo_PowerR_State();	//強攻撃右
 
 	void TransitionDamageState();			//ダメージ
 	void TransitionDeadState();				//死亡
@@ -213,8 +207,6 @@ private:
 	void UpdateCombo_01_01_State(float elapsedTime);	//近接コンボ１
 	void UpdateCombo_01_02_State(float elapsedTime);	//近接コンボ２
 	void UpdateCombo_01_03_State(float elapsedTime);	//近接コンボ３
-	void UpdateCombo_PowerL_State(float elapsedTime);	//強攻撃左
-	void UpdateCombo_PowerR_State(float elapsedTime);	//強攻撃右
 
 	void UpdateDamageState(float elapsedTime);			//ダメージ
 	void UpdateDeadState(float elapsedTime);			//死亡
@@ -266,9 +258,6 @@ private:
 	void OnDamaged(WINCE_TYPE type) override;
 	//ダメージを受ける処理
 	bool ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)override;
-
-	//浮遊する
-	bool Flying();
 
 	//軌跡更新処理
 	void TrailUpdate();
@@ -344,8 +333,16 @@ private:
 		BEAM_SABER,	//サーベルの先端
 		COUNT,		//要素の数（enumの終端）
 	};
-	static const int MAX_POLYGON = 32;
-	DirectX::XMFLOAT3 trailPositions[static_cast<int>(TRAIL::COUNT)][MAX_POLYGON];	//軌跡の保存座標
+	static const int MAX_POLYGON = 12;
+
+	struct TrailParam
+	{
+		DirectX::XMFLOAT3 trailPositions[ToInt(TRAIL::COUNT)][MAX_POLYGON];	//軌跡の保存座標
+		DirectX::XMFLOAT4 color[MAX_POLYGON];
+	};
+	TrailParam trailAttack[ToInt(LR::COUNT)];
+	//軌跡を初期化判定
+	bool resetTrail = false;
 
 	//ボス座標
 	DirectX::XMFLOAT3 bossPosition{};

@@ -5,7 +5,7 @@
 #include "boss.h"
 
 #include "light_manager.h"
-#include "deferred_renderer.h"
+#include "framebuffer.h"
 
 #include "audio.h"
 #include "sky_map.h"
@@ -44,9 +44,6 @@ private:
     DirectX::XMFLOAT3 charaPos{};
     //平行光
     std::shared_ptr<DirLight> dirLight = nullptr;
-    //ディファードレンダー
-    std::unique_ptr<DeferredRenderer> deferred = nullptr;
-
     //IBL
     struct IBL_constants
     {

@@ -39,7 +39,7 @@ private:
 		DirectX::XMFLOAT4X4 world;
 		DirectX::XMFLOAT4 material_color;
 	};
-	std::unique_ptr<Constants<FigureConstants>> figure_constants;
+	std::unique_ptr<Constants<FigureConstants>> figureConstants;
 	struct Sphere
 	{
 		DirectX::XMFLOAT4	color;

@@ -22,7 +22,7 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 		create_ps_from_cso(device, "Shader/debug_renderer_ps.cso", pixelShader.GetAddressOf());
 	}
 	// 定数バッファ
-	figure_constants = std::make_unique<Constants<FigureConstants>>(device);
+	figureConstants = std::make_unique<Constants<FigureConstants>>(device);
 	// 球メッシュ作成
 	CreateSphereMesh(device, 1.0f, 16, 16);
 	// 円柱メッシュ作成
@@ -54,10 +54,10 @@ void DebugRenderer::RenderAlFigures(ID3D11DeviceContext* context)
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(sphere.center.x, sphere.center.y, sphere.center.z);
 		DirectX::XMMATRIX W = S * T;
 		// 定数バッファ更新
-		figure_constants->data.material_color = sphere.color;
-		DirectX::XMStoreFloat4x4(&figure_constants->data.world, W);
+		figureConstants->data.material_color = sphere.color;
+		DirectX::XMStoreFloat4x4(&figureConstants->data.world, W);
 
-		figure_constants->Bind(context, 0, CB_FLAG::VS);
+		figureConstants->Bind(context, 0, CB_FLAG::VS);
 		//if (DebugFlag::get_wireframe_switching())
 			context->Draw(sphereVertexCount, 0);
 	}
@@ -71,10 +71,10 @@ void DebugRenderer::RenderAlFigures(ID3D11DeviceContext* context)
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(cylinder.position.x, cylinder.position.y, cylinder.position.z);
 		DirectX::XMMATRIX W = S * T;
 		// 定数バッファ更新
-		figure_constants->data.material_color = cylinder.color;
-		DirectX::XMStoreFloat4x4(&figure_constants->data.world, W);
+		figureConstants->data.material_color = cylinder.color;
+		DirectX::XMStoreFloat4x4(&figureConstants->data.world, W);
 
-		figure_constants->Bind(context, 0, CB_FLAG::VS);
+		figureConstants->Bind(context, 0, CB_FLAG::VS);
 		//if (DebugFlag::get_wireframe_switching())
 			context->Draw(cylinderVertexCount, 0);
 	}
@@ -90,10 +90,10 @@ void DebugRenderer::RenderAlFigures(ID3D11DeviceContext* context)
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(cuboid.position.x, cuboid.position.y, cuboid.position.z);
 		DirectX::XMMATRIX W = S * T;
 		// 定数バッファ更新
-		figure_constants->data.material_color = cuboid.color;
-		DirectX::XMStoreFloat4x4(&figure_constants->data.world, W);
+		figureConstants->data.material_color = cuboid.color;
+		DirectX::XMStoreFloat4x4(&figureConstants->data.world, W);
 
-		figure_constants->Bind(context, 0, CB_FLAG::VS);
+		figureConstants->Bind(context, 0, CB_FLAG::VS);
 		D3D11_BUFFER_DESC buffer_desc{};
 		cuboidIndexBuffer->GetDesc(&buffer_desc);
 		//if (DebugFlag::get_wireframe_switching())
@@ -145,10 +145,10 @@ void DebugRenderer::RenderAlFigures(ID3D11DeviceContext* context)
 		XMMATRIX T = XMMatrixTranslation(capsule.start.x, capsule.start.y, capsule.start.z);
 		XMMATRIX W = S * R * T;
 		// 定数バッファ更新
-		figure_constants->data.material_color = capsule.color;
-		XMStoreFloat4x4(&figure_constants->data.world, W);
+		figureConstants->data.material_color = capsule.color;
+		XMStoreFloat4x4(&figureConstants->data.world, W);
 
-		figure_constants->Bind(context, 0, CB_FLAG::VS);
+		figureConstants->Bind(context, 0, CB_FLAG::VS);
 		//if (DebugFlag::get_wireframe_switching())
 			context->Draw(capsuleVertexCount, 0);
 	}

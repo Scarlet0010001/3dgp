@@ -56,6 +56,8 @@ Player::Player()
 	gamePad = &Device::Instance().GetGamePad();
 	camera = &Camera::Instance();
 
+	//circleShadowConstants = std::make_unique<Constants<CircleShadowConstants>>(Graphics::Instance().GetDevice().Get());
+
 	// 初期化処理を実行
 	Initialize();
 
@@ -112,6 +114,9 @@ void Player::Update(float elapsedTime)
 	//-----------------ブースト更新-----------------//
 	BoostUpdate(elapsedTime);
 
+	//軌跡の初期化
+	resetTrail = false;
+
 	//-----------------ステート更新処理-----------------//
 	(this->*p_update)(elapsedTime);
 
@@ -134,6 +139,9 @@ void Player::Update(float elapsedTime)
 
 	//-----------------デバッグプリミティブ更新-----------------//
 	DebugPrimitiveUpdate();
+
+	//-----------------軌跡更新-----------------//
+	TrailUpdate();
 
 	//-----------------当たり判定カプセル更新-----------------//
 	collider.start = position;
@@ -163,10 +171,6 @@ void Player::Update(float elapsedTime)
 		ui->SetLockonDistance(Math::calc_vector_AtoB_length(position, bossPosition));
 	}
 	ui->Update(elapsedTime);
-}
-
-void Player::Render_d(float elapsedTime)
-{
 }
 
 void Player::Render_f(float elapsedTime)
@@ -266,10 +270,6 @@ void Player::Render_f(float elapsedTime)
 		// 前回のアニメーションを更新
 		playerAnimation_old = playerAnimation;
 	}
-}
-
-void Player::Render_s(float elapsedTime)
-{
 }
 
 void Player::RenderUI(float elapsed_time)
@@ -733,80 +733,105 @@ bool Player::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 
 }
 
-bool Player::Flying()
-{
-    return false;
-}
-
 void Player::TrailUpdate()
 {
-	if (state != STATE::LEFT_ATTACK && state != STATE::RIGHT_ATTACK)
+	//攻撃時以外はtrailPositions配列全てをサーベルの位置に揃え、透明にしておく
+	if ((state != STATE::LEFT_ATTACK
+		&& state != STATE::RIGHT_ATTACK
+		&& !attackParam.isAttack)
+		|| resetTrail
+		)
 	{
-		return;
+		for (int lr = 0; lr < ToInt(LR::COUNT); lr++)
+		{
+			for (int i = MAX_POLYGON - 1; i >= 0; --i)
+			{
+				trailAttack[lr].trailPositions[ToInt(TRAIL::LOWER_ARM)][i] = lowerArm_position[lr];
+				trailAttack[lr].trailPositions[ToInt(TRAIL::BEAM_SABER)][i] = beamSaber_position[lr];
+				trailAttack[lr].color[i] = { 1.0f,0.0f,1.0f,0.0f };
+			}
+		}
+
+		//resetTrailがtrueであればそのまま処理
+		if (resetTrail)
+		{
+			resetTrail = false;
+		}
+		//違えば入らない
+		else
+		{ 
+			return;
+		}
 	}
 
 	// 保存していた頂点バッファを１フレーム分ずらす
+	for(int lr = 0;lr<ToInt(LR::COUNT);lr++)
 	{
 		for (int i = MAX_POLYGON - 1; i > 0; --i)
 		{
-			trailPositions[ToInt(TRAIL::LOWER_ARM)][i] = trailPositions[ToInt(TRAIL::LOWER_ARM)][i - 1];
-			trailPositions[ToInt(TRAIL::BEAM_SABER)][i] = trailPositions[ToInt(TRAIL::BEAM_SABER)][i - 1];
+			trailAttack[lr].trailPositions[ToInt(TRAIL::LOWER_ARM)][i] = trailAttack[lr].trailPositions[ToInt(TRAIL::LOWER_ARM)][i - 1];
+			trailAttack[lr].trailPositions[ToInt(TRAIL::BEAM_SABER)][i] = trailAttack[lr].trailPositions[ToInt(TRAIL::BEAM_SABER)][i - 1];
 			//ここで一緒に不透明度も下げる
+			trailAttack[lr].color[i] = { 1.0f,0.0f,1.0f,1.0f - (static_cast<float>(i) / (MAX_POLYGON - 1)) };
 
 		}
 	}
 
 	//どっちの腕で攻撃するか
 	int side = 0;
-	if (state == STATE::LEFT_ATTACK) side = LR::LEFT;
-	else if (state == STATE::RIGHT_ATTACK) side = LR::RIGHT;
+	if (state == STATE::LEFT_ATTACK)
+	{
+		side = LR::LEFT;
+	}
+	else if (state == STATE::RIGHT_ATTACK)
+	{
+		side = LR::RIGHT;
+	}
 	
 	// 腕の先端とサーベルの先端の座標を取得し、頂点バッファに保存
-	trailPositions[ToInt(TRAIL::LOWER_ARM)][0] = lowerArm_position[side];
-	trailPositions[ToInt(TRAIL::BEAM_SABER)][0] = lowerArm_position[side];
-
-	//軌跡の色
-	DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
-
+	trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][0] = lowerArm_position[side];
+	trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][0] = beamSaber_position[side];
+	
 	// ポリゴン作成
 	PrimitiveRenderer* primitiveRenderer = Graphics::Instance().GetPrimitiveRenderer();
 
 	// 保存していた頂点バッファを用いてスプライン補完処理を行い、滑らかなポリゴンを描画
-	for (int i = 0; i < MAX_POLYGON - 3; i++)
 	{
-		primitiveRenderer->AddVertex(trailPositions[ToInt(TRAIL::LOWER_ARM)][i], color);
-		primitiveRenderer->AddVertex(trailPositions[ToInt(TRAIL::BEAM_SABER)][i], color);
-		for (int j = 1; j < 9; j++)
+		for (int i = 0; i < MAX_POLYGON - 3; i++)
 		{
-			DirectX::XMVECTOR Spline0 =
-				DirectX::XMVectorCatmullRom(
-					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::LOWER_ARM)][i - 1]),
-					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::LOWER_ARM)][i]),
-					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::LOWER_ARM)][i + 1]),
-					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::LOWER_ARM)][i + 2]),
-					j * 0.1f
-				);
-			DirectX::XMVECTOR Spline1 =
-				DirectX::XMVectorCatmullRom(
-					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::BEAM_SABER)][i - 1]),
-					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::BEAM_SABER)][i]),
-					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::BEAM_SABER)][i + 1]),
-					DirectX::XMLoadFloat3(&trailPositions[ToInt(TRAIL::BEAM_SABER)][i + 2]),
-					j * 0.1f
-				);
-			DirectX::XMFLOAT3 splineposition0;
-			DirectX::XMStoreFloat3(&splineposition0, Spline0);
-			DirectX::XMFLOAT3 splineposition1;
-			DirectX::XMStoreFloat3(&splineposition1, Spline1);
-
-			if (i > 0)
+			primitiveRenderer->AddVertex(trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i], trailAttack[side].color[i]);
+			primitiveRenderer->AddVertex(trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i], trailAttack[side].color[i]);
+			for (int j = 1; j < 9; j++)
 			{
-				primitiveRenderer->AddVertex(splineposition0, color);
-				primitiveRenderer->AddVertex(splineposition1, color);
+				DirectX::XMVECTOR Spline0 =
+					DirectX::XMVectorCatmullRom(
+						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i - 1]),
+						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i]),
+						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i + 1]),
+						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i + 2]),
+						j * 0.1f
+					);
+				DirectX::XMVECTOR Spline1 =
+					DirectX::XMVectorCatmullRom(
+						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i - 1]),
+						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i]),
+						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i + 1]),
+						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i + 2]),
+						j * 0.1f
+					);
+				DirectX::XMFLOAT3 splineposition0;
+				DirectX::XMStoreFloat3(&splineposition0, Spline0);
+				DirectX::XMFLOAT3 splineposition1;
+				DirectX::XMStoreFloat3(&splineposition1, Spline1);
+
+				if (i > 0)
+				{
+					primitiveRenderer->AddVertex(splineposition0, trailAttack[side].color[i]);
+					primitiveRenderer->AddVertex(splineposition1, trailAttack[side].color[i]);
+				}
 			}
 		}
 	}
-
 
 }
 

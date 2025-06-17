@@ -95,6 +95,7 @@ void Player::TransitionCombo_01_01_State()
 	//コンボ1状態へ偏移
 	p_update = &Player::UpdateCombo_01_01_State;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_01;
+	resetTrail = true;
 	state = STATE::RIGHT_ATTACK;
 
 	//攻撃パラメータ設定
@@ -112,6 +113,7 @@ void Player::TransitionCombo_01_02_State()
 	//コンボ2状態へ偏移
 	p_update = &Player::UpdateCombo_01_02_State;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_02;
+	resetTrail = true;
 	state = STATE::LEFT_ATTACK;
 
 	//攻撃パラメータ設定
@@ -129,38 +131,11 @@ void Player::TransitionCombo_01_03_State()
 	//コンボ3状態へ偏移
 	p_update = &Player::UpdateCombo_01_03_State;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_03;
+	resetTrail = true;
 	state = STATE::RIGHT_ATTACK;
 
 	//攻撃パラメータ設定
 	attackParam = param.combo_3;
-	nextCombo = false;
-
-	//斬撃音再生
-	audios[SE_SABER]->play();
-	audios[SE_SABER]->volume(1.0f);
-
-}
-
-void Player::TransitionCombo_PowerL_State()
-{
-	//左強攻撃状態へ偏移
-	p_update = &Player::UpdateCombo_PowerL_State;
-	playerAnimation = PlayerAnimation::PLAYER_POWER_L;
-	state = STATE::LEFT_ATTACK;
-	nextCombo = false;
-
-	//斬撃音再生
-	audios[SE_SABER]->play();
-	audios[SE_SABER]->volume(1.0f);
-
-}
-
-void Player::TransitionCombo_PowerR_State()
-{
-	//右強攻撃状態へ偏移
-	p_update = &Player::UpdateCombo_PowerR_State;
-	playerAnimation = PlayerAnimation::PLAYER_POWER_R;
-	state = STATE::RIGHT_ATTACK;
 	nextCombo = false;
 
 	//斬撃音再生
@@ -203,16 +178,12 @@ void Player::UpdateIdleState(float elapsedTime)
 	InputWing();
 
 	//コンボ入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
-		)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
 		TransitionCombo_01_01_State();
 	}
 	//射撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
-		//|| mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK
-		)
+	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER)
 	{
 		TransitionShotState();
 	}
@@ -248,16 +219,12 @@ void Player::UpdateMoveState(float elapsedTime)
 	//飛行入力
 	InputWing();
 	//攻撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
-		)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
 		TransitionCombo_01_01_State();
 	}
 	//射撃入力
-	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER
-		//|| mouse->GetButtonDown() & mouse->BTN_RIGHT_CLICK
-		)
+	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER)
 	{
 		TransitionShotState();
 	}
@@ -378,9 +345,7 @@ void Player::UpdateJumpState(float elapsedTime)
 	InputAvoidance();
 
 	// 攻撃入力処理
-	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
-		)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
 		TransitionCombo_01_01_State();
 	}
@@ -412,9 +377,7 @@ void Player::UpdateShotState(float elapsedTime)
 	else if (ay < 0) playerAnimation = PlayerAnimation::PLAYER_SHOT_BACK;
 
 	// 射撃を解除した場合、待機状態へ遷移
-	if (gamePad->GetButtonUp() & gamePad->BTN_RIGHT_TRIGGER
-		//|| mouse->GetButtonUp() & mouse->BTN_RIGHT_CLICK
-		)
+	if (gamePad->GetButtonUp() & gamePad->BTN_RIGHT_TRIGGER)
 	{
 		TransitionIdleState();
 	}
@@ -450,9 +413,7 @@ void Player::UpdateShotState(float elapsedTime)
 void Player::UpdateCombo_01_01_State(float elapsedTime)
 {
 	// 先行入力（次のコンボ入力を検知）
-	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
-		)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
 		nextCombo = true;
 	}
@@ -496,9 +457,7 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 void Player::UpdateCombo_01_02_State(float elapsedTime)
 {
 	// 先行入力のチェック
-	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
-		)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
 		nextCombo = true;
 	}
@@ -541,9 +500,7 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 
 void Player::UpdateCombo_01_03_State(float elapsedTime)
 {
-	if (gamePad->GetButtonDown() & gamePad->BTN_X
-		//|| mouse->GetButtonDown() & mouse->BTN_LEFT_CLICK
-		)
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
 		nextCombo = true;
 	}
@@ -571,14 +528,6 @@ void Player::UpdateCombo_01_03_State(float elapsedTime)
 	InputAvoidance();
 
 	UpdateVelocity(elapsedTime, position);
-}
-
-void Player::UpdateCombo_PowerL_State(float elapsedTime)
-{
-}
-
-void Player::UpdateCombo_PowerR_State(float elapsedTime)
-{
 }
 
 void Player::UpdateDamageState(float elapsedTime)
