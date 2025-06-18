@@ -418,18 +418,6 @@ bool Player::InputMove(float elapsedTime, float restrictionMove, float restricti
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
 
-bool Player::InputMove(float elapsedTime, float move_speed)
-{
-	//進行ベクトル取得
-	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
-
-	//移動処理
-	Move(move_vec.x, move_vec.z, move_speed);
-	Turn(elapsedTime, camera->GetForward(), charaParam.turnSpeed, orientation);
-
-	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
-}
-
 bool Player::InputMoveWing(float elapsedTime)
 {
 	//進行ベクトル取得
@@ -584,7 +572,7 @@ void Player::InputAvoidance()
 	//右トリガーを押したら回避
 	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_SHOULDER)
 	{
-		TransitionAvoidanceState();
+		TransitionBoostState();
 	}
 
 }
@@ -975,7 +963,7 @@ void Player::DebugGUI()
 				ImGui::DragFloat("TurnSpeed", &charaParam.turnSpeed, 0.1f);
 				ImGui::DragFloat("MoveSpeed", &charaParam.moveSpeed, 0.1f);
 				ImGui::DragFloat("wingSpeed", &param.wingSpeed, 0.1f);
-				ImGui::DragFloat("avoidance_speed", &param.avoidanceSpeed);
+				ImGui::DragFloat("boost_speed", &param.boostSpeed);
 				ImGui::DragFloat("friction", &charaParam.friction);
 				ImGui::DragFloat("acceleration", &charaParam.acceleration);
 				ImGui::DragFloat("jump_speed", &param.jumpSpeed);

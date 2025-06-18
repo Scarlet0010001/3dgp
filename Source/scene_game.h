@@ -55,11 +55,6 @@ private:
     //トーンマップ
     Microsoft::WRL::ComPtr<ID3D11PixelShader> toneMapPixelShader;
 
-    //操作説明UI（仮）
-    //std::unique_ptr<SpriteBatch> operation_ui = nullptr;
-
-    //std::unique_ptr<Tutorial> tutorial = nullptr;
-
     //BGM
     std::shared_ptr<audio> audios[8];
 

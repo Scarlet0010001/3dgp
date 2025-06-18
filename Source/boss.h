@@ -157,34 +157,34 @@ private:
 	/*--------------------状態遷移------------------------*/
 
 	//			移動系				//
-	void TransitionIdleState();									//待機
-	void TransitionWalkState();								//歩行
+	void TransitionIdleState();						//待機
+	void TransitionWalkState();						//歩行
 
 	//			攻撃系				//
-	void TransitionAttack_Tackle_State();				//近接攻撃
+	void TransitionAttack_Tackle_State();			//近接攻撃
 	void TransitionAttack_Jump_State();				//ジャンプ攻撃
-	void TransitionAttack_ShotStraight_State();	//射撃
-	void TransitionAttack_ShotHoming_State();	//誘導ミサイル
+	void TransitionAttack_ShotStraight_State();		//射撃
+	void TransitionAttack_ShotHoming_State();		//誘導ミサイル
 
 	//			ダメージ系			//
-	void TransitionDamageState();							//ダメージ
-	void TransitionDeadState();								//死亡
+	void TransitionDamageState();					//ダメージ
+	void TransitionDeadState();						//死亡
 
 	/*---------------状態更新------------------------*/
 
 	//			移動系				//
-	void UpdateIdleState(float elapsedTime);									//待機
-	void UpdateWalkState(float elapsedTime);									//歩行
+	void UpdateIdleState(float elapsedTime);					//待機
+	void UpdateWalkState(float elapsedTime);					//歩行
 
 	//			攻撃系				//
-	void UpdateAttack_Tackle_State(float elapsedTime);				//近接攻撃
-	void UpdateAttack_Jump_State(float elapsedTime);					//ジャンプ攻撃
+	void UpdateAttack_Tackle_State(float elapsedTime);			//近接攻撃
+	void UpdateAttack_Jump_State(float elapsedTime);			//ジャンプ攻撃
 	void UpdateAttack_ShotStraight_State(float elapsedTime);	//射撃
-	void UpdateAttack_ShotHoming_State(float elapsedTime);	//誘導ミサイル
+	void UpdateAttack_ShotHoming_State(float elapsedTime);		//誘導ミサイル
 
 	//			ダメージ系			//
-	void UpdateDamageState(float elapsedTime);							//ダメージ
-	void UpdateDeadState(float elapsedTime);									//死亡
+	void UpdateDamageState(float elapsedTime);					//ダメージ
+	void UpdateDeadState(float elapsedTime);					//死亡
 
 	//攻撃方法判定
 	void AttackRoutine(float elapsedTime);
@@ -208,102 +208,100 @@ private:
 	void OnDamaged(WINCE_TYPE type) override;
 
 
-	//jsonデータファイルのロードとセーブ
+	//----------<ファイル>------------//
 	void LoadDataFile();
 	void SaveDataFile();
-
-	//jsonファイル名
 	const char* filePath = "Resources/Character/Boss/boss_param.json";
 
 	//---------------------------変数---------------------------//
-// ボスのアクション更新関数（現在のステートの更新処理を指す関数ポインタ）
+	//ボスのアクション更新関数（現在のステートの更新処理を指す関数ポインタ）
 	typedef void (Boss::* ActUpdate)(float elapsedTime);
 	ActUpdate act_update = &Boss::UpdateIdleState;
 
-	// ボスの 3D モデル（GLTF）
+	//ボスの 3D モデル（GLTF）
 	std::unique_ptr<gltf_model> model;
-	// ボス専用 UI
+	//ボス専用 UI
 	std::unique_ptr<BossUI> ui;
 
-	// 砲塔（タレット）のノード
+	//砲塔（タレット）のノード
 	gltf_model::node turretNode;
 
-	// ボスのアニメーション（現在、遷移中、前回の状態を記録）
+	//ボスのアニメーション（現在、遷移中、前回の状態を記録）
 	BossAnimation bossAnimation = BOSS_IDLE;
 	BossAnimation bossAnimation_transition = BOSS_IDLE;
 	BossAnimation bossAnimation_old = BOSS_IDLE;
 
-	// ステート関連のタイマー
-	float stateTimer;						// 現在のステート経過時間
-	float stateDuration;					// 次のステートに移行するまでの時間
-	float attackResponderTimer;	// 攻撃までの猶予時間
+	//ステート関連のタイマー
+	float stateTimer;						//現在のステート経過時間
+	float stateDuration;					//次のステートに移行するまでの時間
+	float attackResponderTimer;				//攻撃までの猶予時間
 
-	// HP 関連
-	int32_t lineHealth;  // ボスが怯むHPライン
+	//HP関連
+	int32_t lineHealth;  //ボスが怯むHPライン
 
-	// ターゲット情報
-	DirectX::XMFLOAT3 target_pos;        // 目標位置
-	DirectX::XMFLOAT3 targetPoint_pos{}; // 目標の胴体位置
-	float targetPoint_height = 0.0f;     // 目標位置からの高さ
-	DirectX::XMFLOAT3 shot_pos;          // 弾を撃つ位置
+	//ターゲット情報
+	DirectX::XMFLOAT3 target_pos;        //目標位置
+	DirectX::XMFLOAT3 targetPoint_pos{}; //目標の胴体位置
+	float targetPoint_height = 0.0f;     //目標位置からの高さ
+	DirectX::XMFLOAT3 shot_pos;          //弾を撃つ位置
 
-	// 行動フラグ
-	bool isJump = false;   // ジャンプ中かどうか
-	bool isBackJump = false; // バックステップ中かどうか
+	//行動フラグ
+	bool isJump = false;		//ジャンプ中かどうか
+	bool isBackJump = false;	//バックステップ中かどうか
 
-	// エフェクト
+	//エフェクト
 	std::unique_ptr<Effect> chargeEffect = nullptr; // チャージ攻撃のエフェクト
 
-	// 連射関連
-	int rapidCount = 0;  // 連射のカウント
+	//連射のカウント
+	int rapidCount = 0;
 
-	// ボスの現在のステート
+	//ボスの現在のステート
 	STATE state;
 
-	// ボスのパラメータ
+	//ボスのパラメータ
 	BossParam param;
-	// 攻撃のパラメータ
+	//攻撃のパラメータ
 	AttackParam attackParam;
-	// ボスの当たり判定（体のコリジョン情報）
+	//ボスの当たり判定（体のコリジョン情報）
 	BodyCollision bossBodyCollision;
-	// タックル時のカメラシェイク情報
+	//タックル時のカメラシェイク情報
 	Camera::CameraShakeParam tackleCameraShake;
 
-	bool displayImgui = false; // ImGui デバッグウィンドウを表示するか
+	bool displayImgui = false; //ImGui デバッグウィンドウを表示するか
 #if _DEBUG
-	bool isUpdate = true;  // 更新処理を行うか
-	bool isRender = true;  // 描画処理を行うか
+	bool isUpdate = true;  //更新処理を行うか
+	bool isRender = true;  //描画処理を行うか
 #endif	//==============================================================
 	// 
 	// 定数
 	// 
 	//==============================================================
 
-	// 移動速度
+	//移動速度
 	const float WALK_SPEED = 6;		//歩くスピード
 	const float RUN_SPEED = 30;		//走るスピード
 
 	//加速度
-	const float ACCELERATION_NORMAL_SPEED = 1.5f;	// 通常の加速度
-	const float ACCELERATION_JUMP_SPEED = 25.0f;		// ジャンプ時の加速度
+	const float ACCELERATION_NORMAL_SPEED = 1.5f;	//通常の加速度
+	const float ACCELERATION_JUMP_SPEED = 25.0f;	//ジャンプ時の加速度
 	
-	// 攻撃関連
+	//攻撃関連
 	
-	const float ATTACK_ACTION_LENGTH = 17;			//通常攻撃の射程
+	const float ATTACK_ACTION_LENGTH = 17;		//通常攻撃の射程
 	const float NORMAL_ATTACK_COOLTIME = 1;		//通常攻撃のクールタイム
-	const float ATTACK_RESPONDER_TIME = 2.0f;	// 近距離以上の射程時の判定時間
+	const float ATTACK_RESPONDER_TIME = 2.0f;	//近距離以上の射程時の判定時間
 
-	// 連射関連
-	const int RAPID_MAX = 10;					// 最大連射回数
-	const float RAPIDFIRE_TIME = 0.5f;	//連射間隔
+	//連射関連
+	const int RAPID_MAX = 10;					//最大連射回数
+	const float RAPIDFIRE_TIME = 0.5f;			//連射間隔
 
-	const float CHARGE_JUMP_TIME = 2.5f;	//ジャンプ攻撃のチャージ時間
+	const float CHARGE_JUMP_TIME = 2.5f;		//ジャンプ攻撃のチャージ時間
 
 	//ダメージを受けたときのスタン時間
 	const float DAMAGE_STUN_DURATION = 3.0f;
 
 public:
-	// 被ダメージ時のコールバック関数
+	//被ダメージ時のコールバック関数
 	AddDamageFunc damagedFunction;
 
 };

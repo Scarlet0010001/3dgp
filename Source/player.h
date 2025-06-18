@@ -20,6 +20,7 @@ class Player final :
     public Character
 {
 public:
+	//コンストラクタとデストラクタ
     Player();
     ~Player()override;
 
@@ -137,7 +138,7 @@ private:
 		//ジャンプスピード
 		float jumpSpeed = 21;
 		//回避速度
-		float avoidanceSpeed = 50;
+		float boostSpeed = 50;
 		//回避用タイマー
 		float avoidanceTimer = 0.0f;
 		//飛行速度
@@ -162,7 +163,7 @@ private:
 			archive(
 				cereal::make_nvp("charaParam", charaInitParam),
 				cereal::make_nvp("jumpSpeed", jumpSpeed),
-				cereal::make_nvp("avoidanceSpeed", avoidanceSpeed),
+				cereal::make_nvp("boostSpeed", boostSpeed),
 				cereal::make_nvp("wingSpeed", wingSpeed),
 				cereal::make_nvp("boostTimer", boostTimer),
 				cereal::make_nvp("floatingValue", floatingValue),
@@ -177,21 +178,21 @@ private:
 private:
 
 	//------------遷移--------------//
-	void TransitionIdleState();				//待機
-	void TransitionMoveState();				//走り
-	void TransitionWingState();				//飛行
+	void TransitionIdleState();			//待機
+	void TransitionMoveState();			//走り
+	void TransitionWingState();			//飛行
 
-	void TransitionAvoidanceState();		//回避
-	void TransitionJumpState();				//ジャンプ
-	void TransitionLandingState();			//着地
+	void TransitionBoostState();		//回避
+	void TransitionJumpState();			//ジャンプ
+	void TransitionLandingState();		//着地
 
-	void TransitionShotState();				//射撃
-	void TransitionCombo_01_01_State();		//近接コンボ１
-	void TransitionCombo_01_02_State();		//近接コンボ２
-	void TransitionCombo_01_03_State();		//近接コンボ３
+	void TransitionShotState();			//射撃
+	void TransitionCombo_01_01_State();	//近接コンボ１
+	void TransitionCombo_01_02_State();	//近接コンボ２
+	void TransitionCombo_01_03_State();	//近接コンボ３
 
-	void TransitionDamageState();			//ダメージ
-	void TransitionDeadState();				//死亡
+	void TransitionDamageState();		//ダメージ
+	void TransitionDeadState();			//死亡
 
 
 	//--------各ステートのアップデート--------//
@@ -199,7 +200,7 @@ private:
 	void UpdateMoveState(float elapsedTime);			//走り
 	void UpdateWingState(float elapsedTime);			//飛行
 
-	void UpdateAvoidanceState(float elapsedTime);		//回避
+	void UpdateBoostState(float elapsedTime);			//回避
 	void UpdateJumpState(float elapsedTime);			//ジャンプ
 	void UpdateLandingState(float elapsedTime);			//着地
 
@@ -222,16 +223,18 @@ private:
 	//ブーストの更新処理
 	void BoostUpdate(float elapsedTime);
 
+	//軌跡更新処理
+	void TrailUpdate();
+
 	//プレイヤーの移動入力処理
 	bool InputMove(float elapsedTime);
+
 	//プレイヤーの飛行入力処理
 	bool InputMoveWing(float elapsedTime);
 
 	//制限付きの移動（攻撃中などの移動入力）
 	bool InputMove(float elapsedTime, float restrictionMove, float restrictionTurn);
-	
-	bool InputMove(float elapsedTime, float move_speed);
-	
+		
 	//入力ベクトル算出
 	const DirectX::XMFLOAT3 GetMoveVec(Camera* camera, bool wing = false) const;
 
@@ -258,9 +261,6 @@ private:
 	void OnDamaged(WINCE_TYPE type) override;
 	//ダメージを受ける処理
 	bool ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)override;
-
-	//軌跡更新処理
-	void TrailUpdate();
 
 	//垂直速力更新処理
 	 void UpdateVerticalVelocity(float elapsed_frame)override;
@@ -292,7 +292,7 @@ private:
 		SE_SABER = 0,		//サーベル音
 		SE_LASER = 1,		//射撃音
 		SE_BOOST =2,		//ブースト音
-		SE_DAMAGE = 3,	//被弾音
+		SE_DAMAGE = 3,		//被弾音
 	};
 	std::shared_ptr<audio> audios[8];
 
@@ -333,15 +333,18 @@ private:
 		BEAM_SABER,	//サーベルの先端
 		COUNT,		//要素の数（enumの終端）
 	};
+	//最大ポリゴン数
 	static const int MAX_POLYGON = 12;
 
+	//軌跡パラメータ
 	struct TrailParam
 	{
-		DirectX::XMFLOAT3 trailPositions[ToInt(TRAIL::COUNT)][MAX_POLYGON];	//軌跡の保存座標
-		DirectX::XMFLOAT4 color[MAX_POLYGON];
+		DirectX::XMFLOAT3 trailPositions[ToInt(TRAIL::COUNT)][MAX_POLYGON];	//軌跡の保存座標配列
+		DirectX::XMFLOAT4 color[MAX_POLYGON];	//各頂点ごとのカラー情報
 	};
+	//左右の攻撃の軌跡配列
 	TrailParam trailAttack[ToInt(LR::COUNT)];
-	//軌跡を初期化判定
+	//軌跡を初期化するかどうかのフラグ
 	bool resetTrail = false;
 
 	//ボス座標
@@ -361,7 +364,7 @@ private:
 		25.0f			//飛行
 	};
 
-	//現何回ジャンプしてるか
+	//現在何回ジャンプしてるか
 	int jumpCount = 0;
 	//ジャンプ可能回数
 	const int jumpLimit = 1;
@@ -369,7 +372,7 @@ private:
 	//ブーストのオンオフ
 	bool isBoost = false;
 
-	//エフェクト
+	//斬撃エフェクト
 	std::unique_ptr<Effect> slashEffect = nullptr;
 
 	//Imguiのオンオフ
@@ -377,6 +380,7 @@ private:
 
 	//------------------攻撃関連--------------------------
 
+	//攻撃に関する各種パラメータ構造体
 	AttackParam attackParam;
 
 	//先行入力判定
