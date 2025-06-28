@@ -1,6 +1,5 @@
 #include "boss.h"
 #include "bullet_straight.h"
-#include "bullet_homing.h"
 #include "bullet_manager.h"
 #include "shader.h"
 #include"user.h"
@@ -25,11 +24,11 @@ Boss::Boss()
 	chargeEffect = std::make_unique<Effect>("Resources/Effect/Charge/charge.efkefc");
 
 	model->cumulate_transforms(model->nodes, transform);
-	for (auto& node : animated_nodes)
+	for (auto& node : animatedNodes)
 	{
 		node = model->nodes;
 	}
-	blended_animated_nodes = model->nodes;
+	blendedAnimatedNodes = model->nodes;
 
 	turretNode = model->find_nodes("Bone_MGun_Main");
 
@@ -95,7 +94,7 @@ void Boss::Update(float elapsedTime)
 #endif
 
 	// アクション更新関数を呼び出し（elapsedTimeを引数として渡す）
-	(this->*act_update)(elapsedTime);
+	(this->*actUpdate)(elapsedTime);
 
 	// 無敵タイマーの更新
 	UpdateInvicibleTimer(elapsedTime);
@@ -135,61 +134,61 @@ void Boss::Render_f(float elapsedTime)
 	if (bossAnimation_transition != bossAnimation)
 	{
 		// 遷移状態がまだ開始されていない場合
-		if (transition_state != TRANSITION_STATE::NONE)
+		if (transitionState != TRANSITION_STATE::NONE)
 		{
 			bossAnimation_old = bossAnimation_transition;  // 前回のアニメーションを記録
-			animated_nodes[ANIME_NODE::OLD_ANIMATION] = blended_animated_nodes;  // ブレンドされた古いアニメーションを保持
+			animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)] = blendedAnimatedNodes;  // ブレンドされた古いアニメーションを保持
 			transitionToTransition = true;  // 遷移フラグを設定
 		}
 		bossAnimation_transition = bossAnimation;  // 現在のアニメーションを遷移先に設定
-		transition_state = TRANSITION_STATE::START;  // 遷移を開始
+		transitionState = TRANSITION_STATE::START;  // 遷移を開始
 	}
 
 
 	bool nowLoop = FindLoopAnimation(bossAnimation);  // 現在のアニメーションがループするか確認
 
 	// ブレンドアニメーションの処理
-	if (transition_state > 0 && transition_time > 0.0f)
+	if (transitionState > TRANSITION_STATE::NONE && transitionTime > 0.0f)
 	{
-		switch (transition_state)
+		switch (transitionState)
 		{
 		case TRANSITION_STATE::NONE:
 			break;
 		case TRANSITION_STATE::START:
 			// 遷移の開始処理
-			model->animate(bossAnimation_old, time, animated_nodes[ANIME_NODE::OLD_ANIMATION], FindLoopAnimation(bossAnimation_old));  // 古いアニメーションの再生
-			model->animate(bossAnimation, 0.0f, animated_nodes[ANIME_NODE::NOW_ANIMATION], nowLoop);  // 新しいアニメーションを開始
-			transition_state = TRANSITION_STATE::TRANSITION;  // 遷移状態に進む
+			model->animate(ToInt(bossAnimation_old), time, animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)], FindLoopAnimation(bossAnimation_old));  // 古いアニメーションの再生
+			model->animate(ToInt(bossAnimation), 0.0f, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], nowLoop);  // 新しいアニメーションを開始
+			transitionState = TRANSITION_STATE::TRANSITION;  // 遷移状態に進む
 			time = 0.0f;  // 時間のリセット
 			factor = 0.0f;  // 遷移係数の初期化
 
 		case TRANSITION_STATE::TRANSITION:
-			factor = time / transition_time;  // 遷移進行度の計算
-			model->blend_animations(animated_nodes[ANIME_NODE::OLD_ANIMATION], animated_nodes[ANIME_NODE::NOW_ANIMATION], factor, blended_animated_nodes);  // アニメーションのブレンド
+			factor = time / transitionTime;  // 遷移進行度の計算
+			model->blend_animations(animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)], animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], factor, blendedAnimatedNodes);  // アニメーションのブレンド
 			time += elapsedTime;  // 経過時間の更新
 			if (factor > 1.0f)
 			{
 				// 遷移が終了した場合
-				transition_state = TRANSITION_STATE::NONE;  // 遷移状態をリセット
+				transitionState = TRANSITION_STATE::NONE;  // 遷移状態をリセット
 				time = 0;  // 時間をリセット
 			}
 			break;
 		}
 		// レンダリング処理（遷移中）
-		model->render(graphics.Get_DC().Get(), transform, blended_animated_nodes);
+		model->render(graphics.Get_DC().Get(), transform, blendedAnimatedNodes);
 	}
 	else
 	{
 		// 遷移がない場合、通常のアニメーション再生
 		time += elapsedTime;  // 経過時間の更新
-		if (model->animations.at(bossAnimation).duration < time)
+		if (model->animations.at(ToInt(bossAnimation)).duration < time)
 		{
 			if (nowLoop)
 				time = 0;  // ループアニメーションの場合、時間をリセット
-			else time = model->animations.at(bossAnimation).duration;  // ループしない場合、アニメーションの終了時間に設定
+			else time = model->animations.at(ToInt(bossAnimation)).duration;  // ループしない場合、アニメーションの終了時間に設定
 		}
-		model->animate(bossAnimation, time, animated_nodes[ANIME_NODE::NOW_ANIMATION], nowLoop);  // 現在のアニメーションを再生
-		model->render(graphics.Get_DC().Get(), transform, animated_nodes[ANIME_NODE::NOW_ANIMATION]);  // レンダリング
+		model->animate(ToInt(bossAnimation), time, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], nowLoop);  // 現在のアニメーションを再生
+		model->render(graphics.Get_DC().Get(), transform, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)]);  // レンダリング
 		bossAnimation_old = bossAnimation;  // 古いアニメーションを更新
 	}
 }
@@ -207,15 +206,15 @@ void Boss::ShotBullet(ATTACK_TYPE type)
 	DirectX::XMFLOAT3 shotPos{};
 	if (type == ATTACK_TYPE::SHOT_S)
 	{
-		targetPoint_pos = target_pos;
+		targetPointPos = targetPos;
 		//発射位置(タレット部分)
-		model->fech_by_bone(bossAnimation, time, transform, turretNode, shotPos);
+		model->fech_by_bone(ToInt(bossAnimation), time, transform, turretNode, shotPos);
 		//目標
 		DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(shotPos,
-			{ targetPoint_pos.x, targetPoint_pos.y + targetPoint_height, targetPoint_pos.z });
+			{ targetPointPos.x, targetPointPos.y + targetPointHeight, targetPointPos.z });
 
 		BulletStraight* bullet = 
-			new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Enemy);
+			new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::ENEMY);
 		bullet->Launch(dir, shotPos);
 	}
 	else if (type == ATTACK_TYPE::SHOT_H)
@@ -352,12 +351,12 @@ void Boss::SaveDataFile()
 	}
 }
 
-bool Boss::FindLoopAnimation(BossAnimation BA)
+bool Boss::FindLoopAnimation(BOSS_ANIMATION BA)
 {
 	//ループさせたいアニメーションだったらtrue
-	if (BA == BossAnimation::BOSS_IDLE
-		|| BA == BossAnimation::BOSS_WALK
-		|| BA == BossAnimation::BOSS_RUN
+	if (BA == BOSS_ANIMATION::BOSS_IDLE
+		|| BA == BOSS_ANIMATION::BOSS_WALK
+		|| BA == BOSS_ANIMATION::BOSS_RUN
 		) return true;
 	return false;
 }
@@ -471,9 +470,9 @@ void Boss::DebugDUI()
 				ImGui::Combo("anime", &item_current, anime_item, IM_ARRAYSIZE(anime_item)); ImGui::Checkbox("is_loop", &loop);
 				if (ImGui::Button("play", { 80,20 }))
 				{
-					bossAnimation = static_cast<BossAnimation>(item_current);
+					bossAnimation = static_cast<BOSS_ANIMATION>(item_current);
 				}
-				ImGui::SliderFloat("transition_time", &transition_time, 0.0f, 5.0f);
+				ImGui::SliderFloat("transitionTime", &transitionTime, 0.0f, 5.0f);
 
 			}
 			if (ImGui::CollapsingHeader("StateMachine", ImGuiTreeNodeFlags_DefaultOpen))
@@ -484,7 +483,6 @@ void Boss::DebugDUI()
 					"PLAYER_Tackle",
 					"PLAYER_Jump",
 					"PLAYER_ShotStraight",
-					"PLAYER_ShotHoming",
 					"PLAYER_Damage",
 					"PLAYER_Dead",
 					"PLAYER_Down",
@@ -493,9 +491,9 @@ void Boss::DebugDUI()
 				StateUpdateFunc stateUpdate[] = {
 					&Boss::TransitionIdleState,
 					&Boss::TransitionWalkState,
-					&Boss::TransitionAttack_Tackle_State,
-					&Boss::TransitionAttack_Jump_State,
-					&Boss::TransitionAttack_ShotStraight_State,
+					&Boss::TransitionAttackTackleState,
+					&Boss::TransitionAttackJumpState,
+					&Boss::TransitionAttackShotStraightState,
 					&Boss::TransitionDamageState,
 					&Boss::TransitionDeadState,
 				};

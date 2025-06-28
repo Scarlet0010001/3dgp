@@ -20,14 +20,14 @@ public:
 	/// <param name="min">最低値</param>
 	/// <param name="max">最高値</param>
 	/// <returns></returns>
-	float random_range(float min, float max);
+	float RandomRange(float min, float max);
 
 	/// <summary>
 	/// 指定した値のマイナスの値とプラスの値の範囲内でのランダム値を返す
 	/// </summary>
 	/// <param name="value">指定する値</param>
 	/// <returns></returns>
-	float random_fixed_range(float value);
+	float RandomFixedRange(float value);
 private:
 	std::random_device rnd;
 	std::mt19937 mt;
@@ -55,11 +55,11 @@ public:
 	// Generate a new permutation vector based on the value of seed
 	PerlinNoise(unsigned int seed);
 	// Get a noise value, for 2D images z can have any value
-	double noise(double x, double y, double z);
+	double Noise(double x, double y, double z);
 private:
-	double fade(double t);
-	double lerp(double t, double a, double b);
-	double grad(int hash, double x, double y, double z);
+	double Fade(double t);
+	double Lerp(double t, double a, double b);
+	double Grad(int hash, double x, double y, double z);
 };
 
 #endif

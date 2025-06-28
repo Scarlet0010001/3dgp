@@ -75,44 +75,6 @@ framebuffer::framebuffer(ID3D11Device* device, uint32_t width, uint32_t height)
     viewport.TopLeftY = 0.0f;
 }
 
-//void framebuffer::clear(ID3D11DeviceContext* immediate_context, float r, float g, float b, float a, float depth)
-//{
-//    // クリアする色の設定
-//    float color[4]{ r, g, b, a };
-//
-//    //レンダーターゲットビューのクリア
-//    immediate_context->ClearRenderTargetView(render_target_view.Get(), color);
-//    // デプス・ステンシルビューのクリア
-//    immediate_context->ClearDepthStencilView(depth_stencil_view.Get(), D3D11_CLEAR_DEPTH, depth, 0);
-//}
-//
-//void framebuffer::activate(ID3D11DeviceContext* immediate_context)
-//{
-//    // 保存されたビューポートとレンダーターゲットを一時的に保持
-//    viewport_count = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
-//    immediate_context->RSGetViewports(&viewport_count, cached_viewports);
-//    immediate_context->OMGetRenderTargets(1, cached_render_target_view.ReleaseAndGetAddressOf(),
-//        cached_depth_stencil_view.ReleaseAndGetAddressOf());
-//
-//    // 新しいビューポートとレンダーターゲットをセットしてアクティブにする
-//    immediate_context->RSSetViewports(1, &viewport);
-//    immediate_context->OMSetRenderTargets(1, render_target_view.GetAddressOf(),
-//        depth_stencil_view.Get());
-//}
-//
-////アクティブなビューポートとレンダーターゲットを以前の状態に戻す
-//void framebuffer::deactivate(ID3D11DeviceContext* immediate_context)
-//{
-//    // 保存したビューポートとレンダーターゲットを復元してアクティブな設定を元に戻す
-//
-//    // 以前のビューポートをセットし直す
-//    immediate_context->RSSetViewports(viewport_count, cached_viewports);
-//    
-//    // 以前のレンダーターゲットとデプス・ステンシルビューをセットし直す
-//    immediate_context->OMSetRenderTargets(1, cached_render_target_view.GetAddressOf(),
-//        cached_depth_stencil_view.Get());
-//}
-
 void framebuffer::clear(ID3D11DeviceContext* immediate_context,
     FB_FLAG flags, DirectX::XMFLOAT4 color, float depth, uint8_t stencil)
 {

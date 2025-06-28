@@ -21,8 +21,8 @@ void SceneTitle::Initialize()
 	audios[0] = audio::_emplace(L"Resources/Sound/BGM/プラネタリウムガーデン.wav");
 
 	selectedMenuState = TITLE_MENU::GAME_START;
-	colorMenu[TITLE_MENU::GAME_START] = { 1,1,1,1 };
-	colorMenu[TITLE_MENU::EXIT] = { 1,1,1,1 };
+	colorMenu[ToInt(TITLE_MENU::GAME_START)] = { 1,1,1,1 };
+	colorMenu[ToInt(TITLE_MENU::EXIT)] = { 1,1,1,1 };
 
 	isStart = false;
 }
@@ -119,12 +119,12 @@ void SceneTitle::Render(float elapsedTime)
 	dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	dc->OMSetRenderTargets(1, &rtv, dsv);
 
-	colorMenu[TITLE_MENU::GAME_START] = { 1,1,1,1 };
-	colorMenu[TITLE_MENU::EXIT] = { 1,1,1,1 };
+	colorMenu[ToInt(TITLE_MENU::GAME_START)] = { 1,1,1,1 };
+	colorMenu[ToInt(TITLE_MENU::EXIT)] = { 1,1,1,1 };
 
 	selectedMenuState == TITLE_MENU::GAME_START ?
-		colorMenu[TITLE_MENU::GAME_START] = select :
-		colorMenu[TITLE_MENU::EXIT] = select;
+		colorMenu[ToInt(TITLE_MENU::GAME_START)] = select :
+		colorMenu[ToInt(TITLE_MENU::EXIT)] = select;
 
 	spriteTitleBack->begin(graphics.Get_DC().Get());
 	spriteTitleBack->render(graphics.Get_DC().Get(),
@@ -133,13 +133,13 @@ void SceneTitle::Render(float elapsedTime)
 
 	spriteStart->begin(graphics.Get_DC().Get());
 	spriteStart->render(graphics.Get_DC().Get(),
-		{ 1100,850 }, { 0.4f, 0.4f }, colorMenu[TITLE_MENU::GAME_START], 0
+		{ 1100,850 }, { 0.4f, 0.4f }, colorMenu[ToInt(TITLE_MENU::GAME_START)], 0
 	);
 	spriteStart->end(graphics.Get_DC().Get());
 
 	spriteExit->begin(graphics.Get_DC().Get());
 	spriteExit->render(graphics.Get_DC().Get(),
-		{ 450,850 }, { 0.4f, 0.4f }, colorMenu[TITLE_MENU::EXIT], 0
+		{ 450,850 }, { 0.4f, 0.4f }, colorMenu[ToInt(TITLE_MENU::EXIT)], 0
 	);
 	spriteExit->end(graphics.Get_DC().Get());
 }

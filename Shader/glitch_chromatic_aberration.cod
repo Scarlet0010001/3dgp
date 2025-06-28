@@ -10,16 +10,16 @@
 //   float iTime;                       // Offset:    0 Size:     4
 //   float density;                     // Offset:    4 Size:     4
 //   float shift;                       // Offset:    8 Size:     4
-//   float rand_float;                  // Offset:   12 Size:     4
-//   float2 x_shift;                    // Offset:   16 Size:     8 [unused]
-//   float2 y_shift;                    // Offset:   24 Size:     8 [unused]
-//   float x_shifting;                  // Offset:   32 Size:     4
-//   float y_shifting;                  // Offset:   36 Size:     4
+//   float randFloat;                   // Offset:   12 Size:     4
+//   float2 XShift;                     // Offset:   16 Size:     8 [unused]
+//   float2 YShift;                     // Offset:   24 Size:     8 [unused]
+//   float XShifting;                   // Offset:   32 Size:     4
+//   float YShifting;                   // Offset:   36 Size:     4
 //   float extension;                   // Offset:   40 Size:     4
-//   float uv_slider;                   // Offset:   44 Size:     4
+//   float uvSlider;                    // Offset:   44 Size:     4
 //   float brightness;                  // Offset:   48 Size:     4
-//   float glitch_mask_radius;          // Offset:   52 Size:     4
-//   int glitch_sampling_count;         // Offset:   56 Size:     4 [unused]
+//   float glitchMaskRadius;            // Offset:   52 Size:     4
+//   int glitchSamplingCount;           // Offset:   56 Size:     4 [unused]
 //   float2 center;                     // Offset:   64 Size:     8
 //
 // }

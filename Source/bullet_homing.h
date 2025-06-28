@@ -25,7 +25,7 @@ private:
     void Move(float elapsedTime, float speed);
 
 private:
-    std::vector<gltf_model::node> animated_nodes{};
+    std::vector<gltf_model::node> animatedNodes{};
 
 };
 

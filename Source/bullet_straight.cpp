@@ -10,7 +10,7 @@ BulletStraight::BulletStraight(BulletManager* manager, BULLET_MASTER MasterType)
         "Resources/Bullet/Bullet.glb");
     masterType = MasterType;
 
-    if (masterType == BULLET_MASTER::Player)
+    if (masterType == BULLET_MASTER::PLAYER)
     {
         bulletEffect =
             std::make_unique<Effect>("Resources/Effect/Bullet/playerBullet.efkefc");
@@ -21,13 +21,13 @@ BulletStraight::BulletStraight(BulletManager* manager, BULLET_MASTER MasterType)
             std::make_unique<Effect>("Resources/Effect/Bullet/bossBullet.efkefc");
     }
 
-    type = BULLET_TYPE::Straight;
+    type = BULLET_TYPE::STRAIGHT;
     //表示サイズを調整
     scale.x = scale.y = scale.z = 1.0f;
 
     BulletManager::Instance().Setting();
 
-    animated_nodes = model->nodes;
+    animatedNodes = model->nodes;
 }
 
 void BulletStraight::Update(float elapsedTime)

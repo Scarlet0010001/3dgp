@@ -111,7 +111,7 @@ public:
     }
 
     //弾丸と弾丸との衝突処理
-    void CollisionBullet(Player* player, Boss* boss);
+    void CollisionBullet(PLAYER* player, Boss* boss);
 
 private:
 
@@ -121,7 +121,7 @@ private:
     void SaveDataFile(Bullet::BULLET_MASTER type);
 
     //保存するjsonファイルの名前
-    const char* filePath[Bullet::BULLET_MASTER::Count]{
+    const char* filePath[ToInt(Bullet::BULLET_MASTER::COUNT)]{
         "Resources/Bullet/playerBullet_param.json",
         "Resources/Bullet/bossBullet_param.json"
     };

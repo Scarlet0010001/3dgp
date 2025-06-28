@@ -31,7 +31,7 @@ void SceneGame::Initialize()
     {
         camera = &Camera::Instance();
         camera->Initialize();
-        player = std::make_unique<Player>();
+        player = std::make_unique<PLAYER>();
         boss = std::make_unique<Boss>();
 
         StageManager& stageManager = StageManager::Instance();
@@ -133,7 +133,7 @@ void SceneGame::Update(float elapsedTime)
 
     //**********ボスの更新**********//
     boss->SetLocationOfAttackTarget(player->GetPosition());
-    boss->SetAttackTarget_height(player->GetHeight());
+    boss->SetAttackTargetHeight(player->GetHeight());
     boss->Update(elapsedTime);
 
     //**********弾の更新**********//

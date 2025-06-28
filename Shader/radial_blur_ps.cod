@@ -4,7 +4,7 @@
 //
 // Buffer Definitions: 
 //
-// cbuffer radial_blur_constants
+// cbuffer radialBlurConstants
 // {
 //
 //   float2 blurCenter;                 // Offset:    0 Size:     8
@@ -22,7 +22,7 @@
 // ------------------------------ ---------- ------- ----------- -------------- ------
 // sampler_states[5]                 sampler      NA          NA             s5      1 
 // texture_maps[0]                   texture  float4          2d             t0      1 
-// radial_blur_constants             cbuffer      NA          NA            cb2      1 
+// radialBlurConstants               cbuffer      NA          NA            cb2      1 
 //
 //
 //

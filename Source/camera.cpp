@@ -105,7 +105,7 @@ void Camera::Update(float elapsedTime)
 {
     using namespace DirectX;
     // 任意のアップデートを実行
-    (this->*p_update)(elapsedTime);
+    (this->*pUpdate)(elapsedTime);
 
     //ロックオン時の挙動
     if (lockOn)
@@ -126,11 +126,11 @@ void Camera::Update(float elapsedTime)
             ControlByMouse(elapsedTime);
             if (state == STATE::Tracking)
             {
-                p_update = &Camera::UpdateWithTracking;
+                pUpdate = &Camera::UpdateWithTracking;
             }
             else
             {
-                p_update = &Camera::UpdateWithWing;
+                pUpdate = &Camera::UpdateWithWing;
             }
         }
     }
@@ -582,7 +582,7 @@ void Camera::CameraShakeUpdate(float elapsedTime)
             if (Y_shake > 0)
             {
                 //任意の揺れ幅の最大値最小値の間でのランダム生成
-                float shake = Noise::Instance().random_range(-Y_shake, Y_shake);
+                float shake = Noise::Instance().RandomRange(-Y_shake, Y_shake);
                 shake = DirectX::XMConvertToRadians(shake);
                 {
                     //回転軸
@@ -603,7 +603,7 @@ void Camera::CameraShakeUpdate(float elapsedTime)
             if (X_shake > 0)
             {
                 //任意の揺れ幅の最大値最小値の間でのランダム生成
-                float shake = Noise::Instance().random_range(-X_shake, X_shake);
+                float shake = Noise::Instance().RandomRange(-X_shake, X_shake);
                 shake = DirectX::XMConvertToRadians(shake);
                 {
                     //回転軸
@@ -700,7 +700,7 @@ void Camera::DebugGui()
 
         if (ImGui::CollapsingHeader("Update"))
         {
-            if (ImGui::Button("tracking")) p_update = &Camera::UpdateWithTracking;
+            if (ImGui::Button("tracking")) pUpdate = &Camera::UpdateWithTracking;
         }
         if (ImGui::CollapsingHeader("Param"))
         {

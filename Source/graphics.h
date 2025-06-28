@@ -28,13 +28,12 @@ CONST BOOL FULLSCREEN{ FALSE };
 #define ST_DEPTH Graphics::DEPTH_STATE
 #define ST_BLEND Graphics::BLEND_STATE
 #define ST_RASTERIZER Graphics::RASTERIZER_STATE
-#define SHADER_TYPE Graphics::SHADER_TYPES
 
 class Graphics
 {
 public:
     //------------<定数>-----------//
-    enum SAMPLER_STATE
+    enum class SAMPLER_STATE
     {
         //ポイントサンプリング、ワープアドレッシング
         //テクスチャが拡大縮小されるとき、最も近いテクセルの色を選択します。これはピクセルアートなど、テクスチャが低解像度の場合に適しています
@@ -61,7 +60,7 @@ public:
         SAMPLER_COUNT,
     };
 
-    enum DEPTH_STATE
+    enum class DEPTH_STATE
     {
         //深度テストが有効で、深度バッファへの書き込みが許可されています。通常の3D描画に使用します。
         DepthON_WriteON = 0,
@@ -78,7 +77,7 @@ public:
         DEPTH_STATE_COUNT
     };
 
-    enum BLEND_STATE
+    enum class BLEND_STATE
     {
         /// <summary>
         /// <para>最も一般的なブレンディングモード</para>
@@ -114,7 +113,7 @@ public:
         BLEND_STATE_COUNT
     };
 
-    enum RASTERIZER_STATE
+    enum class RASTERIZER_STATE
     {
         SOLID_ONESIDE,                   // SOLID, 面カリングなし, 時計回りが表
         CULL_NONE,               // SOLID, 面カリングあり
@@ -125,13 +124,6 @@ public:
         RASTERIZER_STATE_COUNT
     };
 
-    //シェーダータイプ
-    enum SHADER_TYPES
-    {
-        LAMBERT,
-        PBR,
-        SHADOW
-    };
 private:
     Graphics() {}
     ~Graphics();
@@ -163,13 +155,13 @@ public:
     // デバッグレンダラ取得
     PrimitiveRenderer* GetPrimitiveRenderer() const { return primitiveRenderer.get(); }
 
-    //------------<関数>-----------//
 public:
+    //------------<関数>-----------//
     void Initialize(HWND hwnd);
     void DebugGui();
 
-    //------------<変数>-----------//
 private:
+    //------------<変数>-----------//
     //COMオブジェクト
     Microsoft::WRL::ComPtr<ID3D11Device> device;							//DirectX11の機能にアクセスするためのデバイス。このデバイスから描画に必要なオブジェクトの生成などを行う		
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;				//描画コマンドの生成や発行を管理をする。D3D11CreateDeviceAndSwapChainで生成されるのはImmediate。Immediateではコマンドの生成からGPUへの発行まで行う。
@@ -177,19 +169,16 @@ private:
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;			//レンダーターゲットビューを出力結合ステージにバインドできる
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;		//深度ステンシルビューインターフェイスは、深度ステンシルテスト中にテクスチャーリソースにアクセスする。
 
-    Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[SAMPLER_STATE::SAMPLER_COUNT];
-    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[DEPTH_STATE::DEPTH_STATE_COUNT];
-    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[RASTERIZER_STATE::RASTERIZER_STATE_COUNT];
-    Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[BLEND_STATE::BLEND_STATE_COUNT];
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[ToInt(SAMPLER_STATE::SAMPLER_COUNT)];
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[ToInt(DEPTH_STATE::DEPTH_STATE_COUNT)];
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[ToInt(RASTERIZER_STATE::RASTERIZER_STATE_COUNT)];
+    Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[ToInt(BLEND_STATE::BLEND_STATE_COUNT)];
 
     std::unique_ptr<DebugRenderer> debugRenderer;
 
     std::unique_ptr<PrimitiveRenderer> primitiveRenderer;
 
-    //--maps--//
-
 public:
-    //std::shared_ptr<MeshShader> shader = nullptr;
     void SetDepthStencilState(DEPTH_STATE z_stencil);
     void SetBlendState(BLEND_STATE blend);
     void SetRasterizerState(RASTERIZER_STATE rasterizer);
@@ -199,9 +188,6 @@ public:
     inline HWND GetHwnd()const { return this->hwnd; }
     //ミューテックス取得
     std::mutex& GetMutex() { return mutex_; }
-    //シェーダーのリコンパイル
-    //BOOL get_file_name(HWND hWnd, TCHAR* fname, int sz, TCHAR* initDir);
-    //bool recompile_pixel_shader(ID3D11PixelShader** pixel_shader, std::string id);
 private:
     std::mutex mutex_;
 
@@ -209,6 +195,5 @@ private:
     bool isDisplayDebug = false;
 
     HWND hwnd;
-
 };
 

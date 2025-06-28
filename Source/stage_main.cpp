@@ -14,7 +14,7 @@ StageMain::StageMain()
     scale = { 100.0f, 100.0f, 100.0f };
     
     animeTimer = 0.0f;
-    animated_nodes = model->nodes;
+    animatedNodes = model->nodes;
 	transform = Math::calc_world_matrix(scale, angle, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 
 }
@@ -35,8 +35,8 @@ void StageMain::Render(float elapsedTime)
     Graphics& graphics = Graphics::Instance();
 
     //ƒ‚ƒfƒ‹•`‰æ
-    model->animate(0, animeTimer += elapsedTime, animated_nodes);
-    model->render(graphics.Get_DC().Get(), transform, animated_nodes);
+    model->animate(0, animeTimer += elapsedTime, animatedNodes);
+    model->render(graphics.Get_DC().Get(), transform, animatedNodes);
 	elapsedTime_ = elapsedTime;
 }
 

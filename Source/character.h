@@ -104,10 +104,6 @@ public:
 	//ダメージを与える
 	virtual bool ApplyDamage(int damage, float invincibleTime, WINCE_TYPE type);
 
-	//ステージ制限壁判定
-	//void CalcLimitWall(DirectX::XMFLOAT2& limit_x, DirectX::XMFLOAT2& limit_y, DirectX::XMFLOAT2& limit_z, bool isKill = false);
-	void CalcLimitWall(bool isKill = false);
-
 protected:
 	virtual void Move(float vx, float vz, float speed);
 	void Turn(float elapsedTime, float vx, float vz, float speed);//オイラー
@@ -135,20 +131,6 @@ protected:
 	0, 0, 0, 1
 	};
 
-	DirectX::XMFLOAT3 checkpointPosition = { 0, 0, 0 };	//チェックポイント座標
-	
-	//軸の種類
-	enum class LIMIT
-	{
-		X = 0,
-		Y,
-		Z,
-		Count
-	};
-
-	//各軸における制限（壁）の最小値と最大値
-	DirectX::XMFLOAT2 limitWall[static_cast<int>(LIMIT::Count)];
-
 	//キャラクターのパラメータ
 	CharacterParam charaParam;
 
@@ -169,25 +151,25 @@ protected:
 	int32_t health;
 
 	//ブレンドアニメーション
-	enum ANIME_NODE
+	enum class ANIME_NODE
 	{
 		NOW_ANIMATION = 0,
 		OLD_ANIMATION,
 
 		NODE_COUNT
 	};
-	std::vector<gltf_model::node> animated_nodes[NODE_COUNT];
-	std::vector<gltf_model::node> blended_animated_nodes;
+	std::vector<gltf_model::node> animatedNodes[ToInt(ANIME_NODE::NODE_COUNT)];
+	std::vector<gltf_model::node> blendedAnimatedNodes;
 	bool transitionToTransition = false;
 	float time{ 0 };
 	float factor{ 0 };
-	float transition_time{ 0.11f };
-	enum TRANSITION_STATE
+	float transitionTime{ 0.11f };
+	enum class TRANSITION_STATE
 	{
 		NONE,
 		START,
 		TRANSITION,
-	}transition_state;
+	}transitionState;
 
 
 	float vs_wall_ray_power = 5.0f;

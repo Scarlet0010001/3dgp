@@ -8,18 +8,18 @@ class BulletManager;
 class Bullet
 {
 public:
-    enum BULLET_TYPE
+    enum class BULLET_TYPE
     {
         TYPE_NONE = -1,
-        Straight = 0,
-        Missile,
+        STRAIGHT = 0,
+        MISSILE,
     };
-    enum BULLET_MASTER
+    enum class BULLET_MASTER
     {
         MASTER_NONE = -1,
-        Player = 0,
-        Enemy,
-        Count,
+        PLAYER = 0,
+        ENEMY,
+        COUNT,
     };
 
     Bullet(BulletManager* manager);
@@ -82,7 +82,6 @@ protected:
     BULLET_TYPE type = BULLET_TYPE::TYPE_NONE;
     BULLET_MASTER masterType = BULLET_MASTER::MASTER_NONE;
 
-
     std::unique_ptr<gltf_model> model = nullptr;
     float speed = 100.0f;
     float lifeTimer = 3.0f;
@@ -98,4 +97,3 @@ protected:
     };
 
 };
-

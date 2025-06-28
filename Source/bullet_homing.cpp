@@ -8,14 +8,14 @@ BulletHoming::BulletHoming(BulletManager* manager, BULLET_MASTER MasterType)
     Graphics& graphics = Graphics::Instance();
     model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
         "Resources/Bullet/Bullet.glb");
-    type = BULLET_TYPE::Missile;
+    type = BULLET_TYPE::MISSILE;
     masterType = MasterType;
     //表示サイズを調整
     scale.x = scale.y = scale.z = 1.0f;
 
     BulletManager::Instance().Setting();
 
-    animated_nodes = model->nodes;
+    animatedNodes = model->nodes;
 
 }
 
@@ -41,7 +41,7 @@ void BulletHoming::Update(float elapsedTime)
 void BulletHoming::Render(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
-    model->render(graphics.Get_DC().Get(), transform, animated_nodes);
+    model->render(graphics.Get_DC().Get(), transform, animatedNodes);
 
     DrawDebugPrimitive();
 

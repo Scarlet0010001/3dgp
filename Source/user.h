@@ -22,7 +22,7 @@ namespace Math
     //--------------------------------------------------------------
     //  実数値のイコール判定
     //--------------------------------------------------------------
-    inline float equal_check(float value1, float value2, float ep = FLT_EPSILON)
+    inline float EqualCheck(float value1, float value2, float ep = FLT_EPSILON)
     {
         return (value1 >= value2 - ep) && (value1 < value2 + ep);
     }
@@ -1002,7 +1002,7 @@ namespace Math
     //--------------------------------------------------------------
     //  逆ベクトルを返す
     //--------------------------------------------------------------
-    inline DirectX::XMFLOAT3 rev_vec(DirectX::XMVECTOR vec)
+    inline DirectX::XMFLOAT3 RevVec(DirectX::XMVECTOR vec)
     {
         DirectX::XMFLOAT3 fin_vec;
 
@@ -1012,13 +1012,13 @@ namespace Math
         return fin_vec;
     }
 
-    inline DirectX::XMVECTOR rev_vec_v(DirectX::XMVECTOR vec)
+    inline DirectX::XMVECTOR RevVec_V(DirectX::XMVECTOR vec)
     {
         DirectX::XMVECTOR Rev = { -1,-1,-1 };
         return     DirectX::XMVectorMultiply(vec, Rev);
     }
 
-    inline float random_range(float min, float max)
+    inline float RandomRange(float min, float max)
     {
         // 0.0～1.0の間までのランダム値
         float value = static_cast<float>(rand()) / RAND_MAX;
@@ -1076,7 +1076,7 @@ namespace Math
 //  　引数：const int n     変換する整数
 //  戻り値：std::string     数値を2進数に変換したもの(string)
 //--------------------------------------------------------------
-inline std::string strBit16(const int n)
+inline std::string StrBit16(const int n)
 {
     std::stringstream ss;
     ss << static_cast<std::bitset<16>>(n);
@@ -1120,7 +1120,12 @@ inline void ImguiMenuAndSubBar(std::string menu_label, std::string menu_item_lab
 #endif // USE_IMGUI
 }
 
-//enum classを使いやすくするためのstatic_cast簡略化テンプレート
+//--------------------------------------------------------------
+//  int型変換簡略化テンプレート
+//--------------------------------------------------------------
+//      引数：intへ変換させたい値
+//    戻り値：int  変換後の値
+//--------------------------------------------------------------
 template <typename T>
 constexpr auto ToInt(T t) noexcept
 {

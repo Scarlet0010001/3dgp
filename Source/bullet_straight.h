@@ -29,7 +29,7 @@ private:
     //エフェクト
     std::unique_ptr<Effect> bulletEffect = nullptr;
     Effekseer::Handle handle;
-    std::vector<gltf_model::node> animated_nodes{};
+    std::vector<gltf_model::node> animatedNodes{};
 
 };
 

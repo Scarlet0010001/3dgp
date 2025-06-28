@@ -5,7 +5,7 @@ RadialBlur::RadialBlur(ID3D11Device* device)
 {
 	//	ラジアルブラー用定数バッファ
 	D3D11_BUFFER_DESC buffer_desc{};
-	buffer_desc.ByteWidth = sizeof(radial_blur_constants);
+	buffer_desc.ByteWidth = sizeof(radialBlurConstants);
 	buffer_desc.Usage = D3D11_USAGE_DEFAULT;
 	buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	buffer_desc.CPUAccessFlags = 0;
@@ -36,7 +36,7 @@ RadialBlur::RadialBlur(ID3D11Device* device)
 
 	radial_quad = std::make_unique<fullscreen_quad>(Graphics::Instance().GetDevice().Get());
 
-	radial_blur_constant = std::make_unique<Constants<radial_blur_constants>>(Graphics::Instance().GetDevice().Get());
+	radial_blur_constant = std::make_unique<Constants<radialBlurConstants>>(Graphics::Instance().GetDevice().Get());
 }
 
 void RadialBlur::DebugGUI()

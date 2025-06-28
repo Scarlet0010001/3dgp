@@ -37,7 +37,7 @@ private:
     //カメラ
     Camera* camera = nullptr;
     //プレイヤー
-    std::unique_ptr<Player> player = nullptr;
+    std::unique_ptr<PLAYER> player = nullptr;
     //ボス
     std::unique_ptr<Boss> boss = nullptr;
     //キャラ初期位置

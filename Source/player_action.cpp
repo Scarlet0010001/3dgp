@@ -2,10 +2,10 @@
 #include "operators.h"
 #include "bullet_straight.h"
 
-void Player::TransitionIdleState()
+void PLAYER::TransitionIdleState()
 {
 	//待機状態へ偏移
-	p_update = &Player::UpdateIdleState;
+	pUpdate = &PLAYER::UpdateIdleState;
 
 	//状態とアニメーションをIDLEへ偏移
 	state = STATE::IDLE;
@@ -13,38 +13,38 @@ void Player::TransitionIdleState()
 }
 
 
-void Player::TransitionMoveState()
+void PLAYER::TransitionMoveState()
 {
 	//移動状態へ偏移
-	p_update = &Player::UpdateMoveState;
+	pUpdate = &PLAYER::UpdateMoveState;
 
 	//状態をMOVEへ偏移
 	state = STATE::MOVE;
 
 	//加速度を移動状態に設定
-	charaParam.acceleration = accelerationState[ACCELERATION_STATE::MOVE];
+	charaParam.acceleration = accelerationState[ToInt(ACCELERATION_STATE::MOVE)];
 }
 
-void Player::TransitionWingState()
+void PLAYER::TransitionWingState()
 {
 	//飛行状態へ偏移
-	p_update = &Player::UpdateWingState;
+	pUpdate = &PLAYER::UpdateWingState;
 
 	//状態とアニメーションをWINGへ偏移
 	state = STATE::WING;
 	playerAnimation = PlayerAnimation::PLAYER_WING_START;
 
 	//加速度を飛行状態に設定
-	charaParam.acceleration = accelerationState[ACCELERATION_STATE::WING];
+	charaParam.acceleration = accelerationState[ToInt(ACCELERATION_STATE::WING)];
 	
 	//ブースト状態を解除
 	isBoost = false;
 }
 
-void Player::TransitionBoostState()
+void PLAYER::TransitionBoostState()
 {
 	//ブースト状態へ偏移
-	p_update = &Player::UpdateBoostState;
+	pUpdate = &PLAYER::UpdateBoostState;
 
 	//状態とアニメーションをBOOSTへ偏移
 	state = STATE::BOOST;
@@ -52,26 +52,26 @@ void Player::TransitionBoostState()
 
 	//加速度と最大速度をブースト状態に設定
 	charaParam.maxMoveSpeed = param.boostSpeed;
-	charaParam.acceleration = accelerationState[ACCELERATION_STATE::AVOIDANCE];
+	charaParam.acceleration = accelerationState[ToInt(ACCELERATION_STATE::BOOST)];
 
 	//ブースト効果音
-	audios[PLAYER_SE::SE_BOOST]->play();
-	audios[PLAYER_SE::SE_BOOST]->volume(0.5f);
+	audios[ToInt(PLAYER_SE::SE_BOOST)]->play();
+	audios[ToInt(PLAYER_SE::SE_BOOST)]->volume(0.5f);
 
 	//ラジアルブラー設定
-	player_radialBlur_constant.blurStrength = 1.0f;
-	player_radialBlur_constant.blurRadius = 1.0f;
-	radialTimer = player_radialBlur_constant.blurTimer = 0.5f;
+	player_radialBlurConstant.blurStrength = 1.0f;
+	player_radialBlurConstant.blurRadius = 1.0f;
+	radialTimer = player_radialBlurConstant.blurTimer = 0.5f;
 
 	//ブーストタイマーを減少、回避タイマーをリセット
 	param.boostTimer -= 2.5f;
 	param.avoidanceTimer = 0;
 }
 
-void Player::TransitionJumpState()
+void PLAYER::TransitionJumpState()
 {
 	//ジャンプ状態へ偏移
-	p_update = &Player::UpdateJumpState;
+	pUpdate = &PLAYER::UpdateJumpState;
 
 	//地面にいるかどうかでアニメーションを変更
 	if(isGround)
@@ -83,33 +83,33 @@ void Player::TransitionJumpState()
 	state = STATE::JUMP;
 
 	//加速度をジャンプ状態に設定
-	charaParam.acceleration = accelerationState[ACCELERATION_STATE::MOVE];
+	charaParam.acceleration = accelerationState[ToInt(ACCELERATION_STATE::MOVE)];
 }
 
-void Player::TransitionLandingState()
+void PLAYER::TransitionLandingState()
 {
 	//着地状態へ偏移
-	p_update = &Player::UpdateLandingState;
+	pUpdate = &PLAYER::UpdateLandingState;
 
 	//状態とアニメーションをJUMP_ENDへ偏移
 	state = STATE::JUMP;
 	playerAnimation = PlayerAnimation::PLAYER_JUMP_END;
 }
 
-void Player::TransitionShotState()
+void PLAYER::TransitionShotState()
 {
 	//射撃状態へ偏移
-	p_update = &Player::UpdateShotState;
+	pUpdate = &PLAYER::UpdateShotState;
 
 	//状態とアニメーションをSHOTへ偏移
 	state = STATE::SHOT;
 	playerAnimation = PlayerAnimation::PLAYER_SHOT_IDLE;
 }
 
-void Player::TransitionCombo_01_01_State()
+void PLAYER::TransitionCombo_01_01_State()
 {
 	//コンボ1状態へ偏移
-	p_update = &Player::UpdateCombo_01_01_State;
+	pUpdate = &PLAYER::UpdateCombo_01_01_State;
 
 	//状態とアニメーションをATTACK_01へ偏移
 	state = STATE::RIGHT_ATTACK;
@@ -124,14 +124,14 @@ void Player::TransitionCombo_01_01_State()
 	nextCombo = false;
 
 	//斬撃音再生
-	audios[SE_SABER]->play();
-	audios[SE_SABER]->volume(1.0f);
+	audios[ToInt(PLAYER_SE::SE_SABER)]->play();
+	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(1.0f);
 }
 
-void Player::TransitionCombo_01_02_State()
+void PLAYER::TransitionCombo_01_02_State()
 {
 	//コンボ2状態へ偏移
-	p_update = &Player::UpdateCombo_01_02_State;
+	pUpdate = &PLAYER::UpdateCombo_01_02_State;
 
 	//状態とアニメーションをATTACK_02へ偏移
 	state = STATE::LEFT_ATTACK;
@@ -145,14 +145,14 @@ void Player::TransitionCombo_01_02_State()
 	nextCombo = false;
 
 	//斬撃音再生
-	audios[SE_SABER]->play();
-	audios[SE_SABER]->volume(1.0f);
+	audios[ToInt(PLAYER_SE::SE_SABER)]->play();
+	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(1.0f);
 }
 
-void Player::TransitionCombo_01_03_State()
+void PLAYER::TransitionCombo_01_03_State()
 {
 	//コンボ3状態へ偏移
-	p_update = &Player::UpdateCombo_01_03_State;
+	pUpdate = &PLAYER::UpdateCombo_01_03_State;
 
 	//状態とアニメーションをATTACK_03へ偏移
 	state = STATE::RIGHT_ATTACK;
@@ -166,15 +166,15 @@ void Player::TransitionCombo_01_03_State()
 	nextCombo = false;
 
 	//斬撃音再生
-	audios[SE_SABER]->play();
-	audios[SE_SABER]->volume(1.0f);
+	audios[ToInt(PLAYER_SE::SE_SABER)]->play();
+	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(1.0f);
 
 }
 
-void Player::TransitionDamageState()
+void PLAYER::TransitionDamageState()
 {
 	//ダメージ状態へ偏移
-	p_update = &Player::UpdateDamageState;
+	pUpdate = &PLAYER::UpdateDamageState;
 
 	//状態とアニメーションをDAMAGEへ偏移
 	state = STATE::DAMAGE;
@@ -185,10 +185,10 @@ void Player::TransitionDamageState()
 	glitch_CATimer = 0.03f;
 }
 
-void Player::TransitionDeadState()
+void PLAYER::TransitionDeadState()
 {
 	//死亡状態へ偏移
-	p_update = &Player::UpdateDeadState;
+	pUpdate = &PLAYER::UpdateDeadState;
 
 	//状態とアニメーションをDEADへ偏移
 	state = STATE::DEAD;
@@ -196,7 +196,7 @@ void Player::TransitionDeadState()
 
 }
 
-void Player::UpdateIdleState(float elapsedTime)
+void PLAYER::UpdateIdleState(float elapsedTime)
 {
 	//動いていたら移動状態へ偏移
 	if (InputMove(elapsedTime))
@@ -206,7 +206,7 @@ void Player::UpdateIdleState(float elapsedTime)
 	//ジャンプ入力
 	InputJump();
 	//回避入力
-	InputAvoidance();
+	InputBoost();
 	//飛行入力
 	InputWing();
 
@@ -226,7 +226,7 @@ void Player::UpdateIdleState(float elapsedTime)
 
 }
 
-void Player::UpdateMoveState(float elapsedTime)
+void PLAYER::UpdateMoveState(float elapsedTime)
 {
 	//スティック入力
 	float ax = gamePad->GetAxis_LX();
@@ -248,7 +248,7 @@ void Player::UpdateMoveState(float elapsedTime)
 	//ジャンプ入力
 	InputJump();
 	//回避入力
-	InputAvoidance();
+	InputBoost();
 	//飛行入力
 	InputWing();
 	//攻撃入力
@@ -266,7 +266,7 @@ void Player::UpdateMoveState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Player::UpdateWingState(float elapsedTime)
+void PLAYER::UpdateWingState(float elapsedTime)
 {
 	//飛行開始アニメーションの終了判定
 	if (playerAnimation == PlayerAnimation::PLAYER_WING_START)
@@ -284,9 +284,9 @@ void Player::UpdateWingState(float elapsedTime)
 		velocity.z = (forward * (param.wingSpeed)).z;
 
 		//ラジアルブラー設定
-		player_radialBlur_constant.blurStrength = 0.2f;
-		player_radialBlur_constant.blurRadius = 1.0f;
-		radialTimer = player_radialBlur_constant.blurTimer = 0.5f;
+		player_radialBlurConstant.blurStrength = 0.2f;
+		player_radialBlurConstant.blurRadius = 1.0f;
+		radialTimer = player_radialBlurConstant.blurTimer = 0.5f;
 
 		//飛行時の移動入力処理
 		InputMoveWing(elapsedTime);
@@ -311,7 +311,7 @@ void Player::UpdateWingState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Player::UpdateBoostState(float elapsedTime)
+void PLAYER::UpdateBoostState(float elapsedTime)
 {	
 	//進行方向のベクトル取得
 	float ax = gamePad->GetAxis_LX();
@@ -351,7 +351,7 @@ void Player::UpdateBoostState(float elapsedTime)
 	//回避時間の更新
 	param.avoidanceTimer += elapsedTime;
 }
-void Player::UpdateJumpState(float elapsedTime)
+void PLAYER::UpdateJumpState(float elapsedTime)
 {
 	//ジャンプ開始アニメーションの終了判定
 	if (playerAnimation == PlayerAnimation::PLAYER_JUMP_START)
@@ -375,7 +375,7 @@ void Player::UpdateJumpState(float elapsedTime)
 	InputWing();
 
 	//回避入力
-	InputAvoidance();
+	InputBoost();
 
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
@@ -387,7 +387,7 @@ void Player::UpdateJumpState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Player::UpdateLandingState(float elapsedTime)
+void PLAYER::UpdateLandingState(float elapsedTime)
 {
 	//着地アニメーションが終了したら待機状態へ遷移
 	if (model->GetIsEndAnimation())
@@ -396,7 +396,7 @@ void Player::UpdateLandingState(float elapsedTime)
 	}
 }
 
-void Player::UpdateShotState(float elapsedTime)
+void PLAYER::UpdateShotState(float elapsedTime)
 {
 	//コントローラーのスティック入力を取得
 	float ax = gamePad->GetAxis_LX();
@@ -427,7 +427,7 @@ void Player::UpdateShotState(float elapsedTime)
 	//ジャンプ入力
 	InputJump();
 	//回避入力
-	InputAvoidance();
+	InputBoost();
 	//飛行入力
 	InputWing();
 	//攻撃入力
@@ -441,7 +441,7 @@ void Player::UpdateShotState(float elapsedTime)
 }
 
 
-void Player::UpdateCombo_01_01_State(float elapsedTime)
+void PLAYER::UpdateCombo_01_01_State(float elapsedTime)
 {
 	//先行入力のチェック
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
@@ -479,13 +479,13 @@ void Player::UpdateCombo_01_01_State(float elapsedTime)
 	InputMove(elapsedTime, param.attackMoveSpeed, 1);
 
 	//回避入力
-	InputAvoidance();
+	InputBoost();
 
 	//速力更新
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Player::UpdateCombo_01_02_State(float elapsedTime)
+void PLAYER::UpdateCombo_01_02_State(float elapsedTime)
 {
 	//先行入力のチェック
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
@@ -523,13 +523,13 @@ void Player::UpdateCombo_01_02_State(float elapsedTime)
 	InputMove(elapsedTime, param.attackMoveSpeed, 1);
 
 	//回避入力
-	InputAvoidance();
+	InputBoost();
 
 	//速力更新
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Player::UpdateCombo_01_03_State(float elapsedTime)
+void PLAYER::UpdateCombo_01_03_State(float elapsedTime)
 {
 	//先行入力のチェック
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
@@ -560,13 +560,13 @@ void Player::UpdateCombo_01_03_State(float elapsedTime)
 	InputMove(elapsedTime, param.attackMoveSpeed, 1);
 
 	//回避入力
-	InputAvoidance();
+	InputBoost();
 
 	//速力更新
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Player::UpdateDamageState(float elapsedTime)
+void PLAYER::UpdateDamageState(float elapsedTime)
 {
 	static float damageTimer = 0.0f;
 
@@ -585,7 +585,7 @@ void Player::UpdateDamageState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Player::UpdateDeadState(float elapsedTime)
+void PLAYER::UpdateDeadState(float elapsedTime)
 {
 	// アニメーション終了時に死亡フラグを設定
 	if (model->GetIsEndAnimation())

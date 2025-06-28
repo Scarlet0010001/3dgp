@@ -16,13 +16,13 @@
 #define BOOST_MAX (10.0f)
 
 //プレイヤー :final このクラスの継承ができないことを明示する
-class Player final :
+class PLAYER final :
     public Character
 {
 public:
 	//コンストラクタとデストラクタ
-    Player();
-    ~Player()override;
+    PLAYER();
+    ~PLAYER()override;
 
 	//初期化処理
 	void Initialize();
@@ -54,10 +54,10 @@ public:
 	void SetBossPosition(DirectX::XMFLOAT3 p) { bossPosition = p; }
 
 	//ラジアルブラー取得
-	RadialBlur::radial_blur_constants GetRadialBlur() { return player_radialBlur_constant; }
+	RadialBlur::radialBlurConstants GetRadialBlur() { return player_radialBlurConstant; }
 	
 	//色収差取得
-	Glitch_CA::glitch_CA_constants GetGlitch_CA() { return player_glitch_CA_constant; }
+	Glitch_CA::Glitch_CA_constants GetGlitch_CA() { return player_Glitch_CA_Constant; }
 	
 	//プレイヤーのコリジョンと敵の当たり判定
 	void CalcCollision_vs_Enemy(Capsule capsule_collider, float colider_height);
@@ -65,13 +65,10 @@ public:
 	//プレイヤーの攻撃と敵の当たり判定
 	void CalcAttack_vs_Enemy(Capsule capsule_collider, float colider_height, AddDamageFunc damaged_func);
 
-	//ステージ制限壁判定
-	void CalcLimitWall(float limit_xz, float y, bool isKill = false);
-
 private:
 	//-------------構造体、列挙型--------------//
 	//アニメーション
-	enum PlayerAnimation
+	enum class PlayerAnimation
 	{
 		PLAYER_IDLE,			//待機
 
@@ -214,7 +211,7 @@ private:
 
 
 	//更新関数の関数ポインタの定義
-	typedef void (Player::* ActUpdate)(float elapsedTime);
+	typedef void (PLAYER::* ActUpdate)(float elapsedTime);
 
 	//移動ベクトルと速度設定
 	void Move(float vx, float vz, float speed)override;
@@ -245,7 +242,7 @@ private:
 	void InputJump();
 
 	//回避入力
-	void InputAvoidance();
+	void InputBoost();
 
 	//飛行入力
 	void InputWing();
@@ -268,12 +265,12 @@ private:
 	 //----------<ファイル>------------//
 	 void LoadDataFile();
 	 void SaveDataFile();
-	 const char* filePath = "Resources/Character/Player/player_param.json";
+	 const char* filePath = "Resources/Character/PLAYER/player_param.json";
 
 private:
 	//--------------------変数--------------------------
 	//関数ポインタの宣言
-	ActUpdate p_update = &Player::UpdateIdleState;
+	ActUpdate pUpdate = &PLAYER::UpdateIdleState;
 
 	//プレイヤーパラメーター
 	PlayerParam param;
@@ -287,7 +284,7 @@ private:
 	Camera* camera;
 
 	//SE
-	enum PLAYER_SE
+	enum class PLAYER_SE
 	{
 		SE_SABER = 0,		//サーベル音
 		SE_LASER = 1,		//射撃音
@@ -303,28 +300,28 @@ private:
 	std::unique_ptr <gltf_model> model;
 
 	//ラジアルブラー
-	RadialBlur::radial_blur_constants player_radialBlur_constant{}; 
+	RadialBlur::radialBlurConstants player_radialBlurConstant{}; 
 	float radialTimer = 0.0f;	//ラジアルブラータイマー
 
 	//色収差
-	Glitch_CA::glitch_CA_constants player_glitch_CA_constant{};
+	Glitch_CA::Glitch_CA_constants player_Glitch_CA_Constant{};
 	float glitch_CATimer = 0.0f;//色収差タイマー
 	bool isGlitch_CA = false;		//色収差オンオフ
 
 	//左手右手
-	enum LR
+	enum class LR
 	{
 		LEFT,	//左手
 		RIGHT,	//右手
 		COUNT,	//要素の数（enumの終端）
 	};
 	//当たり判定ノード
-	gltf_model::node beamSaber[LR::COUNT];	//サーベルの先端
-	gltf_model::node lowerArm[LR::COUNT];	//腕の先端
+	gltf_model::node beamSaber[ToInt(LR::COUNT)];	//サーベルの先端
+	gltf_model::node lowerArm[ToInt(LR::COUNT)];	//腕の先端
 
-	DirectX::XMFLOAT3 beamSaber_position[LR::COUNT]{};			//サーベルの先端位置
-	DirectX::XMFLOAT3 lowerArm_position[LR::COUNT]{};			//腕の先端位置
-	DirectX::XMFLOAT3 attackCollision_position[LR::COUNT]{};	//サーベルの当たり判定位置
+	DirectX::XMFLOAT3 beamSaberPosition[ToInt(LR::COUNT)]{};			//サーベルの先端位置
+	DirectX::XMFLOAT3 lowerArmPosition[ToInt(LR::COUNT)]{};			//腕の先端位置
+	DirectX::XMFLOAT3 attackCollisionPosition[ToInt(LR::COUNT)]{};	//サーベルの当たり判定位置
 	
 	//軌跡
 	enum class TRAIL
@@ -351,14 +348,14 @@ private:
 	DirectX::XMFLOAT3 bossPosition{};
 
 	//加速度状態
-	enum ACCELERATION_STATE
+	enum class ACCELERATION_STATE
 	{
 		MOVE,					//走り
-		AVOIDANCE,				//ブースト
+		BOOST,					//ブースト
 		WING,					//飛行
 		ACCELERATION_COUNT,		//総数
 	};
-	float accelerationState[ACCELERATION_STATE::ACCELERATION_COUNT]{
+	float accelerationState[ToInt(ACCELERATION_STATE::ACCELERATION_COUNT)]{
 		1.5f,			//走り
 		50.0f,			//ブースト
 		25.0f			//飛行

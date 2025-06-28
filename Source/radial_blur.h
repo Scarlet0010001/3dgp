@@ -17,7 +17,7 @@ public:
 
 	bool GetIsDebug() { return isDebug; }
 
-	struct radial_blur_constants
+	struct radialBlurConstants
 	{
 		DirectX::XMFLOAT2 blurCenter = { 0.5, 0.5 };		// 中心点
 		float blurStrength = 0.0f;									// ぼかし強度
@@ -26,7 +26,7 @@ public:
 		float blurTimer = 0.0f;											// 時間制御用
 		float pads[2];															// 調整
 	};
-	std::unique_ptr<Constants<radial_blur_constants>> radial_blur_constant{};
+	std::unique_ptr<Constants<radialBlurConstants>> radial_blur_constant{};
 private:
 	//	ラジアルブラー
 	Microsoft::WRL::ComPtr<ID3D11Buffer> radial_blur_constant_buffer;

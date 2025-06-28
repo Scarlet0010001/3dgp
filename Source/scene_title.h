@@ -22,7 +22,7 @@ public:
     void Render(float elapsedTime) override;
 
 private:
-    enum TITLE_MENU
+    enum class TITLE_MENU
     {
         GAME_START,
         EXIT

@@ -20,7 +20,7 @@ private:
 	//==============================================================
 
 	//アニメーション
-	enum  BossAnimation
+	enum class BOSS_ANIMATION
 	{
 		BOSS_IDLE,
 		BOSS_WALK,
@@ -136,10 +136,10 @@ public:
 	float CalcMoveSpeed(DirectX::XMFLOAT3 target, float time);
 
 	//攻撃対象の位置を設定
-	void SetLocationOfAttackTarget(DirectX::XMFLOAT3 target) { target_pos = target; }
+	void SetLocationOfAttackTarget(DirectX::XMFLOAT3 target) { targetPos = target; }
 	
 	//攻撃対象の高さを設定
-	void SetAttackTarget_height(float target) { targetPoint_height = target; }
+	void SetAttackTargetHeight(float target) { targetPointHeight = target; }
 
 	//ボス当たり判定を取得
 	BodyCollision GetBodyCollision() { return bossBodyCollision; }
@@ -148,10 +148,7 @@ public:
 	DirectX::XMFLOAT3 GetGazingPoint() { return DirectX::XMFLOAT3(position.x, position.y + (charaParam.height + 3), position.z); }
 
 	//ループアニメーションの検索
-	bool FindLoopAnimation(BossAnimation BA);
-
-	//ステージ制限壁判定
-	void CalcLimitWall(float limit_xz, float y, bool isKill = false);
+	bool FindLoopAnimation(BOSS_ANIMATION BA);
 
 private:
 	/*--------------------状態遷移------------------------*/
@@ -161,10 +158,9 @@ private:
 	void TransitionWalkState();						//歩行
 
 	//			攻撃系				//
-	void TransitionAttack_Tackle_State();			//近接攻撃
-	void TransitionAttack_Jump_State();				//ジャンプ攻撃
-	void TransitionAttack_ShotStraight_State();		//射撃
-	void TransitionAttack_ShotHoming_State();		//誘導ミサイル
+	void TransitionAttackTackleState();				//近接攻撃
+	void TransitionAttackJumpState();				//ジャンプ攻撃
+	void TransitionAttackShotStraightState();		//射撃
 
 	//			ダメージ系			//
 	void TransitionDamageState();					//ダメージ
@@ -177,10 +173,9 @@ private:
 	void UpdateWalkState(float elapsedTime);					//歩行
 
 	//			攻撃系				//
-	void UpdateAttack_Tackle_State(float elapsedTime);			//近接攻撃
-	void UpdateAttack_Jump_State(float elapsedTime);			//ジャンプ攻撃
-	void UpdateAttack_ShotStraight_State(float elapsedTime);	//射撃
-	void UpdateAttack_ShotHoming_State(float elapsedTime);		//誘導ミサイル
+	void UpdateAttackTackleState(float elapsedTime);			//近接攻撃
+	void UpdateAttackJumpState(float elapsedTime);			//ジャンプ攻撃
+	void UpdateAttackShotStraightState(float elapsedTime);	//射撃
 
 	//			ダメージ系			//
 	void UpdateDamageState(float elapsedTime);					//ダメージ
@@ -216,7 +211,7 @@ private:
 	//---------------------------変数---------------------------//
 	//ボスのアクション更新関数（現在のステートの更新処理を指す関数ポインタ）
 	typedef void (Boss::* ActUpdate)(float elapsedTime);
-	ActUpdate act_update = &Boss::UpdateIdleState;
+	ActUpdate actUpdate = &Boss::UpdateIdleState;
 
 	//ボスの 3D モデル（GLTF）
 	std::unique_ptr<gltf_model> model;
@@ -227,9 +222,9 @@ private:
 	gltf_model::node turretNode;
 
 	//ボスのアニメーション（現在、遷移中、前回の状態を記録）
-	BossAnimation bossAnimation = BOSS_IDLE;
-	BossAnimation bossAnimation_transition = BOSS_IDLE;
-	BossAnimation bossAnimation_old = BOSS_IDLE;
+	BOSS_ANIMATION bossAnimation = BOSS_ANIMATION::BOSS_IDLE;
+	BOSS_ANIMATION bossAnimation_transition = BOSS_ANIMATION::BOSS_IDLE;
+	BOSS_ANIMATION bossAnimation_old = BOSS_ANIMATION::BOSS_IDLE;
 
 	//ステート関連のタイマー
 	float stateTimer;						//現在のステート経過時間
@@ -240,10 +235,10 @@ private:
 	int32_t lineHealth;  //ボスが怯むHPライン
 
 	//ターゲット情報
-	DirectX::XMFLOAT3 target_pos;        //目標位置
-	DirectX::XMFLOAT3 targetPoint_pos{}; //目標の胴体位置
-	float targetPoint_height = 0.0f;     //目標位置からの高さ
-	DirectX::XMFLOAT3 shot_pos;          //弾を撃つ位置
+	DirectX::XMFLOAT3 targetPos;        //目標位置
+	DirectX::XMFLOAT3 targetPointPos{}; //目標の胴体位置
+	float targetPointHeight = 0.0f;     //目標位置からの高さ
+	DirectX::XMFLOAT3 shotPos;          //弾を撃つ位置
 
 	//行動フラグ
 	bool isJump = false;		//ジャンプ中かどうか

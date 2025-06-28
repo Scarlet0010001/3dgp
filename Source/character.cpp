@@ -41,44 +41,6 @@ bool Character::ApplyDamage(int damage, float invincibleTime, WINCE_TYPE type)
 	return true;
 
 }
-/// <summary>
-/// ステージ制限壁判定
-/// </summary>
-/// <param name="isKill">範囲外時にチェックポイントにテレポートするかどうか</param>
-void Character::CalcLimitWall(bool isKill)
-{
-	//
-	if (position.x < limitWall[LIMIT_X].y)
-	{
-		position.x = limitWall[LIMIT_X].y;
-	}
-	else if (limitWall[LIMIT_X].x <= position.x)
-	{
-		position.x = limitWall[LIMIT_X].x;
-	}
-
-	//
-	if (position.z < limitWall[LIMIT_Z].y)
-	{
-		position.z = limitWall[LIMIT_Z].y;
-	}
-	else if (limitWall[LIMIT_Z].x <= position.z)
-	{
-		position.z = limitWall[LIMIT_Z].x;
-	}
-
-	//
-	if (position.y < limitWall[LIMIT_Y].y)
-	{
-		//checkpointPosition;
-		//checkpointPositionに初期化時の座標を保存して範囲外に行ったら壁に衝突、もしくはチェックポイントにワープ
-		position.y = 60;
-	}
-	else if (limitWall[LIMIT_Y].x <= position.y)
-	{
-		position.y = limitWall[LIMIT_Y].x;
-	}
-}
 
 void Character::Move(float vx, float vz, float speed)
 {

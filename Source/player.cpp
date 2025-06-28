@@ -15,55 +15,53 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-Player::Player()
+PLAYER::PLAYER()
 {
 	//インスタンス取得
 	Graphics& graphics = Graphics::Instance();
 	//キャラクターモデルを読み込む
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
-		"Resources/Character/Player/glb/white_crow.glb", true);
+		"Resources/Character/PLAYER/glb/white_crow.glb", true);
 	
 	//エフェクト作成（斬撃エフェクト）
 	slashEffect = std::make_unique<Effect>("Resources/Effect/Slash/slash.efkefc");
 
 	// 効果音の読み込み
-	audios[PLAYER_SE::SE_SABER] = audio::_emplace(L"Resources/Sound/SE/saber.wav");
-	audios[PLAYER_SE::SE_LASER] = audio::_emplace(L"Resources/Sound/SE/laser.wav");
-	audios[PLAYER_SE::SE_BOOST] = audio::_emplace(L"Resources/Sound/SE/boost.wav");
-	audios[PLAYER_SE::SE_DAMAGE] = audio::_emplace(L"Resources/Sound/SE/Damage.wav");
+	audios[ToInt(PLAYER_SE::SE_SABER)] = audio::_emplace(L"Resources/Sound/SE/saber.wav");
+	audios[ToInt(PLAYER_SE::SE_LASER)] = audio::_emplace(L"Resources/Sound/SE/laser.wav");
+	audios[ToInt(PLAYER_SE::SE_BOOST)] = audio::_emplace(L"Resources/Sound/SE/boost.wav");
+	audios[ToInt(PLAYER_SE::SE_DAMAGE)] = audio::_emplace(L"Resources/Sound/SE/Damage.wav");
 
 	// モデルのトランスフォームデータを累積
 	model->cumulate_transforms(model->nodes, transform);
 
 	// アニメーションノードを初期化
-	for (auto& node : animated_nodes)
+	for (auto& node : animatedNodes)
 	{
 		node = model->nodes;
 	}
-	blended_animated_nodes = model->nodes;
+	blendedAnimatedNodes = model->nodes;
 
 	// UIを初期化
 	ui = std::make_unique<PlayerUI>();
 
 	// 武器ノードの取得
-	beamSaber[LR::LEFT] = model->find_nodes("Left_wep1");
-	beamSaber[LR::RIGHT] = model->find_nodes("Right_wep1");
-	lowerArm[LR::LEFT] = model->find_nodes("lowerarm_l");
-	lowerArm[LR::RIGHT] = model->find_nodes("lowerarm_r");
+	beamSaber[ToInt(LR::LEFT)] = model->find_nodes("Left_wep1");
+	beamSaber[ToInt(LR::RIGHT)] = model->find_nodes("Right_wep1");
+	lowerArm[ToInt(LR::LEFT)] = model->find_nodes("lowerarm_l");
+	lowerArm[ToInt(LR::RIGHT)] = model->find_nodes("lowerarm_r");
 
 	// 入力デバイスの取得
 	mouse = &Device::Instance().GetMouse();
 	gamePad = &Device::Instance().GetGamePad();
 	camera = &Camera::Instance();
 
-	//circleShadowConstants = std::make_unique<Constants<CircleShadowConstants>>(Graphics::Instance().GetDevice().Get());
-
 	// 初期化処理を実行
 	Initialize();
 
 }
 
-void Player::Initialize()
+void PLAYER::Initialize()
 {
 	//パラメーターロード
 	LoadDataFile();
@@ -102,11 +100,11 @@ void Player::Initialize()
 	attackParam.hitStop.time = 0.1f;
 }
 
-Player::~Player()
+PLAYER::~PLAYER()
 {
 }
 
-void Player::Update(float elapsedTime)
+void PLAYER::Update(float elapsedTime)
 {
 	//インスタンス取得
 	Graphics& graphics = Graphics::Instance();
@@ -118,7 +116,7 @@ void Player::Update(float elapsedTime)
 	resetTrail = false;
 
 	//-----------------ステート更新処理-----------------//
-	(this->*p_update)(elapsedTime);
+	(this->*pUpdate)(elapsedTime);
 
 	//Yボタンを押すとロックオンする
 	if (gamePad->GetButtonDown() & GamePad::BTN_Y)//V
@@ -173,7 +171,7 @@ void Player::Update(float elapsedTime)
 	ui->Update(elapsedTime);
 }
 
-void Player::Render_f(float elapsedTime)
+void PLAYER::Render_f(float elapsedTime)
 {
 	// グラフィックスインスタンスを取得
 	Graphics& graphics = Graphics::Instance();
@@ -184,25 +182,25 @@ void Player::Render_f(float elapsedTime)
 	// アニメーションの遷移チェック
 	if (playerAnimation_transition != playerAnimation)
 	{
-		if (transition_state != TRANSITION_STATE::NONE)
+		if (transitionState != TRANSITION_STATE::NONE)
 		{
 			// 現在の遷移アニメーションを保存
 			playerAnimation_old = playerAnimation_transition;
-			animated_nodes[ANIME_NODE::OLD_ANIMATION] = blended_animated_nodes;
+			animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)] = blendedAnimatedNodes;
 			transitionToTransition = true;
 		}
 		// 新しいアニメーションへの遷移開始
 		playerAnimation_transition = playerAnimation;
-		transition_state = TRANSITION_STATE::START;
+		transitionState = TRANSITION_STATE::START;
 	}
 
 	// 現在のアニメーションがループするか判定
 	bool isLoop = FindLoopAnimation(playerAnimation);
 
 	// アニメーションブレンド処理
-	if (transition_state > 0 && transition_time > 0.0f)
+	if (transitionState > TRANSITION_STATE::NONE && transitionTime > 0.0f)
 	{
-		switch (transition_state)
+		switch (transitionState)
 		{
 		case TRANSITION_STATE::NONE:
 			break;
@@ -211,25 +209,25 @@ void Player::Render_f(float elapsedTime)
 			if (!transitionToTransition)
 			{
 				// 直前のアニメーションを設定
-				model->animate(playerAnimation_old, time, animated_nodes[ANIME_NODE::OLD_ANIMATION],
+				model->animate(ToInt(playerAnimation_old), time, animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)],
 					FindLoopAnimation(playerAnimation_old));
 			}
 			// 新しいアニメーションを0秒の状態から設定
-			model->animate(playerAnimation, 0.0f, animated_nodes[ANIME_NODE::NOW_ANIMATION], isLoop);
+			model->animate(ToInt(playerAnimation), 0.0f, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], isLoop);
 
 			// 遷移ステートを「移行中」に設定
-			transition_state = TRANSITION_STATE::TRANSITION;
+			transitionState = TRANSITION_STATE::TRANSITION;
 			time = 0.0f;
 			factor = 0.0f;
 
 		case TRANSITION_STATE::TRANSITION:
 			// アニメーション遷移のブレンド率を計算
-			factor = time / transition_time;
+			factor = time / transitionTime;
 
 			// 旧アニメーションと新アニメーションをブレンド
-			model->blend_animations(animated_nodes[ANIME_NODE::OLD_ANIMATION],
-				animated_nodes[ANIME_NODE::NOW_ANIMATION],
-				factor, blended_animated_nodes);
+			model->blend_animations(animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)],
+				animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)],
+				factor, blendedAnimatedNodes);
 
 			// 経過時間を加算
 			time += elapsedTime;
@@ -239,13 +237,13 @@ void Player::Render_f(float elapsedTime)
 			{
 				// 遷移終了処理
 				transitionToTransition = false;
-				transition_state = TRANSITION_STATE::NONE;
+				transitionState = TRANSITION_STATE::NONE;
 				time = 0;
 			}
 			break;
 		}
 		// ブレンド後のアニメーションを描画
-		model->render(graphics.Get_DC().Get(), transform, blended_animated_nodes);
+		model->render(graphics.Get_DC().Get(), transform, blendedAnimatedNodes);
 	}
 	else
 	{
@@ -253,33 +251,33 @@ void Player::Render_f(float elapsedTime)
 		time += elapsedTime;
 
 		// アニメーションが終了した場合の処理
-		if (model->animations.at(playerAnimation).duration < time)
+		if (model->animations.at(ToInt(playerAnimation)).duration < time)
 		{
 			if (isLoop)
 				time = 0;  // ループする場合は最初に戻す
 			else
-				time = model->animations.at(playerAnimation).duration; // ループしない場合は最後のフレームで停止
+				time = model->animations.at(ToInt(playerAnimation)).duration; // ループしない場合は最後のフレームで停止
 		}
 
 		// アニメーションを適用
-		model->animate(playerAnimation, time, animated_nodes[ANIME_NODE::NOW_ANIMATION], isLoop);
+		model->animate(ToInt(playerAnimation), time, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], isLoop);
 
 		// モデルを描画
-		model->render(graphics.Get_DC().Get(), transform, animated_nodes[ANIME_NODE::NOW_ANIMATION]);
+		model->render(graphics.Get_DC().Get(), transform, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)]);
 
 		// 前回のアニメーションを更新
 		playerAnimation_old = playerAnimation;
 	}
 }
 
-void Player::RenderUI(float elapsed_time)
+void PLAYER::RenderUI(float elapsed_time)
 {
 	//プレイヤーのUI
 	ui->Render();
 	
 }
 
-void Player::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_height)
+void PLAYER::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_height)
 {
 	//身体の押し出し判定
 	Collision::CylinderVsCylinder(
@@ -288,18 +286,18 @@ void Player::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_hei
 
 }
 
-void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height, AddDamageFunc damaged_func)
+void PLAYER::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height, AddDamageFunc damaged_func)
 {
 	//攻撃フラグがオフなら終わる
 	if (!attackParam.isAttack) return;
 
 	//どっちの腕で攻撃するか
 	int side = 0;
-	if (state == STATE::LEFT_ATTACK) side = LR::LEFT;
-	else if (state == STATE::RIGHT_ATTACK) side = LR::RIGHT;
+	if (state == STATE::LEFT_ATTACK) side = ToInt(LR::LEFT);
+	else if (state == STATE::RIGHT_ATTACK) side = ToInt(LR::RIGHT);
 
 	//攻撃時の当たり判定
-	if (Collision::SphereVsCylinder(attackCollision_position[side], 1.5f,
+	if (Collision::SphereVsCylinder(attackCollisionPosition[side], 1.5f,
 		capsule_collider.start, capsule_collider.radius,collider_height))
 	{
 		//攻撃対象に与えるダメージ量と無敵時間
@@ -312,12 +310,12 @@ void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 			camera->SetHitStop(attackParam.hitStop);
 
 			//ヒットエフェクト再生
-			slashEffect->Play(attackCollision_position[side], 1.5f);
+			slashEffect->Play(attackCollisionPosition[side], 1.5f);
 		}
 	}
 }
 
-bool Player::FindLoopAnimation(PlayerAnimation PA)
+bool PLAYER::FindLoopAnimation(PlayerAnimation PA)
 {
 	//ループさせたいアニメーションじゃなかったらfalse
 	if (PA == PlayerAnimation::PLAYER_ATTACK_01
@@ -335,7 +333,7 @@ bool Player::FindLoopAnimation(PlayerAnimation PA)
 	return true;
 }
 
-void Player::Move(float vx, float vz, float speed)
+void PLAYER::Move(float vx, float vz, float speed)
 {
 	//移動方向ベクトルを設定
 	moveVec_x = vx;
@@ -353,7 +351,7 @@ void Player::Move(float vx, float vz, float speed)
 	}
 }
 
-void Player::Move(float vx, float vy, float vz, float speed)
+void PLAYER::Move(float vx, float vy, float vz, float speed)
 {
 	//移動方向ベクトルを設定
 	moveVec_x = vx;
@@ -372,7 +370,7 @@ void Player::Move(float vx, float vy, float vz, float speed)
 	}
 }
 
-void Player::BoostUpdate(float elapsedTime)
+void PLAYER::BoostUpdate(float elapsedTime)
 {
 	//ブーストステートじゃないかつ地面に接していたらブーストゲージを回復する
 	if (isGround && STATE::BOOST != state)
@@ -394,7 +392,7 @@ void Player::BoostUpdate(float elapsedTime)
 	}
 }
 
-bool Player::InputMove(float elapsedTime)
+bool PLAYER::InputMove(float elapsedTime)
 {
 	//進行ベクトル取得
 	const DirectX::XMFLOAT3 moveVec = GetMoveVec(camera);
@@ -406,7 +404,7 @@ bool Player::InputMove(float elapsedTime)
 	return moveVec.x != 0.0f || moveVec.y != 0.0f || moveVec.z != 0.0f;
 }
 
-bool Player::InputMove(float elapsedTime, float restrictionMove, float restrictionTurn)
+bool PLAYER::InputMove(float elapsedTime, float restrictionMove, float restrictionTurn)
 {
 	//進行ベクトル取得
 	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
@@ -418,7 +416,7 @@ bool Player::InputMove(float elapsedTime, float restrictionMove, float restricti
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
 
-bool Player::InputMoveWing(float elapsedTime)
+bool PLAYER::InputMoveWing(float elapsedTime)
 {
 	//進行ベクトル取得
 	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
@@ -430,7 +428,7 @@ bool Player::InputMoveWing(float elapsedTime)
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
 
-const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
+const DirectX::XMFLOAT3 PLAYER::GetMoveVec(Camera* camera, bool wing) const
 {
 	//入力情報を取得
 	float ax = gamePad->GetAxis_LX();
@@ -485,29 +483,29 @@ const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
 	return vec;
 }
 
-void Player::ShaderUpdate(float elapsedTime)
+void PLAYER::ShaderUpdate(float elapsedTime)
 {
 	//ラジアルブラータイマーがオフの場合
-	if (player_radialBlur_constant.blurStrength <= 0 
+	if (player_radialBlurConstant.blurStrength <= 0 
 		|| radialTimer <= 0) {
-		player_radialBlur_constant.blurStrength = 0.0f;
-		player_radialBlur_constant.blurRadius = 0.0f;
+		player_radialBlurConstant.blurStrength = 0.0f;
+		player_radialBlurConstant.blurRadius = 0.0f;
 	}
 	else
 	{
 		//飛行モード時
 		if (state == STATE::WING)
 		{
-			player_radialBlur_constant.blurStrength -= elapsedTime;
-			player_radialBlur_constant.blurRadius -= elapsedTime;
+			player_radialBlurConstant.blurStrength -= elapsedTime;
+			player_radialBlurConstant.blurRadius -= elapsedTime;
 		}
 		//ブースト時
 		else
 		{
-			float factor = radialTimer / player_radialBlur_constant.blurTimer;
+			float factor = radialTimer / player_radialBlurConstant.blurTimer;
 			radialTimer -= elapsedTime;
 
-			player_radialBlur_constant.blurStrength = factor;
+			player_radialBlurConstant.blurStrength = factor;
 		}
 	}
 	
@@ -518,32 +516,32 @@ void Player::ShaderUpdate(float elapsedTime)
 		float factor = glitch_CATimer / 0.03f;
 		glitch_CATimer -= 0.03f * elapsedTime;
 
-		player_glitch_CA_constant.density = factor;
-		player_glitch_CA_constant.shift = 0.015f;
-		player_glitch_CA_constant.x_shifting = 0.015f;
-		player_glitch_CA_constant.y_shifting = 0.015f;
+		player_Glitch_CA_Constant.density = factor;
+		player_Glitch_CA_Constant.shift = 0.015f;
+		player_Glitch_CA_Constant.XShifting = 0.015f;
+		player_Glitch_CA_Constant.YShifting = 0.015f;
 	}
 	//平常時
 	else
 	{
-		player_glitch_CA_constant.center = { 0.5f,0.5f };
-		player_glitch_CA_constant.brightness = 0.0f;
-		player_glitch_CA_constant.density = 0.0f;
-		player_glitch_CA_constant.extension = 0.0f;
-		player_glitch_CA_constant.glitch_mask_radius = 0.0f;
-		player_glitch_CA_constant.glitch_sampling_count = 0.0f;
-		player_glitch_CA_constant.rand_float = 0.0f;
-		player_glitch_CA_constant.shift = 0.0f;
-		player_glitch_CA_constant.uv_slider = 0.0f;
-		player_glitch_CA_constant.x_shift = { 0,0 };
-		player_glitch_CA_constant.x_shifting = 0.0f;
-		player_glitch_CA_constant.y_shift = { 0,0 };
-		player_glitch_CA_constant.y_shifting = 0.0f;
+		player_Glitch_CA_Constant.center = { 0.5f,0.5f };
+		player_Glitch_CA_Constant.brightness = 0.0f;
+		player_Glitch_CA_Constant.density = 0.0f;
+		player_Glitch_CA_Constant.extension = 0.0f;
+		player_Glitch_CA_Constant.glitchMaskRadius = 0.0f;
+		player_Glitch_CA_Constant.glitchSamplingCount = 0.0f;
+		player_Glitch_CA_Constant.randFloat = 0.0f;
+		player_Glitch_CA_Constant.shift = 0.0f;
+		player_Glitch_CA_Constant.uvSlider = 0.0f;
+		player_Glitch_CA_Constant.XShift = { 0,0 };
+		player_Glitch_CA_Constant.XShifting = 0.0f;
+		player_Glitch_CA_Constant.YShift = { 0,0 };
+		player_Glitch_CA_Constant.YShifting = 0.0f;
 
 	}
 }
 
-void Player::InputJump()
+void PLAYER::InputJump()
 {
 	//スペースを押したらジャンプ
 	if (gamePad->GetButtonDown() & GamePad::BTN_A)
@@ -564,7 +562,7 @@ void Player::InputJump()
 	}
 }
 
-void Player::InputAvoidance()
+void PLAYER::InputBoost()
 {
 	//ブースト量が25%以下だと出来ない
 	if (param.boostTimer < 2.5f)return;
@@ -577,7 +575,7 @@ void Player::InputAvoidance()
 
 }
 
-void Player::InputWing()
+void PLAYER::InputWing()
 {
 	//Xボタン押すと飛行モードになる
 	if (gamePad->GetButtonDown() & GamePad::BTN_B)
@@ -586,14 +584,14 @@ void Player::InputWing()
 	}
 }
 
-void Player::InputShot()
+void PLAYER::InputShot()
 {
 	// 弾管理クラスのインスタンス取得
 	BulletManager& bulletManager = BulletManager::Instance();
 
 	// 剣（ビームサーベル）の位置をアニメーションのボーン情報から取得
-	model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
-	model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
+	model->fech_by_bone(ToInt(playerAnimation), time, transform, beamSaber[ToInt(LR::RIGHT)], beamSaberPosition[ToInt(LR::RIGHT)]);
+	model->fech_by_bone(ToInt(playerAnimation), time, transform, beamSaber[ToInt(LR::LEFT)], beamSaberPosition[ToInt(LR::LEFT)]);
 
 	DirectX::XMFLOAT3 dir{}; // 発射方向
 	DirectX::XMFLOAT3 pos{}; // 発射位置
@@ -603,12 +601,12 @@ void Player::InputShot()
 		|| playerAnimation == PlayerAnimation::PLAYER_SHOT_BACK)
 	{
 		// 右手側のビームサーベル位置
-		pos = beamSaber_position[LR::RIGHT];
+		pos = beamSaberPosition[ToInt(LR::RIGHT)];
 	}
 	else
 	{
 		// 左手側のビームサーベル位置
-		pos = beamSaber_position[LR::LEFT];
+		pos = beamSaberPosition[ToInt(LR::LEFT)];
 	}
 
 	// ロックオンしていなかったらカメラの前方方向に発射
@@ -625,17 +623,17 @@ void Player::InputShot()
 
 	// 直線弾（BulletStraight）の生成
 	BulletStraight* bullet =
-		new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::Player);
+		new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::PLAYER);
 
 	// 弾を発射
 	bullet->Launch(dir, pos);
 
 	//射撃音
-	audios[PLAYER_SE::SE_LASER]->play();
-	audios[PLAYER_SE::SE_LASER]->volume(0.3f);
+	audios[ToInt(PLAYER_SE::SE_LASER)]->play();
+	audios[ToInt(PLAYER_SE::SE_LASER)]->volume(0.3f);
 }
 
-void Player::OnLanding()
+void PLAYER::OnLanding()
 {
 	// ジャンプ回数をリセット（地面に着地したと判断）
 	jumpCount = 0;
@@ -663,12 +661,12 @@ void Player::OnLanding()
 	}
 }
 
-void Player::OnDead()
+void PLAYER::OnDead()
 {
 	TransitionDeadState();
 }
 
-void Player::OnDamaged(WINCE_TYPE type)
+void PLAYER::OnDamaged(WINCE_TYPE type)
 {
 	//typeによって偏移する状態を変える
 	switch (type)
@@ -686,7 +684,7 @@ void Player::OnDamaged(WINCE_TYPE type)
 
 }
 
-bool Player::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
+bool PLAYER::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 {
 	//ダメージが0の場合は健康状態を変更する必要がない
 	if (damage == 0)return false;
@@ -713,15 +711,15 @@ bool Player::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 	}
 
 	//ダメージ効果音
-	audios[PLAYER_SE::SE_DAMAGE]->play();
-	audios[PLAYER_SE::SE_DAMAGE]->volume(0.5f);
+	audios[ToInt(PLAYER_SE::SE_DAMAGE)]->play();
+	audios[ToInt(PLAYER_SE::SE_DAMAGE)]->volume(0.5f);
 
 	//健康状態が変更した場合はtrueを返す
 	return true;
 
 }
 
-void Player::TrailUpdate()
+void PLAYER::TrailUpdate()
 {
 	//攻撃時以外はtrailPositions配列全てをサーベルの位置に揃え、透明にしておく
 	if ((state != STATE::LEFT_ATTACK
@@ -734,8 +732,8 @@ void Player::TrailUpdate()
 		{
 			for (int i = MAX_POLYGON - 1; i >= 0; --i)
 			{
-				trailAttack[lr].trailPositions[ToInt(TRAIL::LOWER_ARM)][i] = lowerArm_position[lr];
-				trailAttack[lr].trailPositions[ToInt(TRAIL::BEAM_SABER)][i] = beamSaber_position[lr];
+				trailAttack[lr].trailPositions[ToInt(TRAIL::LOWER_ARM)][i] = lowerArmPosition[lr];
+				trailAttack[lr].trailPositions[ToInt(TRAIL::BEAM_SABER)][i] = beamSaberPosition[lr];
 				trailAttack[lr].color[i] = { 1.0f,0.0f,1.0f,0.0f };
 			}
 		}
@@ -769,16 +767,16 @@ void Player::TrailUpdate()
 	int side = 0;
 	if (state == STATE::LEFT_ATTACK)
 	{
-		side = LR::LEFT;
+		side = ToInt(LR::LEFT);
 	}
 	else if (state == STATE::RIGHT_ATTACK)
 	{
-		side = LR::RIGHT;
+		side = ToInt(LR::RIGHT);
 	}
 	
 	// 腕の先端とサーベルの先端の座標を取得し、頂点バッファに保存
-	trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][0] = lowerArm_position[side];
-	trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][0] = beamSaber_position[side];
+	trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][0] = lowerArmPosition[side];
+	trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][0] = beamSaberPosition[side];
 	
 	// ポリゴン作成
 	PrimitiveRenderer* primitiveRenderer = Graphics::Instance().GetPrimitiveRenderer();
@@ -823,7 +821,7 @@ void Player::TrailUpdate()
 
 }
 
-void Player::UpdateVerticalVelocity(float elapsed_frame)
+void PLAYER::UpdateVerticalVelocity(float elapsed_frame)
 {
 	// プレイヤーのアニメーションがPLAYER_WING_STARTでない場合、重力を適用
 	if (playerAnimation != PlayerAnimation::PLAYER_WING_START)
@@ -833,7 +831,7 @@ void Player::UpdateVerticalVelocity(float elapsed_frame)
 		velocity.y += (gravity * 0.2f) * elapsed_frame;
 }
 
-void Player::LoadDataFile()
+void PLAYER::LoadDataFile()
 {
 	// Jsonファイルから値を取得
 	std::filesystem::path path = filePath;
@@ -850,7 +848,7 @@ void Player::LoadDataFile()
 	}
 }
 
-void Player::SaveDataFile()
+void PLAYER::SaveDataFile()
 {
 	// ベースクラスの初期化パラメーター情報を更新
 	param.charaInitParam = charaParam;
@@ -865,7 +863,7 @@ void Player::SaveDataFile()
 		o_archive(param);  // paramのデータをシリアライズして保存
 	}
 }
-void Player::DebugPrimitiveUpdate()
+void PLAYER::DebugPrimitiveUpdate()
 {
 	// デバッグレンダラーのインスタンスを取得
 	DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
@@ -873,10 +871,10 @@ void Player::DebugPrimitiveUpdate()
 	// サーベルの当たり判定処理
 	{
 		// ボーン位置を取得して、サーベルや下腕の位置を更新
-		model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::LEFT], beamSaber_position[LR::LEFT]);
-		model->fech_by_bone(playerAnimation, time, transform, lowerArm[LR::LEFT], lowerArm_position[LR::LEFT]);
-		model->fech_by_bone(playerAnimation, time, transform, beamSaber[LR::RIGHT], beamSaber_position[LR::RIGHT]);
-		model->fech_by_bone(playerAnimation, time, transform, lowerArm[LR::RIGHT], lowerArm_position[LR::RIGHT]);
+		model->fech_by_bone(ToInt(playerAnimation), time, transform, beamSaber[ToInt(LR::LEFT)], beamSaberPosition[ToInt(LR::LEFT)]);
+		model->fech_by_bone(ToInt(playerAnimation), time, transform, lowerArm[ToInt(LR::LEFT)], lowerArmPosition[ToInt(LR::LEFT)]);
+		model->fech_by_bone(ToInt(playerAnimation), time, transform, beamSaber[ToInt(LR::RIGHT)], beamSaberPosition[ToInt(LR::RIGHT)]);
+		model->fech_by_bone(ToInt(playerAnimation), time, transform, lowerArm[ToInt(LR::RIGHT)], lowerArmPosition[ToInt(LR::RIGHT)]);
 
 		// サーベルの位置を求める関数（腕とサーベルの位置から中間点を計算）
 		std::function<DirectX::XMFLOAT3(DirectX::XMFLOAT3&, DirectX::XMFLOAT3&)> saber_position{
@@ -894,17 +892,17 @@ void Player::DebugPrimitiveUpdate()
 		} };
 
 		// サーベルの衝突判定位置を計算
-		attackCollision_position[LR::LEFT] = saber_position(lowerArm_position[LR::LEFT], beamSaber_position[LR::LEFT]);
-		attackCollision_position[LR::RIGHT] = saber_position(lowerArm_position[LR::RIGHT], beamSaber_position[LR::RIGHT]);
+		attackCollisionPosition[ToInt(LR::LEFT)] = saber_position(lowerArmPosition[ToInt(LR::LEFT)], beamSaberPosition[ToInt(LR::LEFT)]);
+		attackCollisionPosition[ToInt(LR::RIGHT)] = saber_position(lowerArmPosition[ToInt(LR::RIGHT)], beamSaberPosition[ToInt(LR::RIGHT)]);
 
 		// 攻撃が有効な場合、デバッグ用にサーベルの位置に球体を描画
 		if (attackParam.isAttack)
 		{
 			debugRender->CreateSphere(
-				attackCollision_position[LR::LEFT],
+				attackCollisionPosition[ToInt(LR::LEFT)],
 				1.0f, { 1.0f,0.0f,0.0f,1.0f });  // 左側のサーベルの位置
 			debugRender->CreateSphere(
-				attackCollision_position[LR::RIGHT],
+				attackCollisionPosition[ToInt(LR::RIGHT)],
 				1.0f, { 1.0f,0.0f,0.0f,1.0f });  // 右側のサーベルの位置
 		}
 	}
@@ -916,7 +914,7 @@ void Player::DebugPrimitiveUpdate()
 		{ 0.0f,1.0f,0.0f,1.0f });  // 自キャラの当たり判定を緑色で表示
 }
 
-void Player::DebugGUI()
+void PLAYER::DebugGUI()
 {
 #ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
@@ -926,7 +924,7 @@ void Player::DebugGUI()
 	if (displayPlayerImgui)
 	{
 
-		if (ImGui::Begin("Player", nullptr, ImGuiWindowFlags_None))
+		if (ImGui::Begin("PLAYER", nullptr, ImGuiWindowFlags_None))
 		{
 			//カメラ
 			//トランスフォーム
@@ -1061,7 +1059,7 @@ void Player::DebugGUI()
 				{
 					playerAnimation = static_cast<PlayerAnimation>(item_current);
 				}
-				ImGui::SliderFloat("transition_time", &transition_time, 0.0f, 5.0f);
+				ImGui::SliderFloat("transitionTime", &transitionTime, 0.0f, 5.0f);
 
 			}
 

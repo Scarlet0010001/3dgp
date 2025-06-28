@@ -32,7 +32,7 @@ private:
     };
 
 public:
-    enum STATE
+    enum class STATE
     {
         Tracking = 0,   // トラッキング状態（ターゲットの追跡）
         LockOn,           // ロックオン状態（ターゲットをロック）
@@ -182,7 +182,7 @@ private:
 
     //--------< 関数ポインタ >--------//
     typedef void (Camera::* p_Update)(float elapsedTime);
-    p_Update p_update = &Camera::UpdateWithTracking;
+    p_Update pUpdate = &Camera::UpdateWithTracking;
 
 private:
     //--------< 変数 >--------//

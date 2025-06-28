@@ -5,11 +5,11 @@
 void Boss::TransitionIdleState()
 {
 	//待機状態へ遷移
-	act_update = &Boss::UpdateIdleState;
+	actUpdate = &Boss::UpdateIdleState;
 
 	//状態とアニメーションをIDLEに設定
 	state = STATE::IDLE;
-	bossAnimation = BossAnimation::BOSS_IDLE;
+	bossAnimation = BOSS_ANIMATION::BOSS_IDLE;
 
 	//状態タイマーと持続時間を初期化
 	stateTimer = 0;
@@ -19,11 +19,11 @@ void Boss::TransitionIdleState()
 void Boss::TransitionWalkState()
 {
 	//歩行状態へ遷移
-	act_update = &Boss::UpdateWalkState;
+	actUpdate = &Boss::UpdateWalkState;
 
 	//状態とアニメーションをWALKに設定
 	state = STATE::WALK;
-	bossAnimation = BossAnimation::BOSS_WALK;
+	bossAnimation = BOSS_ANIMATION::BOSS_WALK;
 
 	//移動速度を歩行速度に設定
 	charaParam.moveSpeed = WALK_SPEED;
@@ -33,14 +33,14 @@ void Boss::TransitionWalkState()
 	stateDuration = 3.0f;
 }
 
-void Boss::TransitionAttack_Tackle_State()
+void Boss::TransitionAttackTackleState()
 {
 	//タックル攻撃状態へ遷移
-	act_update = &Boss::UpdateAttack_Tackle_State;
+	actUpdate = &Boss::UpdateAttackTackleState;
 
 	//状態とアニメーションをTACKLEに設定
 	state = STATE::TACKLE;
-	bossAnimation = BossAnimation::BOSS_RUN;
+	bossAnimation = BOSS_ANIMATION::BOSS_RUN;
 
 	//攻撃パラメータをタックル用に設定
 	attackParam = param.tackleParam;
@@ -50,14 +50,14 @@ void Boss::TransitionAttack_Tackle_State()
 	stateDuration = 1.0f;
 }
 
-void Boss::TransitionAttack_Jump_State()
+void Boss::TransitionAttackJumpState()
 {
 	//ジャンプ攻撃状態へ遷移
-	act_update = &Boss::UpdateAttack_Jump_State;
+	actUpdate = &Boss::UpdateAttackJumpState;
 
 	//状態とアニメーションをJUMPに設定
 	state = STATE::JUMP;
-	bossAnimation = BossAnimation::BOSS_CHARGE;
+	bossAnimation = BOSS_ANIMATION::BOSS_CHARGE;
 
 	//加速度をジャンプ用に設定
 	charaParam.acceleration = ACCELERATION_JUMP_SPEED;
@@ -73,14 +73,14 @@ void Boss::TransitionAttack_Jump_State()
 	chargeEffect->Play(position, 3.0f);
 }
 
-void Boss::TransitionAttack_ShotStraight_State()
+void Boss::TransitionAttackShotStraightState()
 {
 	//直線射撃状態へ遷移
-	act_update = &Boss::UpdateAttack_ShotStraight_State;
+	actUpdate = &Boss::UpdateAttackShotStraightState;
 
 	//状態をSHOT_Sに、アニメーションをJUMPに設定
 	state = STATE::SHOT_S;
-	bossAnimation = BossAnimation::BOSS_JUMP;
+	bossAnimation = BOSS_ANIMATION::BOSS_JUMP;
 
 	//加速度をジャンプ用に設定
 	charaParam.acceleration = ACCELERATION_JUMP_SPEED;
@@ -93,18 +93,14 @@ void Boss::TransitionAttack_ShotStraight_State()
 	stateDuration = RAPIDFIRE_TIME;
 }
 
-void Boss::TransitionAttack_ShotHoming_State()
-{
-}
-
 void Boss::TransitionDamageState()
 {
 	//ダメージ状態へ遷移
-	act_update = &Boss::UpdateDamageState;
+	actUpdate = &Boss::UpdateDamageState;
 
 	//状態とアニメーションをDAMAGEに設定
 	state = STATE::DAMAGE;
-	bossAnimation = BossAnimation::BOSS_HIT;
+	bossAnimation = BOSS_ANIMATION::BOSS_HIT;
 
 	//状態タイマーと持続時間を初期化
 	stateTimer = 0;
@@ -114,11 +110,11 @@ void Boss::TransitionDamageState()
 void Boss::TransitionDeadState()
 {
 	//死亡状態へ遷移
-	act_update = &Boss::UpdateDeadState;
+	actUpdate = &Boss::UpdateDeadState;
 
 	//状態とアニメーションをDEADに設定
 	state = STATE::DEAD;
-	bossAnimation = BossAnimation::BOSS_DEAD;
+	bossAnimation = BOSS_ANIMATION::BOSS_DEAD;
 
 	//状態タイマーを初期化
 	stateTimer = 0;
@@ -139,7 +135,7 @@ void Boss::UpdateIdleState(float elapsedTime)
 void Boss::UpdateWalkState(float elapsedTime)
 {
 	//プレイヤー方向に歩く
-	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, target_pos);  //プレイヤー位置への方向ベクトルを計算
+	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, targetPos);  //プレイヤー位置への方向ベクトルを計算
 	Move(dir_target_vec.x, dir_target_vec.z, charaParam.moveSpeed);  //プレイヤー方向に移動
 	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);  //プレイヤー方向に向けて回転
 
@@ -153,24 +149,24 @@ void Boss::UpdateWalkState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Boss::UpdateAttack_Tackle_State(float elapsedTime)
+void Boss::UpdateAttackTackleState(float elapsedTime)
 {
 	//タックル攻撃の状態が終了するまで目標地点を設定
 	if (stateTimer < stateDuration)
 	{
-		targetPoint_pos.x = target_pos.x;
-		targetPoint_pos.z = target_pos.z;
+		targetPointPos.x = targetPos.x;
+		targetPointPos.z = targetPos.z;
 		return;
 	}
 
 	//目標地点までのXZ平面での距離判定
-	float vx = targetPoint_pos.x - position.x;
-	float vz = targetPoint_pos.z - position.z;
+	float vx = targetPointPos.x - position.x;
+	float vz = targetPointPos.z - position.z;
 	float distSq = vx * vx + vz * vz;
 
 	attackParam.isAttack = true;  //攻撃中に設定
 	DirectX::XMFLOAT3 pos = { position.x ,0.0f, position.z };
-	DirectX::XMFLOAT3 pointPos = { targetPoint_pos.x ,0.0f, targetPoint_pos.z };
+	DirectX::XMFLOAT3 pointPos = { targetPointPos.x ,0.0f, targetPointPos.z };
 	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(pos, pointPos);  //目標地点への方向ベクトルを計算
 	Move(dir_target_vec.x, dir_target_vec.z, param.runSpeed);  //目標地点に向かって移動
 	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);  //目標地点に向けて回転
@@ -188,30 +184,30 @@ void Boss::UpdateAttack_Tackle_State(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Boss::UpdateAttack_Jump_State(float elapsedTime)
+void Boss::UpdateAttackJumpState(float elapsedTime)
 {
 	//ジャンプアニメーションが開始されるまで、早すぎる場合は何もしない
-	if (bossAnimation == BossAnimation::BOSS_JUMP && time < 0.1f)
+	if (bossAnimation == BOSS_ANIMATION::BOSS_JUMP && time < 0.1f)
 		return;
 
 	//状態タイマーが持続時間を超えたら、ジャンプ攻撃を行う
 	if (stateTimer < stateDuration)
 	{
 		//目標地点までの移動速度を計算
-		charaParam.moveSpeed = CalcMoveSpeed(target_pos, 0.5f);
-		targetPoint_pos.x = target_pos.x;
-		targetPoint_pos.y = target_pos.y;
-		targetPoint_pos.z = target_pos.z;
+		charaParam.moveSpeed = CalcMoveSpeed(targetPos, 0.5f);
+		targetPointPos.x = targetPos.x;
+		targetPointPos.y = targetPos.y;
+		targetPointPos.z = targetPos.z;
 		return;
 	}
 	else
 	{
 		//ジャンプアニメーションに変更
-		bossAnimation = BossAnimation::BOSS_JUMP; 
+		bossAnimation = BOSS_ANIMATION::BOSS_JUMP; 
 	}
 
 	//目標地点までの高さの差
-	float length = targetPoint_pos.y - position.y;
+	float length = targetPointPos.y - position.y;
 	if (!isJump && length > 5.0f && time > 0.1f)
 	{
 		isJump = true;
@@ -219,8 +215,8 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	}
 
 	//目標地点までのXZ平面での距離判定
-	float vx = targetPoint_pos.x - position.x;
-	float vz = targetPoint_pos.z - position.z;
+	float vx = targetPointPos.x - position.x;
+	float vz = targetPointPos.z - position.z;
 	float distSq = vx * vx + vz * vz;
 
 	DirectX::XMFLOAT3 dir_target_vec{};
@@ -249,7 +245,7 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	}
 	else
 	{
-		dir_target_vec = Math::calc_vector_AtoB_normalize(position, targetPoint_pos);  //目標地点への方向ベクトルを計算
+		dir_target_vec = Math::calc_vector_AtoB_normalize(position, targetPointPos);  //目標地点への方向ベクトルを計算
 	}
 
 	//移動処理
@@ -260,7 +256,7 @@ void Boss::UpdateAttack_Jump_State(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void Boss::UpdateAttack_ShotStraight_State(float elapsedTime)
+void Boss::UpdateAttackShotStraightState(float elapsedTime)
 {
 	//飛びのいた後連射設定する
 	//アニメーションが終了し、バックジャンプが行われていなければ連射設定を開始
@@ -282,7 +278,7 @@ void Boss::UpdateAttack_ShotStraight_State(float elapsedTime)
 	{
 		const float backJumpSpeed = 20.0f;  //バックジャンプの速度
 		//プレイヤー位置とのベクトル計算
-		DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(target_pos, position); 
+		DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(targetPos, position); 
 		
 		//後退移動
 		Move(dir_target_vec.x, dir_target_vec.z, backJumpSpeed);  
@@ -313,10 +309,6 @@ void Boss::UpdateAttack_ShotStraight_State(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);  //ボスの速度を更新
 }
 
-void Boss::UpdateAttack_ShotHoming_State(float elapsedTime)
-{
-}
-
 void Boss::UpdateDamageState(float elapsedTime)
 {
 	//ダメージ状態が終了したら待機状態に戻る
@@ -339,7 +331,7 @@ void Boss::UpdateDeadState(float elapsedTime)
 void Boss::AttackRoutine(float elapsedTime)
 {
 	//プレイヤーまでの距離を計算
-	float length_to_target = Math::calc_vector_AtoB_length(position, target_pos);
+	float length_to_target = Math::calc_vector_AtoB_length(position, targetPos);
 
 	//プレイヤーが近ければ近距離攻撃を選択
 	if (length_to_target < ATTACK_ACTION_LENGTH)
@@ -368,11 +360,11 @@ void Boss::SelectAttackTypeShort()
 	{
 	case ATTACK_TYPE::TACKLE:
 		//タックル攻撃へ遷移
-		TransitionAttack_Tackle_State();
+		TransitionAttackTackleState();
 		break;
 	case ATTACK_TYPE::JUMP:
 		//ジャンプ攻撃へ遷移
-		TransitionAttack_Jump_State();
+		TransitionAttackJumpState();
 		break;
 	}
 }
@@ -388,15 +380,15 @@ void Boss::SelectAttackTypeLong()
 	{
 	case ATTACK_TYPE::TACKLE:
 		//タックル攻撃へ遷移
-		TransitionAttack_Tackle_State();
+		TransitionAttackTackleState();
 		break;
 	case ATTACK_TYPE::JUMP:
 		//ジャンプ攻撃へ遷移
-		TransitionAttack_Jump_State();
+		TransitionAttackJumpState();
 		break;
 	case ATTACK_TYPE::SHOT_S:
 		//直線射撃攻撃へ遷移
-		TransitionAttack_ShotStraight_State();
+		TransitionAttackShotStraightState();
 		break;
 	}
 }

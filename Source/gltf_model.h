@@ -212,7 +212,7 @@ public: //関数
 	void fetch_materials(ID3D11Device* device, const tinygltf::Model& gltf_model);
 	void fetch_textures(ID3D11Device* device, const tinygltf::Model& gltf_model);
 	void fetch_animations(const tinygltf::Model& gltf_model);
-	void animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback = false);
+	void animate(size_t animation_index, float time, std::vector<node>& animatedNodes, bool loopback = false);
 	//bool is_animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback = false);
 	
 	//ブレンドアニメーション
@@ -223,7 +223,7 @@ public: //関数
 
 	void fech_by_bone(size_t anime_index, float time, const DirectX::XMFLOAT4X4& world, const node& bone, DirectX::XMFLOAT3& pos, DirectX::XMFLOAT4X4* mat = nullptr);
 
-	void render(ID3D11DeviceContext* immediate__context, const DirectX::XMFLOAT4X4& world,const std::vector<node>& animated_nodes,int skin_node = 0);
+	void render(ID3D11DeviceContext* immediate__context, const DirectX::XMFLOAT4X4& world,const std::vector<node>& animatedNodes,int skin_node = 0);
 
 public:
 	//ループ取得

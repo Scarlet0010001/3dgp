@@ -1,13 +1,13 @@
 // UNIT.32
 #include "fullscreen_quad.hlsli"
 
-cbuffer radial_blur_constants : register(b2)
+cbuffer radialBlurConstants : register(b2)
 {
-	float2 blurCenter; // center point where the blur is applied
-	float blurStrength; // blurring strength
-	float blurRadius; // blurred radiu
-	float blurDecay; // percentage of the maximum radius at which the intensity of the blur begins to decay
-	float blurTimer; // percentage of the maximum radius at which the intensity of the blur begins to decay
+	float2 blurCenter;
+	float blurStrength;
+	float blurRadius;
+	float blurDecay;
+	float blurTimer;
 };
 
 #define POINT 0

@@ -22,11 +22,6 @@ public:
     framebuffer(ID3D11Device* device, uint32_t width, uint32_t height);
     virtual ~framebuffer() = default;
 
-    //Microsoft::WRL::ComPtr<ID3D11RenderTargetView> render_target_view;
-    //Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depth_stencil_view;
-    //Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[2];
-    //D3D11_VIEWPORT viewport;
-
     void clear(ID3D11DeviceContext* immediate_context,
         FB_FLAG flags = FB_FLAG::COLOR_DEPTH_STENCIL, DirectX::XMFLOAT4 color = { 0, 0, 0, 1 }, float depth = 1, uint8_t stencil = 0);
     void activate(ID3D11DeviceContext* immediate_context, FB_FLAG flags = FB_FLAG::COLOR_DEPTH_STENCIL);

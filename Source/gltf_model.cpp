@@ -199,32 +199,6 @@ void gltf_model::cumulate_transforms(std::vector<node>& nodes, DirectX::XMFLOAT4
 		traverse(node_index);
 		parent_global_transforms.pop();
 	}
-	/*
-		std::stack<XMFLOAT4X4> parent_global_transforms;
-
-		std::function<void(int)> traverse{ [&](int node_index)->void
-		{
-			node& node{ nodes.at(node_index) };
-			XMMATRIX S{ XMMatrixScaling(node.scale.x,node.scale.y,node.scale.z) };
-			XMMATRIX R{ XMMatrixRotationQuaternion(
-				XMVectorSet(node.rotation.x,node.rotation.y,node.rotation.z,node.rotation.w)) };
-			XMMATRIX T{ XMMatrixTranslation(node.translation.x,node.translation.y,node.translation.z) };
-			XMStoreFloat4x4(&node.global_transform, S * R * T * XMLoadFloat4x4(&parent_global_transforms.top()));
-			for (int child_index : node.children)
-			{
-				parent_global_transforms.push(node.global_transform);
-				traverse(child_index);
-				parent_global_transforms.pop();
-			}
-		}};
-	for (std::vector<int>::value_type node_index : scenes.at(0).nodes)
-	{
-		parent_global_transforms.push({ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 });
-		traverse(node_index);
-		parent_global_transforms.pop();
-	}
-
-	*/
 #else
 	DirectX::XMMATRIX ParentWorldTransform = DirectX::XMLoadFloat4x4(&world_transform);
 	
@@ -646,7 +620,7 @@ void gltf_model::fetch_animations(const tinygltf::Model& Model)
 
 }
 
-void gltf_model::animate(size_t animation_index, float time, std::vector<node>& animated_nodes, bool loopback)
+void gltf_model::animate(size_t animation_index, float time, std::vector<node>& animatedNodes, bool loopback)
 {
 	using namespace std;
 	using namespace DirectX;
@@ -704,30 +678,30 @@ void gltf_model::animate(size_t animation_index, float time, std::vector<node>& 
 			if (channel.target_path == "scale")
 			{
 				const vector<XMFLOAT3>& scales{ animation.scales.at(sampler.output) };
-				DirectX::XMStoreFloat3(&animated_nodes.at(channel.target_node).scale,
+				DirectX::XMStoreFloat3(&animatedNodes.at(channel.target_node).scale,
 					XMVectorLerp(DirectX::XMLoadFloat3(&scales.at(keyframe_index + 0)),
 						DirectX::XMLoadFloat3(&scales.at(keyframe_index + 1)), interpolation_factor));
 			}
 			else if (channel.target_path == "rotation")
 			{
 				const vector<XMFLOAT4>& rotations{ animation.rotations.at(sampler.output) };
-				DirectX::XMStoreFloat4(&animated_nodes.at(channel.target_node).rotation,
+				DirectX::XMStoreFloat4(&animatedNodes.at(channel.target_node).rotation,
 					XMQuaternionNormalize(XMQuaternionSlerp(DirectX::XMLoadFloat4(&rotations.at(keyframe_index + 0)),
 						DirectX::XMLoadFloat4(&rotations.at(keyframe_index + 1)), interpolation_factor)));
 			}
 			else if (channel.target_path == "translation")
 			{
 				const vector<XMFLOAT3>& translations{ animation.translations.at(sampler.output) };
-				DirectX::XMStoreFloat3(&animated_nodes.at(channel.target_node).translation,
+				DirectX::XMStoreFloat3(&animatedNodes.at(channel.target_node).translation,
 					XMVectorLerp(DirectX::XMLoadFloat3(&translations.at(keyframe_index + 0)),
 						DirectX::XMLoadFloat3(&translations.at(keyframe_index + 1)), interpolation_factor));
 			}
 		}
-		cumulate_transforms(animated_nodes);
+		cumulate_transforms(animatedNodes);
 	}
 	else
 	{
-		animated_nodes = nodes;
+		animatedNodes = nodes;
 	}
 
 	isEndAnimation = is;
@@ -769,7 +743,6 @@ gltf_model::node& gltf_model::find_nodes(const std::string name)
 	return dummy;
 }
 
-//size_t animation_index, float time, std::vector<node>& animated_nodes,
 void gltf_model::fech_by_bone(size_t anime_index,
 	float time,
 	const DirectX::XMFLOAT4X4& world,
@@ -778,7 +751,6 @@ void gltf_model::fech_by_bone(size_t anime_index,
 	DirectX::XMFLOAT4X4* mat)
 {
 	if (animations.empty()) return;
-	//const animation& animation{ animations.at(anime_index) };
 	std::vector<node> n = nodes;
 
 	animate(anime_index, time, n);
@@ -811,7 +783,7 @@ void gltf_model::fech_by_bone(size_t anime_index,
 	}
 }
 
-void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4& world,const std::vector<node>& animated_nodes,int skin_node)
+void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4& world,const std::vector<node>& animatedNodes,int skin_node)
 {
 	using namespace DirectX;
 
@@ -907,7 +879,7 @@ void gltf_model::render(ID3D11DeviceContext* immediate_context, const DirectX::X
 				{
 					XMStoreFloat4x4(&primitive_joint_data.matrices[joint_index],
 						DirectX::XMLoadFloat4x4(&skin.inverse_bind_matrices.at(joint_index)) *
-						DirectX::XMLoadFloat4x4(&animated_nodes.at(skin.joints.at(joint_index)).global_transform) *
+						DirectX::XMLoadFloat4x4(&animatedNodes.at(skin.joints.at(joint_index)).global_transform) *
 							XMMatrixInverse(NULL, DirectX::XMLoadFloat4x4(&node.global_transform)));
 				}
 				immediate_context->UpdateSubresource(primitive_joint_cbuffer.Get(), 0, 0, &primitive_joint_data, 0, 0);

@@ -19,8 +19,8 @@ BulletManager::~BulletManager()
 void BulletManager::Initialize()
 {
     //パラメーターロード
-    LoadDataFile(Bullet::BULLET_MASTER::Player);
-    LoadDataFile(Bullet::BULLET_MASTER::Enemy);
+    LoadDataFile(Bullet::BULLET_MASTER::PLAYER);
+    LoadDataFile(Bullet::BULLET_MASTER::ENEMY);
 
     hitEffect = std::make_unique<Effect>("Resources/Effect/Hit/hit.efkefc");
 }
@@ -80,7 +80,7 @@ void BulletManager::Register(Bullet* bullet)
 
 void BulletManager::Setting()
 {
-    if (setting->GetMasterType() == Bullet::BULLET_MASTER::Player)
+    if (setting->GetMasterType() == Bullet::BULLET_MASTER::PLAYER)
     {
         setting->SetScale(P_param.scale);
         setting->SetSpeed(P_param.speed);
@@ -113,7 +113,7 @@ void BulletManager::Clear()
     bullets.clear();
 }
 
-void BulletManager::CollisionBullet(Player* player, Boss*boss)
+void BulletManager::CollisionBullet(PLAYER* player, Boss*boss)
 {
     //インスタンス取得
     Camera& camera = Camera::Instance();
@@ -141,7 +141,7 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
         }
 
         //プレイヤーとの当たり判定
-        if (bulletA->GetMasterType() == Bullet::BULLET_MASTER::Enemy &&
+        if (bulletA->GetMasterType() == Bullet::BULLET_MASTER::ENEMY &&
             Collision::SphereVsCylinder(
                 bulletA->GetPosition(),
                 bulletA->GetRadius(),
@@ -162,7 +162,7 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
             bulletA->Destroy();
         }
         //ボスとの当たり判定
-        if (bulletA->GetMasterType() == Bullet::BULLET_MASTER::Player &&
+        if (bulletA->GetMasterType() == Bullet::BULLET_MASTER::PLAYER &&
             Collision::SphereVsCylinder(
                 bulletA->GetPosition(),
                 bulletA->GetRadius(),
@@ -195,7 +195,7 @@ void BulletManager::CollisionBullet(Player* player, Boss*boss)
 void BulletManager::LoadDataFile(Bullet::BULLET_MASTER type)
 {
     // JSONファイルのパスを設定（拡張子を .json に変更）
-    std::filesystem::path path = filePath[type];
+    std::filesystem::path path = filePath[ToInt(type)];
     path.replace_extension(".json");
 
     // ファイルが存在するかチェック
@@ -210,11 +210,11 @@ void BulletManager::LoadDataFile(Bullet::BULLET_MASTER type)
             cereal::JSONInputArchive o_archive(ifs);
 
             // 弾丸パラメータをデシリアライズ
-            if (type == Bullet::BULLET_MASTER::Player)
+            if (type == Bullet::BULLET_MASTER::PLAYER)
             {
                 o_archive(P_param);
             }
-            else if (type == Bullet::BULLET_MASTER::Enemy)
+            else if (type == Bullet::BULLET_MASTER::ENEMY)
             {
                 o_archive(E_param);
             }
@@ -225,7 +225,7 @@ void BulletManager::LoadDataFile(Bullet::BULLET_MASTER type)
 void BulletManager::SaveDataFile(Bullet::BULLET_MASTER type)
 {
     // JSONファイルのパスを設定（拡張子を .json に変更）
-    std::filesystem::path path = filePath[type];
+    std::filesystem::path path = filePath[ToInt(type)];
     path.replace_extension(".json");
 
     // JSONファイルを書き込み用に開く
@@ -238,11 +238,11 @@ void BulletManager::SaveDataFile(Bullet::BULLET_MASTER type)
         cereal::JSONOutputArchive o_archive(ifs);
 
         // 各弾丸パラメータをデシリアライズ
-        if (type == Bullet::BULLET_MASTER::Player)
+        if (type == Bullet::BULLET_MASTER::PLAYER)
         {
             o_archive(P_param);
         }
-        else if (type == Bullet::BULLET_MASTER::Enemy)
+        else if (type == Bullet::BULLET_MASTER::ENEMY)
         {
             o_archive(E_param);
         }
@@ -254,7 +254,7 @@ void BulletManager::DebugGUI()
 #ifdef USE_IMGUI
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-    imguiMenuBar("Bullet", "Player", displayPlayerImgui);
+    imguiMenuBar("Bullet", "PLAYER", displayPlayerImgui);
 
     if (displayPlayerImgui)
     {
@@ -289,17 +289,17 @@ void BulletManager::DebugGUI()
             }
             if (ImGui::Button("load"))
             {
-                LoadDataFile(Bullet::BULLET_MASTER::Player);
+                LoadDataFile(Bullet::BULLET_MASTER::PLAYER);
             }
             ImGui::Separator();
             if (ImGui::Button("save"))
             {
-                SaveDataFile(Bullet::BULLET_MASTER::Player);
+                SaveDataFile(Bullet::BULLET_MASTER::PLAYER);
             }
         }
         ImGui::End();
     }
-    imguiMenuBar("Bullet", "Enemy", displayBossImgui);
+    imguiMenuBar("Bullet", "ENEMY", displayBossImgui);
     if (displayBossImgui)
     {
         if (ImGui::Begin("EnemyBullet", nullptr, ImGuiWindowFlags_None))
@@ -335,12 +335,12 @@ void BulletManager::DebugGUI()
         }
         if (ImGui::Button("load"))
         {
-            LoadDataFile(Bullet::BULLET_MASTER::Enemy);
+            LoadDataFile(Bullet::BULLET_MASTER::ENEMY);
         }
         ImGui::Separator();
         if (ImGui::Button("save"))
         {
-            SaveDataFile(Bullet::BULLET_MASTER::Enemy);
+            SaveDataFile(Bullet::BULLET_MASTER::ENEMY);
         }
         ImGui::End();
 
