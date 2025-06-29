@@ -166,7 +166,7 @@ void Boss::Render_f(float elapsedTime)
 			factor = time / transitionTime;  // 遷移進行度の計算
 			model->blend_animations(animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)], animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], factor, blendedAnimatedNodes);  // アニメーションのブレンド
 			time += elapsedTime;  // 経過時間の更新
-			if (factor > 1.0f)
+			if (factor > FACTOR_MAX)
 			{
 				// 遷移が終了した場合
 				transitionState = TRANSITION_STATE::NONE;  // 遷移状態をリセット
@@ -424,9 +424,6 @@ void Boss::DebugDUI()
 
 					ImGui::Text("hit_stop");
 					ImGui::DragFloat("tackle_stop_time", &param.tackleParam.hitStop.time, 0.1f);
-					//ImGui::DragFloat("combo1_hit_viberation.l_moter", &param.combo_1.hitViberation.L_moter, 0.1f);
-					//ImGui::DragFloat("combo1_hit_viberation.r_moter", &param.combo_1.hitViberation.R_moter, 0.1f);
-					//ImGui::DragFloat("combo1_vibe_time", &param.combo_1.hitViberation.VibeTime, 0.1f);
 				}
 				if (ImGui::CollapsingHeader("stomp"))
 				{
@@ -440,9 +437,6 @@ void Boss::DebugDUI()
 					ImGui::DragFloat("stomp_smmoth", &param.stompParam.cameraShake.shakeSmoothness, 0.1f, 0.1f, 1.0f);
 					ImGui::Text("hit_stop");
 					ImGui::DragFloat("stomp_stop_time", &param.stompParam.hitStop.time, 0.1f);
-					//ImGui::DragFloat("combo2_hit_viberation.l_moter", &param.combo_2.hitViberation.L_moter, 0.1f);
-					//ImGui::DragFloat("combo2_hit_viberation.r_moter", &param.combo_2.hitViberation.R_moter, 0.1f);
-					//ImGui::DragFloat("combo2_vibe_time", &param.combo_2.hitViberation.VibeTime, 0.1f);
 				}
 			}
 			if (ImGui::CollapsingHeader("bossBodyCollision", ImGuiTreeNodeFlags_DefaultOpen))

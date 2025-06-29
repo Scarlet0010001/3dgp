@@ -66,38 +66,44 @@ void PLAYER::Initialize()
 	//パラメーターロード
 	LoadDataFile();
 
-	//パラメーター初期化
+	//各変数初期化
+	//初期位置設定
 	position = { 0.0f, 37.0f, 0.0f };
-	velocity = { 0.0f, 0.0f, 0.0f };
+
+	//スケールを2倍に設定
 	scale.x = scale.y = scale.z = 2.0f;
-	//Charactorクラスのパラメーター初期化
+
+	//Characterクラスのパラメーター初期化
 	charaParam = param.charaInitParam;
 
 	//当たり判定半径設定
-	collider.radius = 1.0f;
+	collider.radius = COLLIDER_RADIUS;
 
 	//体力を設定
-	charaParam.maxHealth = 150.0f;
 	health = charaParam.maxHealth;
-
-	// 移動速度とジャンプ回数を設定
-	stepOffset = 2.0f;
+	//移動速度とジャンプ回数を設定
 	jumpCount = jumpLimit;
-	charaParam.moveSpeed = 15.0f;
 
-	// 移動速度とジャンプ回数を設定
+	//ステートマシンの初期化
 	TransitionIdleState();
+
+	//コンボ01のフレーム初期化
+	attackFlameParam[ToInt(COMBO::ATTACK01)].startFlame = 0.023f;
+	attackFlameParam[ToInt(COMBO::ATTACK01)].endFlame = 0.15f;
+	attackFlameParam[ToInt(COMBO::ATTACK01)].preInputFlame = 0.173f;
+	
+	//コンボ02のフレーム初期化
+	attackFlameParam[ToInt(COMBO::ATTACK02)].startFlame = 0.03f;
+	attackFlameParam[ToInt(COMBO::ATTACK02)].endFlame = 0.175f;
+	attackFlameParam[ToInt(COMBO::ATTACK02)].preInputFlame = 0.2f;
+	
+	//コンボ03のフレーム初期化
+	attackFlameParam[ToInt(COMBO::ATTACK03)].startFlame = 0.325f;
+	attackFlameParam[ToInt(COMBO::ATTACK03)].endFlame = 0.65f;
+	attackFlameParam[ToInt(COMBO::ATTACK03)].preInputFlame = 1.0f;
 
 	// 被ダメージ時の処理を設定
 	damagedFunction = [=](int damage, float invincible, WINCE_TYPE type)->bool {return ApplyDamage(damage, invincible, type); };
-
-	// 攻撃時のカメラ揺れパラメータ設定
-	attackParam.cameraShake.max_X_shake = 3.0f;
-	attackParam.cameraShake.max_Y_shake = 7.0f;
-	attackParam.cameraShake.time = 0.5f;
-
-	// ヒットストップの設定
-	attackParam.hitStop.time = 0.1f;
 }
 
 PLAYER::~PLAYER()
@@ -118,8 +124,8 @@ void PLAYER::Update(float elapsedTime)
 	//-----------------ステート更新処理-----------------//
 	(this->*pUpdate)(elapsedTime);
 
-	//Yボタンを押すとロックオンする
-	if (gamePad->GetButtonDown() & GamePad::BTN_Y)//V
+	//YボタンかVキーを押すとロックオンする
+	if (gamePad->GetButtonDown() & GamePad::BTN_Y)
 	{
 		camera->SetLockOn();
 	}
@@ -152,9 +158,9 @@ void PLAYER::Update(float elapsedTime)
 	}
 
 	//画面外に行った場合初期位置に戻す
-	if (position.y < -10.0f)
+	if (position.y < limitY)
 	{
-		position = { 0.0f,50.0f,0.0f };
+		position.y = RESPAWN_Y;
 	}
 
 	//-----------------シェーダー更新-----------------//
@@ -233,7 +239,7 @@ void PLAYER::Render_f(float elapsedTime)
 			time += elapsedTime;
 
 			// 遷移完了判定
-			if (factor > 1.0f)
+			if (factor > FACTOR_MAX)
 			{
 				// 遷移終了処理
 				transitionToTransition = false;
@@ -297,7 +303,7 @@ void PLAYER::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 	else if (state == STATE::RIGHT_ATTACK) side = ToInt(LR::RIGHT);
 
 	//攻撃時の当たり判定
-	if (Collision::SphereVsCylinder(attackCollisionPosition[side], 1.5f,
+	if (Collision::SphereVsCylinder(attackCollisionPosition[side], ATTACK_RADIUS,
 		capsule_collider.start, capsule_collider.radius,collider_height))
 	{
 		//攻撃対象に与えるダメージ量と無敵時間
@@ -310,7 +316,7 @@ void PLAYER::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 			camera->SetHitStop(attackParam.hitStop);
 
 			//ヒットエフェクト再生
-			slashEffect->Play(attackCollisionPosition[side], 1.5f);
+			slashEffect->Play(attackCollisionPosition[side], ATTACK_RADIUS);
 		}
 	}
 }
@@ -375,9 +381,9 @@ void PLAYER::BoostUpdate(float elapsedTime)
 	//ブーストステートじゃないかつ地面に接していたらブーストゲージを回復する
 	if (isGround && STATE::BOOST != state)
 	{
-		param.boostTimer += elapsedTime * 3.0f;
+		param.boostTimer += elapsedTime * CHARGE_SPEED;
 	}
-
+	
 	//ブースト最大設定
 	if (param.boostTimer >= BOOST_MAX)
 	{
@@ -486,45 +492,51 @@ const DirectX::XMFLOAT3 PLAYER::GetMoveVec(Camera* camera, bool wing) const
 void PLAYER::ShaderUpdate(float elapsedTime)
 {
 	//ラジアルブラータイマーがオフの場合
-	if (player_radialBlurConstant.blurStrength <= 0 
-		|| radialTimer <= 0) {
-		player_radialBlurConstant.blurStrength = 0.0f;
-		player_radialBlurConstant.blurRadius = 0.0f;
+	if (player_RadialBlurConstant.blurStrength <= 0 
+		|| radialTimer <= 0)
+	{
+		player_RadialBlurConstant.blurStrength = 0.0f;
+		player_RadialBlurConstant.blurRadius = 0.0f;
 	}
 	else
 	{
 		//飛行モード時
 		if (state == STATE::WING)
 		{
-			player_radialBlurConstant.blurStrength -= elapsedTime;
-			player_radialBlurConstant.blurRadius -= elapsedTime;
+			//時間経過に応じてラジアルブラーを減衰
+			player_RadialBlurConstant.blurStrength -= elapsedTime;
+			player_RadialBlurConstant.blurRadius -= elapsedTime;
 		}
 		//ブースト時
 		else
 		{
-			float factor = radialTimer / player_radialBlurConstant.blurTimer;
+			//タイマーに基づいてブラー強度を補間
+			float factor = radialTimer / player_RadialBlurConstant.blurTimer;
 			radialTimer -= elapsedTime;
 
-			player_radialBlurConstant.blurStrength = factor;
+			player_RadialBlurConstant.blurStrength = factor;
 		}
 	}
 	
-	//色収差
+	//色収差処理
 	//ダメージを食らったとき
 	if (isGlitch_CA && glitch_CATimer > 0)
 	{
-		float factor = glitch_CATimer / 0.03f;
-		glitch_CATimer -= 0.03f * elapsedTime;
+		//時間経過に応じてグリッチの強度を減衰
+		float factor = glitch_CATimer / GLITCH_MAX_DURATION;
+		glitch_CATimer -= GLITCH_MAX_DURATION * elapsedTime;
 
+		//色収差のパラメータ設定
 		player_Glitch_CA_Constant.density = factor;
-		player_Glitch_CA_Constant.shift = 0.015f;
-		player_Glitch_CA_Constant.XShifting = 0.015f;
-		player_Glitch_CA_Constant.YShifting = 0.015f;
+		player_Glitch_CA_Constant.shift = GLITCH_SHIFT_AMOUNT;
+		player_Glitch_CA_Constant.XShifting = GLITCH_SHIFT_AMOUNT;
+		player_Glitch_CA_Constant.YShifting = GLITCH_SHIFT_AMOUNT;
 	}
 	//平常時
 	else
 	{
-		player_Glitch_CA_Constant.center = { 0.5f,0.5f };
+		//色収差を全てリセット
+		player_Glitch_CA_Constant.center = { GLITCH_CENTER_X, GLITCH_CENTER_Y };
 		player_Glitch_CA_Constant.brightness = 0.0f;
 		player_Glitch_CA_Constant.density = 0.0f;
 		player_Glitch_CA_Constant.extension = 0.0f;
@@ -537,7 +549,6 @@ void PLAYER::ShaderUpdate(float elapsedTime)
 		player_Glitch_CA_Constant.XShifting = 0.0f;
 		player_Glitch_CA_Constant.YShift = { 0,0 };
 		player_Glitch_CA_Constant.YShifting = 0.0f;
-
 	}
 }
 
@@ -546,17 +557,17 @@ void PLAYER::InputJump()
 	//スペースを押したらジャンプ
 	if (gamePad->GetButtonDown() & GamePad::BTN_A)
 	{
-		//ジャンプ回数が最大になったらジャンプしない
+		//ジャンプ回数が上限に達していなければジャンプを実行
 		if (jumpCount < jumpLimit)
 		{
-			{
-				TransitionJumpState();
-				Jump(param.jumpSpeed);
-			}
+			//ジャンプ状態へ遷移
+			TransitionJumpState();
+			Jump(param.jumpSpeed);
 
-			//ジャンプしても地面についているというありえない状況を回避するため
+			//ジャンプ直後に地面にいると判定されないように強制的にfalseにする
 			isGround = false;
 
+			//ジャンプ回数を加算
 			++jumpCount;
 		}
 	}
@@ -565,14 +576,13 @@ void PLAYER::InputJump()
 void PLAYER::InputBoost()
 {
 	//ブースト量が25%以下だと出来ない
-	if (param.boostTimer < 2.5f)return;
+	if (param.boostTimer < BOOST_MIN_THRESHOLD)return;
 
 	//右トリガーを押したら回避
 	if (gamePad->GetButtonDown() & GamePad::BTN_LEFT_SHOULDER)
 	{
 		TransitionBoostState();
 	}
-
 }
 
 void PLAYER::InputWing()
@@ -630,7 +640,7 @@ void PLAYER::InputShot()
 
 	//射撃音
 	audios[ToInt(PLAYER_SE::SE_LASER)]->play();
-	audios[ToInt(PLAYER_SE::SE_LASER)]->volume(0.3f);
+	audios[ToInt(PLAYER_SE::SE_LASER)]->volume(SOUND_VOLUME_LASER);
 }
 
 void PLAYER::OnLanding()
@@ -646,7 +656,7 @@ void PLAYER::OnLanding()
 		TransitionLandingState();
 
 		// 速度をゼロにリセット（着地したため）
-		velocity = { 0,0,0 };
+		velocity = {};
 	}
 	else
 	{
@@ -661,8 +671,49 @@ void PLAYER::OnLanding()
 	}
 }
 
+void PLAYER::CheckPreInput(COMBO combo)
+{
+	//先行入力のチェック
+	if (gamePad->GetButtonDown() & gamePad->BTN_X)
+	{
+		nextCombo = true;
+	}
+
+	//一定時間経過後に攻撃判定をオン
+	if (attackFlameParam[ToInt(combo)].startFlame < time && !attackParam.isAttack)
+	{
+		attackParam.isAttack = true;
+	}
+
+	//先行入力があれば次のコンボへ遷移
+	if (attackFlameParam[ToInt(combo)].preInputFlame < time && nextCombo)
+	{
+		switch (combo)
+		{
+		case PLAYER::COMBO::ATTACK01:
+			TransitionCombo_01_02_State();
+			break;
+		case PLAYER::COMBO::ATTACK02:
+			TransitionCombo_01_03_State();
+			break;
+		case PLAYER::COMBO::ATTACK03:
+			//最後のコンボだから偏移しない
+			break;
+		}
+		attackParam.isAttack = false;
+	}
+
+	//攻撃判定をオフにするタイミング
+	if (attackFlameParam[ToInt(combo)].endFlame < time)
+	{
+		attackParam.isAttack = false;
+	}
+
+}
+
 void PLAYER::OnDead()
 {
+	//死亡状態へ偏移
 	TransitionDeadState();
 }
 
@@ -674,6 +725,7 @@ void PLAYER::OnDamaged(WINCE_TYPE type)
 	case WINCE_TYPE::NONE:
 		break;
 	case WINCE_TYPE::SMALL:
+		//怯みダメージ
 		TransitionDamageState();
 		break;
 	case WINCE_TYPE::BIG:
@@ -712,7 +764,7 @@ bool PLAYER::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 
 	//ダメージ効果音
 	audios[ToInt(PLAYER_SE::SE_DAMAGE)]->play();
-	audios[ToInt(PLAYER_SE::SE_DAMAGE)]->volume(0.5f);
+	audios[ToInt(PLAYER_SE::SE_DAMAGE)]->volume(SOUND_VOLUME_DAMAGE);
 
 	//健康状態が変更した場合はtrueを返す
 	return true;
@@ -721,13 +773,14 @@ bool PLAYER::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 
 void PLAYER::TrailUpdate()
 {
-	//攻撃時以外はtrailPositions配列全てをサーベルの位置に揃え、透明にしておく
+	//攻撃状態でない、またはトレイルリセットフラグが立っている場合
 	if ((state != STATE::LEFT_ATTACK
 		&& state != STATE::RIGHT_ATTACK
 		&& !attackParam.isAttack)
 		|| resetTrail
 		)
 	{
+		//全ての頂点を現在の腕とサーベルの位置に固定し、透明化する
 		for (int lr = 0; lr < ToInt(LR::COUNT); lr++)
 		{
 			for (int i = MAX_POLYGON - 1; i >= 0; --i)
@@ -738,32 +791,33 @@ void PLAYER::TrailUpdate()
 			}
 		}
 
-		//resetTrailがtrueであればそのまま処理
+		//resetTrailがtrueであればフラグをリセットして抜けずに処理継続
 		if (resetTrail)
 		{
 			resetTrail = false;
 		}
-		//違えば入らない
+		//それ以外は処理終了
 		else
 		{ 
 			return;
 		}
 	}
 
-	// 保存していた頂点バッファを１フレーム分ずらす
+	//頂点バッファを1フレーム分後ろにずらす
 	for(int lr = 0;lr<ToInt(LR::COUNT);lr++)
 	{
 		for (int i = MAX_POLYGON - 1; i > 0; --i)
 		{
 			trailAttack[lr].trailPositions[ToInt(TRAIL::LOWER_ARM)][i] = trailAttack[lr].trailPositions[ToInt(TRAIL::LOWER_ARM)][i - 1];
 			trailAttack[lr].trailPositions[ToInt(TRAIL::BEAM_SABER)][i] = trailAttack[lr].trailPositions[ToInt(TRAIL::BEAM_SABER)][i - 1];
-			//ここで一緒に不透明度も下げる
+			
+			//透明度をフレームごとに下げていく
 			trailAttack[lr].color[i] = { 1.0f,0.0f,1.0f,1.0f - (static_cast<float>(i) / (MAX_POLYGON - 1)) };
 
 		}
 	}
 
-	//どっちの腕で攻撃するか
+	//左右どちらの腕で攻撃しているかを判定
 	int side = 0;
 	if (state == STATE::LEFT_ATTACK)
 	{
@@ -774,12 +828,16 @@ void PLAYER::TrailUpdate()
 		side = ToInt(LR::RIGHT);
 	}
 	
-	// 腕の先端とサーベルの先端の座標を取得し、頂点バッファに保存
+	//現在の腕・サーベルの位置をtrailの先頭に保存
 	trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][0] = lowerArmPosition[side];
 	trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][0] = beamSaberPosition[side];
 	
 	// ポリゴン作成
 	PrimitiveRenderer* primitiveRenderer = Graphics::Instance().GetPrimitiveRenderer();
+
+	//補間点数（分割数）
+	const int SPLINE_DIV = 9;
+	const float DIV_STEP = 1.0f / static_cast<float>(SPLINE_DIV); //0.1f 相当
 
 	// 保存していた頂点バッファを用いてスプライン補完処理を行い、滑らかなポリゴンを描画
 	{
@@ -787,29 +845,35 @@ void PLAYER::TrailUpdate()
 		{
 			primitiveRenderer->AddVertex(trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i], trailAttack[side].color[i]);
 			primitiveRenderer->AddVertex(trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i], trailAttack[side].color[i]);
-			for (int j = 1; j < 9; j++)
+			for (int j = 1; j < SPLINE_DIV; j++)
 			{
+				//LOWER_ARM側のスプライン補間
 				DirectX::XMVECTOR Spline0 =
 					DirectX::XMVectorCatmullRom(
 						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i - 1]),
 						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i]),
 						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i + 1]),
 						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::LOWER_ARM)][i + 2]),
-						j * 0.1f
+						j * DIV_STEP
 					);
+
+				//BEAM_SABER側のスプライン補間
 				DirectX::XMVECTOR Spline1 =
 					DirectX::XMVectorCatmullRom(
 						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i - 1]),
 						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i]),
 						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i + 1]),
 						DirectX::XMLoadFloat3(&trailAttack[side].trailPositions[ToInt(TRAIL::BEAM_SABER)][i + 2]),
-						j * 0.1f
+						j * DIV_STEP
 					);
+
+				//補間結果をXMFLOAT3に変換
 				DirectX::XMFLOAT3 splineposition0;
 				DirectX::XMStoreFloat3(&splineposition0, Spline0);
 				DirectX::XMFLOAT3 splineposition1;
 				DirectX::XMStoreFloat3(&splineposition1, Spline1);
 
+				//先頭フレームでない場合のみ追加
 				if (i > 0)
 				{
 					primitiveRenderer->AddVertex(splineposition0, trailAttack[side].color[i]);
@@ -818,32 +882,42 @@ void PLAYER::TrailUpdate()
 			}
 		}
 	}
-
 }
 
 void PLAYER::UpdateVerticalVelocity(float elapsed_frame)
 {
-	// プレイヤーのアニメーションがPLAYER_WING_STARTでない場合、重力を適用
+	//プレイヤーのアニメーションが飛行開始でない場合は通常の重力を適用
 	if (playerAnimation != PlayerAnimation::PLAYER_WING_START)
+	{
 		velocity.y += gravity * elapsed_frame;
-	// プレイヤーのアニメーションがPLAYER_WING_STARTの場合、重力の影響を20%に減少
+	}
+
+	//飛行開始アニメーション中は、重力を軽減
 	else if (playerAnimation == PlayerAnimation::PLAYER_WING_START)
-		velocity.y += (gravity * 0.2f) * elapsed_frame;
+	{
+		//重力の影響を20%に抑える
+		velocity.y += (gravity * WING_GRAVITY_SCALE) * elapsed_frame;
+	}
 }
 
 void PLAYER::LoadDataFile()
 {
 	// Jsonファイルから値を取得
 	std::filesystem::path path = filePath;
-	path.replace_extension(".json");  // 拡張子を.jsonに変更
-	if (std::filesystem::exists(path.c_str()))  // ファイルが存在する場合
+
+	path.replace_extension(".json");  //拡張子を.jsonに変更
+
+	//ファイルが存在する場合
+	if (std::filesystem::exists(path.c_str()))
 	{
 		std::ifstream ifs;
-		ifs.open(path);  // ファイルを開く
+
+		//ファイルを開く
+		ifs.open(path);  
 		if (ifs)
 		{
-			cereal::JSONInputArchive o_archive(ifs);  // JSON形式でファイルを読み込み
-			o_archive(param);  // データをparamにデシリアライズ
+			cereal::JSONInputArchive o_archive(ifs);  //JSON形式でファイルを読み込み
+			o_archive(param);  //データをparamにデシリアライズ
 		}
 	}
 }
@@ -852,11 +926,15 @@ void PLAYER::SaveDataFile()
 {
 	// ベースクラスの初期化パラメーター情報を更新
 	param.charaInitParam = charaParam;
+
 	// Jsonファイルに値を保存
 	std::filesystem::path path = filePath;
+
 	path.replace_extension(".json");  // 拡張子を.jsonに変更
 	std::ofstream ifs;
-	ifs.open(path);  // ファイルを開く
+
+	// ファイルを開く
+	ifs.open(path);  
 	if (ifs)
 	{
 		cereal::JSONOutputArchive o_archive(ifs);  // JSON形式でファイルに書き込み
@@ -865,45 +943,45 @@ void PLAYER::SaveDataFile()
 }
 void PLAYER::DebugPrimitiveUpdate()
 {
-	// デバッグレンダラーのインスタンスを取得
+	//デバッグレンダラーのインスタンスを取得
 	DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
 
-	// サーベルの当たり判定処理
+	//サーベルの当たり判定処理
 	{
-		// ボーン位置を取得して、サーベルや下腕の位置を更新
+		//現在アニメーションを元に、各ボーンのワールド位置を取得
 		model->fech_by_bone(ToInt(playerAnimation), time, transform, beamSaber[ToInt(LR::LEFT)], beamSaberPosition[ToInt(LR::LEFT)]);
 		model->fech_by_bone(ToInt(playerAnimation), time, transform, lowerArm[ToInt(LR::LEFT)], lowerArmPosition[ToInt(LR::LEFT)]);
 		model->fech_by_bone(ToInt(playerAnimation), time, transform, beamSaber[ToInt(LR::RIGHT)], beamSaberPosition[ToInt(LR::RIGHT)]);
 		model->fech_by_bone(ToInt(playerAnimation), time, transform, lowerArm[ToInt(LR::RIGHT)], lowerArmPosition[ToInt(LR::RIGHT)]);
 
-		// サーベルの位置を求める関数（腕とサーベルの位置から中間点を計算）
+		//腕とサーベルの中間点を計算するラムダ関数
 		std::function<DirectX::XMFLOAT3(DirectX::XMFLOAT3&, DirectX::XMFLOAT3&)> saber_position{
 			[](DirectX::XMFLOAT3& arm, DirectX::XMFLOAT3& saber)->DirectX::XMFLOAT3 {
 
 				DirectX::XMFLOAT3 Arm{ arm };
 				DirectX::XMFLOAT3 Saber{ saber };
 
-				// 腕とサーベルの方向ベクトルと距離を計算
+				//方向ベクトルと距離を計算
 				DirectX::XMFLOAT3 direction = Math::calc_vector_AtoB_normalize(Arm, Saber);
 				float length = Math::calc_vector_AtoB_length(Arm, Saber);
 
-				// 腕の位置から方向ベクトルを使って、長さの半分の位置を計算
+				//腕から見てサーベルまでの中間点（攻撃位置の中心）を返す
 				return Math::calc_designated_point(Arm, direction, length * 0.5f);
 		} };
 
-		// サーベルの衝突判定位置を計算
+		//サーベルの衝突判定位置を計算
 		attackCollisionPosition[ToInt(LR::LEFT)] = saber_position(lowerArmPosition[ToInt(LR::LEFT)], beamSaberPosition[ToInt(LR::LEFT)]);
 		attackCollisionPosition[ToInt(LR::RIGHT)] = saber_position(lowerArmPosition[ToInt(LR::RIGHT)], beamSaberPosition[ToInt(LR::RIGHT)]);
 
-		// 攻撃が有効な場合、デバッグ用にサーベルの位置に球体を描画
+		//攻撃が有効な場合、デバッグ用にサーベルの位置に球体を描画
 		if (attackParam.isAttack)
 		{
 			debugRender->CreateSphere(
 				attackCollisionPosition[ToInt(LR::LEFT)],
-				1.0f, { 1.0f,0.0f,0.0f,1.0f });  // 左側のサーベルの位置
+				ATTACK_RADIUS, DEBUG_ATTACK_COLOR);  //左側のサーベルの位置
 			debugRender->CreateSphere(
 				attackCollisionPosition[ToInt(LR::RIGHT)],
-				1.0f, { 1.0f,0.0f,0.0f,1.0f });  // 右側のサーベルの位置
+				ATTACK_RADIUS, DEBUG_ATTACK_COLOR);  //右側のサーベルの位置
 		}
 	}
 
@@ -911,7 +989,7 @@ void PLAYER::DebugPrimitiveUpdate()
 	debugRender->CreateCylinder(collider.start,
 		collider.radius,
 		charaParam.height,
-		{ 0.0f,1.0f,0.0f,1.0f });  // 自キャラの当たり判定を緑色で表示
+		DEBUG_COLLIDER_COLOR);  // 自キャラの当たり判定を緑色で表示
 }
 
 void PLAYER::DebugGUI()

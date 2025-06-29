@@ -3,10 +3,6 @@
 #include "damage_func.h"
 #include "gltf_model.h"
 
-#define LIMIT_X static_cast<int>(LIMIT::X)
-#define LIMIT_Y static_cast<int>(LIMIT::Y)
-#define LIMIT_Z static_cast<int>(LIMIT::Z)
-
 class Character
 {
 public:
@@ -135,11 +131,15 @@ protected:
 	CharacterParam charaParam;
 
 	//’i·‚ğæ‚è‰z‚¦‚ç‚ê‚éÅ‘å‚Ì‚‚³
-	float stepOffset = 0.7f;
+	float stepOffset = 2.0f;
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };
 	//’n–Ê‚É“–‚½‚Á‚Ä‚¢‚é‚©
 	bool isGround = false;
 	bool isDead = false;
+
+	//Y²‰º‚Ì§ŒÀ
+	const float limitY = -10.0f;
+
 	float slopeRate = 1.0f;
 
 	float invincibleTimer = 0.0f;

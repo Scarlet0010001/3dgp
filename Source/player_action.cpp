@@ -59,9 +59,9 @@ void PLAYER::TransitionBoostState()
 	audios[ToInt(PLAYER_SE::SE_BOOST)]->volume(0.5f);
 
 	//ラジアルブラー設定
-	player_radialBlurConstant.blurStrength = 1.0f;
-	player_radialBlurConstant.blurRadius = 1.0f;
-	radialTimer = player_radialBlurConstant.blurTimer = 0.5f;
+	player_RadialBlurConstant.blurStrength = 1.0f;
+	player_RadialBlurConstant.blurRadius = 1.0f;
+	radialTimer = player_RadialBlurConstant.blurTimer = 0.5f;
 
 	//ブーストタイマーを減少、回避タイマーをリセット
 	param.boostTimer -= 2.5f;
@@ -284,9 +284,9 @@ void PLAYER::UpdateWingState(float elapsedTime)
 		velocity.z = (forward * (param.wingSpeed)).z;
 
 		//ラジアルブラー設定
-		player_radialBlurConstant.blurStrength = 0.2f;
-		player_radialBlurConstant.blurRadius = 1.0f;
-		radialTimer = player_radialBlurConstant.blurTimer = 0.5f;
+		player_RadialBlurConstant.blurStrength = 0.2f;
+		player_RadialBlurConstant.blurRadius = 1.0f;
+		radialTimer = player_RadialBlurConstant.blurTimer = 0.5f;
 
 		//飛行時の移動入力処理
 		InputMoveWing(elapsedTime);
@@ -443,31 +443,9 @@ void PLAYER::UpdateShotState(float elapsedTime)
 
 void PLAYER::UpdateCombo_01_01_State(float elapsedTime)
 {
-	//先行入力のチェック
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
-	{
-		nextCombo = true;
-	}
-
-	//一定時間経過後に攻撃判定をオン
-	if (0.023f < time && !attackParam.isAttack)
-	{
-		attackParam.isAttack = true;
-	}
-
-	//先行入力があれば次のコンボへ遷移
-	if (0.173f < time && nextCombo)
-	{
-		TransitionCombo_01_02_State();
-		attackParam.isAttack = false;
-	}
-
-	//攻撃判定をオフにするタイミング
-	if (0.15f < time)
-	{
-		attackParam.isAttack = false;
-	}
-
+	//先行入力チェックと攻撃当たり判定のオンオフ
+	CheckPreInput(COMBO::ATTACK01);
+	
 	//アニメーションが終了したら待機状態へ遷移
 	if (model->GetIsEndAnimation())
 	{
@@ -487,30 +465,8 @@ void PLAYER::UpdateCombo_01_01_State(float elapsedTime)
 
 void PLAYER::UpdateCombo_01_02_State(float elapsedTime)
 {
-	//先行入力のチェック
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
-	{
-		nextCombo = true;
-	}
-
-	//攻撃判定のオン
-	if (0.03f < time && !attackParam.isAttack)
-	{
-		attackParam.isAttack = true;
-	}
-
-	//先行入力されていたら次のコンボへ遷移
-	if (0.2f < time && nextCombo)
-	{
-		TransitionCombo_01_03_State();
-		attackParam.isAttack = false;
-	}
-
-	//攻撃判定のオフ
-	if (0.175f < time)
-	{
-		attackParam.isAttack = false;
-	}
+	//先行入力チェックと攻撃当たり判定のオンオフ
+	CheckPreInput(COMBO::ATTACK02);
 
 	//アニメーション終了時に待機状態へ遷移
 	if (model->GetIsEndAnimation())
@@ -531,23 +487,8 @@ void PLAYER::UpdateCombo_01_02_State(float elapsedTime)
 
 void PLAYER::UpdateCombo_01_03_State(float elapsedTime)
 {
-	//先行入力のチェック
-	if (gamePad->GetButtonDown() & gamePad->BTN_X)
-	{
-		nextCombo = true;
-	}
-
-	//攻撃判定のオン
-	if (0.325f < time && !attackParam.isAttack)
-	{
-		attackParam.isAttack = true;
-	}
-
-	//攻撃判定のオフ
-	if (0.65f < time)
-	{
-		attackParam.isAttack = false;
-	}
+	//先行入力チェックと攻撃当たり判定のオンオフ
+	CheckPreInput(COMBO::ATTACK03);
 
 	//アニメーション終了時に待機状態へ遷移
 	if (model->GetIsEndAnimation())

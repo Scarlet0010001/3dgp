@@ -12,6 +12,7 @@
 #include "shader.h"
 #include "constant.h"
 #include "gltf_model.h"
+#include "user.h"
 
 
 #if _DEBUG
@@ -28,6 +29,9 @@ CONST BOOL FULLSCREEN{ FALSE };
 #define ST_DEPTH Graphics::DEPTH_STATE
 #define ST_BLEND Graphics::BLEND_STATE
 #define ST_RASTERIZER Graphics::RASTERIZER_STATE
+
+//ƒuƒŒƒ“ƒhŠ®—¹’l
+#define FACTOR_MAX (1.0f)
 
 class Graphics
 {

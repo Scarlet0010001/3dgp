@@ -54,7 +54,7 @@ public:
 	void SetBossPosition(DirectX::XMFLOAT3 p) { bossPosition = p; }
 
 	//ラジアルブラー取得
-	RadialBlur::radialBlurConstants GetRadialBlur() { return player_radialBlurConstant; }
+	RadialBlur::radialBlurConstants GetRadialBlur() { return player_RadialBlurConstant; }
 	
 	//色収差取得
 	Glitch_CA::Glitch_CA_constants GetGlitch_CA() { return player_Glitch_CA_Constant; }
@@ -128,6 +128,16 @@ private:
 		DEAD,			//死亡
 	};
 
+	//コンボ
+	enum class COMBO
+	{
+		NONE = -1,
+		ATTACK01 = 0,
+		ATTACK02,
+		ATTACK03,
+		COUNT,
+	};
+
 	struct PlayerParam
 	{
 		//基底クラスのパラメーター
@@ -172,8 +182,8 @@ private:
 		}
 	};
 
-private:
 
+private:
 	//------------遷移--------------//
 	void TransitionIdleState();			//待機
 	void TransitionMoveState();			//走り
@@ -249,13 +259,19 @@ private:
 
 	//射撃入力
 	void InputShot();
+	
+	//先行入力チェック
+	void CheckPreInput(COMBO combo);
 
 	//着地したか
 	void OnLanding()override;
+
 	//死亡したときの処理
 	void OnDead() override;
+
 	//ダメージを受けた時の処理
 	void OnDamaged(WINCE_TYPE type) override;
+
 	//ダメージを受ける処理
 	bool ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)override;
 
@@ -300,7 +316,7 @@ private:
 	std::unique_ptr <gltf_model> model;
 
 	//ラジアルブラー
-	RadialBlur::radialBlurConstants player_radialBlurConstant{}; 
+	RadialBlur::radialBlurConstants player_RadialBlurConstant{}; 
 	float radialTimer = 0.0f;	//ラジアルブラータイマー
 
 	//色収差
@@ -308,41 +324,6 @@ private:
 	float glitch_CATimer = 0.0f;//色収差タイマー
 	bool isGlitch_CA = false;		//色収差オンオフ
 
-	//左手右手
-	enum class LR
-	{
-		LEFT,	//左手
-		RIGHT,	//右手
-		COUNT,	//要素の数（enumの終端）
-	};
-	//当たり判定ノード
-	gltf_model::node beamSaber[ToInt(LR::COUNT)];	//サーベルの先端
-	gltf_model::node lowerArm[ToInt(LR::COUNT)];	//腕の先端
-
-	DirectX::XMFLOAT3 beamSaberPosition[ToInt(LR::COUNT)]{};			//サーベルの先端位置
-	DirectX::XMFLOAT3 lowerArmPosition[ToInt(LR::COUNT)]{};			//腕の先端位置
-	DirectX::XMFLOAT3 attackCollisionPosition[ToInt(LR::COUNT)]{};	//サーベルの当たり判定位置
-	
-	//軌跡
-	enum class TRAIL
-	{
-		LOWER_ARM,	//腕の先端
-		BEAM_SABER,	//サーベルの先端
-		COUNT,		//要素の数（enumの終端）
-	};
-	//最大ポリゴン数
-	static const int MAX_POLYGON = 12;
-
-	//軌跡パラメータ
-	struct TrailParam
-	{
-		DirectX::XMFLOAT3 trailPositions[ToInt(TRAIL::COUNT)][MAX_POLYGON];	//軌跡の保存座標配列
-		DirectX::XMFLOAT4 color[MAX_POLYGON];	//各頂点ごとのカラー情報
-	};
-	//左右の攻撃の軌跡配列
-	TrailParam trailAttack[ToInt(LR::COUNT)];
-	//軌跡を初期化するかどうかのフラグ
-	bool resetTrail = false;
 
 	//ボス座標
 	DirectX::XMFLOAT3 bossPosition{};
@@ -380,6 +361,53 @@ private:
 	//攻撃に関する各種パラメータ構造体
 	AttackParam attackParam;
 
+	//左手右手
+	enum class LR
+	{
+		LEFT,	//左手
+		RIGHT,	//右手
+		COUNT,	//要素の数（enumの終端）
+	};
+	//当たり判定ノード
+	gltf_model::node beamSaber[ToInt(LR::COUNT)];	//サーベルの先端
+	gltf_model::node lowerArm[ToInt(LR::COUNT)];	//腕の先端
+
+	DirectX::XMFLOAT3 beamSaberPosition[ToInt(LR::COUNT)]{};		//サーベルの先端位置
+	DirectX::XMFLOAT3 lowerArmPosition[ToInt(LR::COUNT)]{};			//腕の先端位置
+	DirectX::XMFLOAT3 attackCollisionPosition[ToInt(LR::COUNT)]{};	//サーベルの当たり判定位置
+
+	//軌跡
+	enum class TRAIL
+	{
+		LOWER_ARM,	//腕の先端
+		BEAM_SABER,	//サーベルの先端
+		COUNT,		//要素の数（enumの終端）
+	};
+	//最大ポリゴン数
+	static const int MAX_POLYGON = 12;
+
+	//軌跡パラメータ
+	struct TrailParam
+	{
+		DirectX::XMFLOAT3 trailPositions[ToInt(TRAIL::COUNT)][MAX_POLYGON];	//軌跡の保存座標配列
+		DirectX::XMFLOAT4 color[MAX_POLYGON];	//各頂点ごとのカラー情報
+	};
+	//左右の攻撃の軌跡配列
+	TrailParam trailAttack[ToInt(LR::COUNT)];
+	//軌跡を初期化するかどうかのフラグ
+	bool resetTrail = false;
+
+	//現在のコンボ数
+	COMBO nowCombo = COMBO::NONE;
+
+	//攻撃時のフレームパラメータ
+	struct AttackFlameParam
+	{
+		float startFlame = 0.0f;
+		float endFlame = 0.0f;
+		float preInputFlame = 0.0f;
+	};
+	AttackFlameParam attackFlameParam[ToInt(COMBO::COUNT)];
 	//先行入力判定
 	bool nextCombo = false;
 
@@ -398,5 +426,32 @@ private:
 	//--------------------定数--------------------------//
 	//着地ステートに偏移する速度
 	const float LANDING_SPEED = 30.0f;
-};
 
+	//下に行き過ぎた時のリスポーンy座標
+	const float RESPAWN_Y = 50.0f;
+
+	//身体当たり判定の大きさ
+	const float COLLIDER_RADIUS = 1.0f;
+	//攻撃当たり判定の大きさ
+	const float ATTACK_RADIUS = 1.5f;
+
+	//PLAYER_WING_START中の重力影響率
+	const float WING_GRAVITY_SCALE = 2.0f;
+
+	const DirectX::XMFLOAT4 DEBUG_ATTACK_COLOR = { 1.0f,0.0f,0.0f,1.0f };	//デバッグ時の攻撃当たり判定の色
+	const DirectX::XMFLOAT4 DEBUG_COLLIDER_COLOR = { 0.0f,1.0f,0.0f,1.0f };	//デバッグ時の身体当たり判定の色
+
+	const float CHARGE_SPEED = 3.0f;			//ブーストの回復速度
+	const float BOOST_MIN_THRESHOLD = 2.5f;		//ブーストのしきい値
+
+	const float GLITCH_MAX_DURATION = 0.03f;	//グリッチ効果の最大持続時間
+	const float GLITCH_SHIFT_AMOUNT = 0.015f;	//RGBシフトの移動量
+	const float GLITCH_CENTER_X = 0.5f;			//色収差中心のX座標
+	const float GLITCH_CENTER_Y = 0.5f;			//色収差中心のY座標
+	
+	//射撃音のボリューム
+	const float SOUND_VOLUME_LASER = 0.3f;
+
+	//被弾音のボリューム
+	const float SOUND_VOLUME_DAMAGE = 0.5f;
+};
