@@ -101,17 +101,30 @@ public:
 	virtual bool ApplyDamage(int damage, float invincibleTime, WINCE_TYPE type);
 
 protected:
+	//移動
 	virtual void Move(float vx, float vz, float speed);
-	void Turn(float elapsedTime, float vx, float vz, float speed);//オイラー
-	void Turn(float elapsedTime, DirectX::XMFLOAT3 move_vec, float speed, DirectX::XMFLOAT4& orien);//クォータニオン
+
+	//回転処理（オイラー）
+	void Turn(float elapsedTime, float vx, float vz, float speed);
+	//回転処理（クォータニオン使用）
+	void Turn(float elapsedTime, DirectX::XMFLOAT3 move_vec, float speed, DirectX::XMFLOAT4& orien);
+	
 	//ジャンプ処理
 	void Jump(float speed);
+
 	//速力処理更新
 	void UpdateVelocity(float elapsedTime, DirectX::XMFLOAT3& position);
+	
+	//着地時に呼ばれる処理
 	virtual void OnLanding() {}
-	//死亡したときに呼ばれる
+
+	//死亡時に呼ばれる処理
 	virtual void OnDead() {}
+
+	//ダメージ時に呼ばれる処理
 	virtual void OnDamaged(WINCE_TYPE type) {}
+
+	//無敵タイマーの更新
 	void UpdateInvicibleTimer(float elapsedTime);
 
 	//-----------変数--------------//
@@ -132,17 +145,22 @@ protected:
 
 	//段差を乗り越えられる最大の高さ
 	float stepOffset = 2.0f;
+
+	//現在の速度ベクトル
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };
-	//地面に当たっているか
+
+	//接地判定フラグ
 	bool isGround = false;
+	//死亡フラグ
 	bool isDead = false;
 
-	//Y軸下の制限
-	const float limitY = -10.0f;
-
+	//坂を登るときの速度補正係数
 	float slopeRate = 1.0f;
 
+	//無敵時間
 	float invincibleTimer = 0.0f;
+
+	//移動方向ベクトル
 	float moveVec_x = 0.0f;
 	float moveVec_y = 0.0f;
 	float moveVec_z = 0.0f;
@@ -153,30 +171,54 @@ protected:
 	//ブレンドアニメーション
 	enum class ANIME_NODE
 	{
-		NOW_ANIMATION = 0,
-		OLD_ANIMATION,
-
-		NODE_COUNT
+		NOW_ANIMATION = 0,		//現在のアニメーション
+		OLD_ANIMATION,			//前のアニメーション
+		NODE_COUNT				//個数
 	};
+
+	//現在と前回のアニメーション情報
 	std::vector<gltf_model::node> animatedNodes[ToInt(ANIME_NODE::NODE_COUNT)];
+	
+	//ブレンド後のアニメーション結果
 	std::vector<gltf_model::node> blendedAnimatedNodes;
+
+	//アニメーションの再遷移中かどうか
 	bool transitionToTransition = false;
-	float time{ 0 };
-	float factor{ 0 };
-	float transitionTime{ 0.11f };
+
+	//アニメーション再生時間
+	float time = 0.0f;
+
+	//アニメーションブレンド係数
+	float factor = 0.0f;
+
+	//アニメーション遷移にかける時間
+	float transitionTime = 0.11f;
+
+	//アニメーションの遷移状態
 	enum class TRANSITION_STATE
 	{
-		NONE,
-		START,
-		TRANSITION,
+		NONE,			//遷移なし
+		START,			//遷移開始
+		TRANSITION		//ブレンド中
 	}transitionState;
 
-
-	float vs_wall_ray_power = 5.0f;
+	//壁との押し戻し反力
+	float vsWallRayPower = 5.0f;
 	//坂の法線
 	DirectX::XMFLOAT3 slopeNormal = {};
+
+	//重力加速度
 	float gravity = -1.0f;
-	float turnAngle;			//体を向けるときの回転角
+	//体の向きを調整する回転角
+	float turnAngle = 0.0f;
+
+	//-----------変数--------------//
+	//Y軸下の制限
+	const float LIMIT_Y = -10.0f;
+
+	//下に行き過ぎた時のリスポーンy座標
+	const float RESPAWN_Y = 50.0f;
+
 	//-----------プライベート関数--------------//
 private:
 	//垂直速力更新処理

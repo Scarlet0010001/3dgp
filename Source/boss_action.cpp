@@ -135,9 +135,9 @@ void Boss::UpdateIdleState(float elapsedTime)
 void Boss::UpdateWalkState(float elapsedTime)
 {
 	//プレイヤー方向に歩く
-	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(position, targetPos);  //プレイヤー位置への方向ベクトルを計算
-	Move(dir_target_vec.x, dir_target_vec.z, charaParam.moveSpeed);  //プレイヤー方向に移動
-	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);  //プレイヤー方向に向けて回転
+	DirectX::XMFLOAT3 dirTargetVec = Math::calc_vector_AtoB_normalize(position, targetPos);  //プレイヤー位置への方向ベクトルを計算
+	Move(dirTargetVec.x, dirTargetVec.z, charaParam.moveSpeed);  //プレイヤー方向に移動
+	Turn(elapsedTime, dirTargetVec, charaParam.turnSpeed, orientation);  //プレイヤー方向に向けて回転
 
 	//状態タイマーが持続時間を超えたら、攻撃のルーチンへ遷移
 	if (stateTimer > stateDuration)
@@ -164,16 +164,22 @@ void Boss::UpdateAttackTackleState(float elapsedTime)
 	float vz = targetPointPos.z - position.z;
 	float distSq = vx * vx + vz * vz;
 
-	attackParam.isAttack = true;  //攻撃中に設定
+	//攻撃フラグを設定
+	attackParam.isAttack = true;
 	DirectX::XMFLOAT3 pos = { position.x ,0.0f, position.z };
 	DirectX::XMFLOAT3 pointPos = { targetPointPos.x ,0.0f, targetPointPos.z };
-	DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(pos, pointPos);  //目標地点への方向ベクトルを計算
-	Move(dir_target_vec.x, dir_target_vec.z, param.runSpeed);  //目標地点に向かって移動
-	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);  //目標地点に向けて回転
+	
+	//目標地点への方向ベクトルを計算
+	DirectX::XMFLOAT3 dirTargetVec = Math::calc_vector_AtoB_normalize(pos, pointPos);
+	
+	//目標地点に向かって移動
+	Move(dirTargetVec.x, dirTargetVec.z, param.runSpeed);
+
+	//目標地点に向けて回転
+	Turn(elapsedTime, dirTargetVec, charaParam.turnSpeed, orientation);
 
 	//半径2.0fの範囲内に目標地点が入ったら、待機状態に遷移
-	const float radius = 2.0f;
-	if (distSq < radius * radius)
+	if (distSq < TACKLE_HIT_RADIUS * TACKLE_HIT_RADIUS)
 	{
 		TransitionIdleState();
 		stateDuration = NORMAL_ATTACK_COOLTIME;  //通常攻撃のクールタイムを設定
@@ -186,18 +192,16 @@ void Boss::UpdateAttackTackleState(float elapsedTime)
 
 void Boss::UpdateAttackJumpState(float elapsedTime)
 {
-	//ジャンプアニメーションが開始されるまで、早すぎる場合は何もしない
-	if (bossAnimation == BOSS_ANIMATION::BOSS_JUMP && time < 0.1f)
+	//ジャンプアニメーションがまだ開始されていない初期フレームは何もしない
+	if (bossAnimation == BOSS_ANIMATION::BOSS_JUMP && time < JUMP_ANIM_START_WAIT)
 		return;
 
 	//状態タイマーが持続時間を超えたら、ジャンプ攻撃を行う
 	if (stateTimer < stateDuration)
 	{
 		//目標地点までの移動速度を計算
-		charaParam.moveSpeed = CalcMoveSpeed(targetPos, 0.5f);
-		targetPointPos.x = targetPos.x;
-		targetPointPos.y = targetPos.y;
-		targetPointPos.z = targetPos.z;
+		charaParam.moveSpeed = CalcMoveSpeed(targetPos, JUMP_MOVE_TIME);
+		targetPointPos = targetPos;
 		return;
 	}
 	else
@@ -206,12 +210,12 @@ void Boss::UpdateAttackJumpState(float elapsedTime)
 		bossAnimation = BOSS_ANIMATION::BOSS_JUMP; 
 	}
 
-	//目標地点までの高さの差
+	//垂直方向の目標との距離を計算し、条件を満たしたらジャンプ初速を設定
 	float length = targetPointPos.y - position.y;
-	if (!isJump && length > 5.0f && time > 0.1f)
+	if (!isJump && length > JUMP_HEIGHT_THRESHOLD && time > JUMP_ANIM_START_WAIT)
 	{
 		isJump = true;
-		velocity.y = 30.0f;  //ジャンプの初期速度を設定
+		velocity.y = JUMP_SPEED;  //垂直速度にジャンプ初速を設定
 	}
 
 	//目標地点までのXZ平面での距離判定
@@ -219,25 +223,35 @@ void Boss::UpdateAttackJumpState(float elapsedTime)
 	float vz = targetPointPos.z - position.z;
 	float distSq = vx * vx + vz * vz;
 
-	DirectX::XMFLOAT3 dir_target_vec{};
-	attackParam.isAttack = true;  //攻撃中に設定
+	//攻撃状態を有効に
+	attackParam.isAttack = true;
 
-	const float radius = 3.0f;
-	if (distSq < radius * radius)
+	DirectX::XMFLOAT3 dirTargetVec{};
+
+	// 一定距離内に到達したら着地処理へ
+	if (distSq < JUMP_RADIUS * JUMP_RADIUS)
 	{
 		//ジャンプ攻撃アニメーションが終了したら、待機状態に遷移
 		if (model->GetIsEndAnimation())
 		{
 			TransitionIdleState();
-			attackParam.isAttack = false;  //攻撃終了
+			attackParam.isAttack = false;		//攻撃終了
 			charaParam.moveSpeed = WALK_SPEED;  //歩行速度に戻す
-			charaParam.acceleration = ACCELERATION_NORMAL_SPEED;  //加速度を通常の速度に戻す
+			
+			//加速度を通常の速度に戻す
+			charaParam.acceleration = ACCELERATION_NORMAL_SPEED;
 			isJump = false;  //ジャンプフラグをリセット
 		}
 		else
 		{
-			stateDuration = NORMAL_ATTACK_COOLTIME;  //通常攻撃のクールタイムを設定
-			charaParam.moveSpeed = 0;  //移動速度を0に設定
+			//アニメーションがまだ続いている場合、動きを止めてその場に留まる
+			
+			//通常攻撃のクールタイムを設定
+			stateDuration = NORMAL_ATTACK_COOLTIME;
+			
+			//移動速度を0に設定
+			charaParam.moveSpeed = 0;
+
 			velocity.x = 0.0f;
 			velocity.z = 0.0f;
 			charaParam.acceleration = 0.0f;  //加速度を0に設定
@@ -245,12 +259,13 @@ void Boss::UpdateAttackJumpState(float elapsedTime)
 	}
 	else
 	{
-		dir_target_vec = Math::calc_vector_AtoB_normalize(position, targetPointPos);  //目標地点への方向ベクトルを計算
+		//目標地点への方向ベクトルを計算
+		dirTargetVec = Math::calc_vector_AtoB_normalize(position, targetPointPos);  //目標地点への方向ベクトルを計算
 	}
 
 	//移動処理
-	Move(dir_target_vec.x, dir_target_vec.z, charaParam.moveSpeed); 
-	Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);  
+	Move(dirTargetVec.x, dirTargetVec.z, charaParam.moveSpeed); 
+	Turn(elapsedTime, dirTargetVec, charaParam.turnSpeed, orientation);  
 
 	//速度更新
 	UpdateVelocity(elapsedTime, position);
@@ -266,47 +281,50 @@ void Boss::UpdateAttackShotStraightState(float elapsedTime)
 		stateTimer = 0.0f;                //タイマーリセット
 		isBackJump = true;                //バックジャンプ開始
 
-		//バックジャンプ中は移動を停止し、加速度もゼロに設定
+		//その場停止
 		charaParam.moveSpeed = 0;
 		velocity.x = 0.0f;
 		velocity.z = 0.0f;
 		charaParam.acceleration = 0.0f;
 	}
 
-	//バックジャンプが終了していない場合、後退移動を行う
+	//まだバックジャンプが完了していない場合は後退移動する
 	if (!isBackJump)
 	{
-		const float backJumpSpeed = 20.0f;  //バックジャンプの速度
-		//プレイヤー位置とのベクトル計算
+		//プレイヤーからの逆方向に移動するための方向ベクトル計算
 		DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(targetPos, position); 
 		
 		//後退移動
-		Move(dir_target_vec.x, dir_target_vec.z, backJumpSpeed);  
+		Move(dir_target_vec.x, dir_target_vec.z, BACK_JUMP_SPEED);
 		//向きの調整
 		Turn(elapsedTime, dir_target_vec, charaParam.turnSpeed, orientation);  
 	}
 
-	//連射タイミングになったら弾を撃つ
+	//バックジャンプ後、一定時間経過したら弾を発射
 	if (stateTimer > stateDuration && isBackJump)
 	{
-		ShotBullet(ATTACK_TYPE::SHOT_S);  //弾を発射
-		stateTimer = 0;  //タイマーリセット
-		rapidCount++;    //連射回数をカウント
+		ShotBullet(ATTACK_TYPE::SHOT_S);	//弾を発射
+		stateTimer = 0;						//タイマーリセット
+		rapidCount++;						//連射回数カウント
 	}
 
 	//連射回数が上限を超えたら、待機状態に遷移
 	if (rapidCount > RAPID_MAX && isBackJump)
 	{
-		TransitionIdleState();  //待機状態に遷移
-		isBackJump = false;     //バックジャンプフラグをリセット
-		stateDuration = NORMAL_ATTACK_COOLTIME;  //通常の攻撃クールタイム
-		charaParam.moveSpeed = WALK_SPEED;  //歩行速度に設定
-		charaParam.maxMoveSpeed = WALK_SPEED;  //最大速度も歩行速度に設定
-		charaParam.acceleration = ACCELERATION_NORMAL_SPEED;  //通常の加速度
+		TransitionIdleState();
+		isBackJump = false;     //バックジャンプフラグOFF
+		
+		//通常の攻撃クールタイム
+		stateDuration = NORMAL_ATTACK_COOLTIME;
+		
+		//パラメータリセット
+		charaParam.moveSpeed = WALK_SPEED;
+		charaParam.maxMoveSpeed = WALK_SPEED;
+		charaParam.acceleration = ACCELERATION_NORMAL_SPEED;
 	}
 
 	//速度更新
-	UpdateVelocity(elapsedTime, position);  //ボスの速度を更新
+	UpdateVelocity(elapsedTime, position);
 }
 
 void Boss::UpdateDamageState(float elapsedTime)

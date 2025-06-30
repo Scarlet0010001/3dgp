@@ -70,6 +70,4 @@ void Bullet::UpdateTransform()
 
     //”­ŽË•ûŒü
     this->direction = front;
-
-
 }

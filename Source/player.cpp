@@ -68,10 +68,10 @@ void PLAYER::Initialize()
 
 	//各変数初期化
 	//初期位置設定
-	position = { 0.0f, 37.0f, 0.0f };
+	position = INIT_POSITION;
 
 	//スケールを2倍に設定
-	scale.x = scale.y = scale.z = 2.0f;
+	scale.x = scale.y = scale.z = PLAYER_SCALE;
 
 	//Characterクラスのパラメーター初期化
 	charaParam = param.charaInitParam;
@@ -158,7 +158,7 @@ void PLAYER::Update(float elapsedTime)
 	}
 
 	//画面外に行った場合初期位置に戻す
-	if (position.y < limitY)
+	if (position.y < LIMIT_Y)
 	{
 		position.y = RESPAWN_Y;
 	}
@@ -179,99 +179,104 @@ void PLAYER::Update(float elapsedTime)
 
 void PLAYER::Render_f(float elapsedTime)
 {
-	// グラフィックスインスタンスを取得
+	//グラフィックスインスタンスを取得
 	Graphics& graphics = Graphics::Instance();
 
-	// 自機モデルのトランスフォームを更新（ワールド行列を計算）
+	//自機モデルのトランスフォームを更新（ワールド行列を計算）
 	transform = Math::calc_world_matrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 
-	// アニメーションの遷移チェック
+	//アニメーションの遷移チェック
 	if (playerAnimation_transition != playerAnimation)
 	{
 		if (transitionState != TRANSITION_STATE::NONE)
 		{
-			// 現在の遷移アニメーションを保存
+			//現在の遷移アニメーションを保存
 			playerAnimation_old = playerAnimation_transition;
 			animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)] = blendedAnimatedNodes;
 			transitionToTransition = true;
 		}
-		// 新しいアニメーションへの遷移開始
+		//新しいアニメーションへの遷移開始
 		playerAnimation_transition = playerAnimation;
 		transitionState = TRANSITION_STATE::START;
 	}
 
-	// 現在のアニメーションがループするか判定
+	//現在のアニメーションがループするか判定
 	bool isLoop = FindLoopAnimation(playerAnimation);
 
-	// アニメーションブレンド処理
+	//ブレンドアニメーション処理
 	if (transitionState > TRANSITION_STATE::NONE && transitionTime > 0.0f)
 	{
 		switch (transitionState)
 		{
 		case TRANSITION_STATE::NONE:
 			break;
-
 		case TRANSITION_STATE::START:
 			if (!transitionToTransition)
 			{
-				// 直前のアニメーションを設定
+				//直前のアニメーションを設定
 				model->animate(ToInt(playerAnimation_old), time, animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)],
 					FindLoopAnimation(playerAnimation_old));
 			}
-			// 新しいアニメーションを0秒の状態から設定
+			//新しいアニメーションを0秒の状態から設定
 			model->animate(ToInt(playerAnimation), 0.0f, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], isLoop);
 
-			// 遷移ステートを「移行中」に設定
+			//遷移ステートを「移行中」に設定
 			transitionState = TRANSITION_STATE::TRANSITION;
-			time = 0.0f;
-			factor = 0.0f;
+			time = 0.0f;	//時間のリセット
+			factor = 0.0f;	//遷移係数の初期化
+			break;
 
 		case TRANSITION_STATE::TRANSITION:
-			// アニメーション遷移のブレンド率を計算
+			//アニメーション遷移のブレンド率を計算
 			factor = time / transitionTime;
 
-			// 旧アニメーションと新アニメーションをブレンド
+			//旧アニメーションと新アニメーションをブレンド
 			model->blend_animations(animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)],
 				animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)],
 				factor, blendedAnimatedNodes);
 
-			// 経過時間を加算
+			//経過時間を加算
 			time += elapsedTime;
 
-			// 遷移完了判定
+			//遷移完了判定
 			if (factor > FACTOR_MAX)
 			{
-				// 遷移終了処理
+				//遷移終了処理
 				transitionToTransition = false;
 				transitionState = TRANSITION_STATE::NONE;
 				time = 0;
 			}
 			break;
 		}
-		// ブレンド後のアニメーションを描画
+		//ブレンド後のアニメーションを描画
 		model->render(graphics.Get_DC().Get(), transform, blendedAnimatedNodes);
 	}
 	else
 	{
-		// 通常アニメーションの更新
+		//通常アニメーションの更新
 		time += elapsedTime;
 
-		// アニメーションが終了した場合の処理
+		//アニメーションが終了した場合の処理
 		if (model->animations.at(ToInt(playerAnimation)).duration < time)
 		{
 			if (isLoop)
-				time = 0;  // ループする場合は最初に戻す
+			{
+				time = 0;  //ループする場合は最初に戻す
+			}
 			else
-				time = model->animations.at(ToInt(playerAnimation)).duration; // ループしない場合は最後のフレームで停止
+			{
+				// ループしない場合は最後のフレームで停止
+				time = model->animations.at(ToInt(playerAnimation)).duration;
+			}
 		}
 
-		// アニメーションを適用
+		//アニメーションを適用
 		model->animate(ToInt(playerAnimation), time, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], isLoop);
 
-		// モデルを描画
+		//モデルを描画
 		model->render(graphics.Get_DC().Get(), transform, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)]);
 
-		// 前回のアニメーションを更新
+		//前回のアニメーションを更新
 		playerAnimation_old = playerAnimation;
 	}
 }

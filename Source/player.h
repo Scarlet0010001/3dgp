@@ -427,13 +427,15 @@ private:
 	//着地ステートに偏移する速度
 	const float LANDING_SPEED = 30.0f;
 
-	//下に行き過ぎた時のリスポーンy座標
-	const float RESPAWN_Y = 50.0f;
-
 	//身体当たり判定の大きさ
 	const float COLLIDER_RADIUS = 1.0f;
 	//攻撃当たり判定の大きさ
 	const float ATTACK_RADIUS = 1.5f;
+
+	//ボスの初期座標
+	const DirectX::XMFLOAT3 INIT_POSITION = { 0.0f, 37.0f, 0.0f };
+	//プレイヤーモデルのスケール倍率
+	const float PLAYER_SCALE = 2.0f;
 
 	//PLAYER_WING_START中の重力影響率
 	const float WING_GRAVITY_SCALE = 2.0f;

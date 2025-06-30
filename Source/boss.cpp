@@ -18,23 +18,31 @@
 Boss::Boss()
 {
 	Graphics& graphics = Graphics::Instance();
-	//キャラクターモデル
+	//キャラクターモデルを読み込み
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
 		"Resources/Character/Boss/RobotDog_main.glb", false);
+	
+	//チャージエフェクト読み込み
 	chargeEffect = std::make_unique<Effect>("Resources/Effect/Charge/charge.efkefc");
 
+	//初期のノード変換行列を累積して取得
 	model->cumulate_transforms(model->nodes, transform);
+
+	//アニメーションノード初期化
 	for (auto& node : animatedNodes)
 	{
 		node = model->nodes;
 	}
+	//アニメーションブレンド用のノード初期化
 	blendedAnimatedNodes = model->nodes;
 
+	//砲塔ノードを取得
 	turretNode = model->find_nodes("Bone_MGun_Main");
 
-	// UIを初期化
+	//UI初期化
 	ui = std::make_unique<BossUI>();
 
+	//初期化処理
 	Initialize();
 
 }
@@ -44,42 +52,43 @@ void Boss::Initialize()
 	//パラメーターロード
 	LoadDataFile();
 
-	//パラメーター初期化
-	position = { 0.0f, 41.0f, 30.0f };
-	velocity = { 0.0f, 0.0f, 0.0f };
-	scale.x = scale.y = scale.z = 10.0f;
+	//ボスの初期位置・速度・スケールを設定
+	position = INIT_POSITION;
+	velocity = {};
+	scale.x = scale.y = scale.z = BOSS_SCALE;
 
-	//Charactorクラスのパラメーター初期化
+	//キャラクターパラメーターを初期化
 	charaParam = param.charaInitParam;
-	charaParam.maxHealth = 1000;
-	lineHealth = 700;
+	lineHealth = INIT_LINE_HEALTH;
 
+	//待機状態に遷移
 	TransitionIdleState();
 
-	//体力初期化
+	//体力を最大値で初期化
 	health = charaParam.maxHealth;
 
-	stepOffset = 2.0f;  // キャラクターの歩幅のオフセット設定
-
-	// キャラクターの移動速度を設定（歩行速度）
+	//歩行速度を設定
 	charaParam.moveSpeed = WALK_SPEED;
 
-	// ステートの継続時間を設定
-	stateDuration = 2.0f;  // ステートが続く時間（例えば、アニメーションの継続時間など）
+	//ステート継続時間を設定
+	stateDuration = STATE_DURATION;
 
-	// ランニング時の移動速度を設定
+	//走行時の速度を設定
 	param.runSpeed = RUN_SPEED;
 
-	// ボスキャラクターの当たり判定（カプセル形状）の設定
-	bossBodyCollision.capsule.start = position;  // カプセルの開始位置を現在位置に設定
-	bossBodyCollision.capsule.radius = 5;  // カプセルの半径を設定
-	bossBodyCollision.height = 10;  // ボスキャラクターの高さを設定
-	bossBodyCollision.capsule.end = bossBodyCollision.capsule.start;  // カプセルの終了位置も開始位置に設定
-	bossBodyCollision.capsule.end.y = bossBodyCollision.capsule.start.y + bossBodyCollision.height;  // 高さを加えてカプセルの終点を設定
+	//当たり判定（カプセル）の設定
+	bossBodyCollision.capsule.start = position;				//カプセル始点を現在位置に設定
+	bossBodyCollision.capsule.radius = BODY_RADIUS;			//半径を設定
+	bossBodyCollision.height = BODY_HEIGHT;					//カプセルの高さを設定
+	
+	//カプセルの終了位置も開始位置に設定
+	bossBodyCollision.capsule.end = bossBodyCollision.capsule.start;
+	//高さを加えてカプセルの終点を設定
+	bossBodyCollision.capsule.end.y = bossBodyCollision.capsule.start.y + bossBodyCollision.height;
 
-	// 攻撃用のカプセルの範囲設定
-	bossBodyCollision.attackRadius = 5.2f;  // 攻撃範囲の半径を設定
-	bossBodyCollision.attackHeight = 10;  // 攻撃範囲の高さを設定
+	//攻撃時の当たり判定の設定
+	bossBodyCollision.attackRadius = ATTACK_RADIUS;
+	bossBodyCollision.attackHeight = BODY_HEIGHT;
 
 	// ダメージ処理関数をラムダ式で設定（ダメージ、無敵時間、攻撃タイプを引数にとる）
 	damagedFunction = [=](int damage, float invincible, WINCE_TYPE type)->bool {
@@ -90,64 +99,67 @@ void Boss::Initialize()
 void Boss::Update(float elapsedTime)
 {
 #if _DEBUG
-	if (!isUpdate) return;  // デバッグビルドの場合、更新処理が無効化されているときはリターン
+	if (!isUpdate) return;  //デバッグビルドの場合、更新処理が無効化されているときはリターン
 #endif
 
-	// アクション更新関数を呼び出し（elapsedTimeを引数として渡す）
+	// アクション更新関数を呼び出し
 	(this->*actUpdate)(elapsedTime);
 
-	// 無敵タイマーの更新
+	//無敵時間の更新
 	UpdateInvicibleTimer(elapsedTime);
 
-	// ボスキャラクターの当たり判定（カプセル形状）の位置更新
-	bossBodyCollision.capsule.start = position;  // カプセルの開始位置を現在位置に設定
-	bossBodyCollision.capsule.end = bossBodyCollision.capsule.start;  // カプセルの終了位置も開始位置と同じに設定
-	bossBodyCollision.capsule.end.y = bossBodyCollision.capsule.start.y + bossBodyCollision.height;  // 高さを加えてカプセルの終点を設定
+	//当たり判定カプセル位置の更新
+	bossBodyCollision.capsule.start = position;
+	bossBodyCollision.capsule.end = position;
+	bossBodyCollision.capsule.end.y += bossBodyCollision.height;
 
-	// ボスのY座標が-10以下になった場合、位置をリセット
-	if (position.y < -10.0f)
+	//Y座標がしきい値より下に落ちたら位置を復帰
+	if (position.y < LIMIT_Y)
 	{
-		position.y = 50.0f;  // 位置をY = 50に設定（復活地点など）
+		position.y = RESPAWN_Y;
 	}
 
-	// 状態タイマーを更新
+	//ステートタイマーを更新
 	stateTimer += elapsedTime;
 
 	//-----------------UI更新-----------------//
-	// UIのHPバーを更新（現在のHPパーセンテージを設定）
+	//現在のHP割合を設定
 	ui->SetHPPercent(GetHpPercent());
-	// UIのその他の更新
+	//UI自体の更新処理
 	ui->Update(elapsedTime);
 
-	// デバッグ用のプリミティブ（例えば、ボスの位置などの表示）の更新
+	//デバッグプリミティブの更新処理
 	DebugPrimitiveUpdate();
 }
 
 void Boss::Render_f(float elapsedTime)
 {
-	Graphics& graphics = Graphics::Instance();  // グラフィックインスタンスの取得
+	//グラフィックインスタンスの取得
+	Graphics& graphics = Graphics::Instance();
 
-	// ボスモデルのトランスフォーム更新（スケール、姿勢、位置を基にワールド行列を計算）
+	//ボスモデルのトランスフォーム更新（スケール、姿勢、位置を基にワールド行列を計算）
 	transform = Math::calc_world_matrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 
-	// アニメーションの遷移処理
+	//アニメーションの遷移チェック
 	if (bossAnimation_transition != bossAnimation)
 	{
-		// 遷移状態がまだ開始されていない場合
 		if (transitionState != TRANSITION_STATE::NONE)
 		{
-			bossAnimation_old = bossAnimation_transition;  // 前回のアニメーションを記録
-			animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)] = blendedAnimatedNodes;  // ブレンドされた古いアニメーションを保持
-			transitionToTransition = true;  // 遷移フラグを設定
+			// 現在の遷移アニメーションを保存
+			bossAnimation_old = bossAnimation_transition;
+			animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)] = blendedAnimatedNodes;
+			transitionToTransition = true;
 		}
-		bossAnimation_transition = bossAnimation;  // 現在のアニメーションを遷移先に設定
-		transitionState = TRANSITION_STATE::START;  // 遷移を開始
+		//新しいアニメーションへの遷移開始
+		bossAnimation_transition = bossAnimation;
+		transitionState = TRANSITION_STATE::START;
 	}
 
 
-	bool nowLoop = FindLoopAnimation(bossAnimation);  // 現在のアニメーションがループするか確認
+	//現在のアニメーションがループするか判定
+	bool isLoop = FindLoopAnimation(bossAnimation);
 
-	// ブレンドアニメーションの処理
+	//ブレンドアニメーション処理
 	if (transitionState > TRANSITION_STATE::NONE && transitionTime > 0.0f)
 	{
 		switch (transitionState)
@@ -155,41 +167,67 @@ void Boss::Render_f(float elapsedTime)
 		case TRANSITION_STATE::NONE:
 			break;
 		case TRANSITION_STATE::START:
-			// 遷移の開始処理
+			// 直前のアニメーションを設定
 			model->animate(ToInt(bossAnimation_old), time, animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)], FindLoopAnimation(bossAnimation_old));  // 古いアニメーションの再生
-			model->animate(ToInt(bossAnimation), 0.0f, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], nowLoop);  // 新しいアニメーションを開始
-			transitionState = TRANSITION_STATE::TRANSITION;  // 遷移状態に進む
-			time = 0.0f;  // 時間のリセット
-			factor = 0.0f;  // 遷移係数の初期化
+			
+			//新しいアニメーションを0秒の状態から設定
+			model->animate(ToInt(bossAnimation), 0.0f, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], isLoop);  // 新しいアニメーションを開始
+			
+			//遷移ステートを「移行中」に設定
+			transitionState = TRANSITION_STATE::TRANSITION;
+			time = 0.0f;	//時間のリセット
+			factor = 0.0f;  //遷移係数の初期化
+			break;
 
 		case TRANSITION_STATE::TRANSITION:
-			factor = time / transitionTime;  // 遷移進行度の計算
-			model->blend_animations(animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)], animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], factor, blendedAnimatedNodes);  // アニメーションのブレンド
-			time += elapsedTime;  // 経過時間の更新
+			//アニメーション遷移のブレンド率を計算
+			factor = time / transitionTime;
+
+			//旧アニメーションと新アニメーションをブレンド
+			model->blend_animations(animatedNodes[ToInt(ANIME_NODE::OLD_ANIMATION)], animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], factor, blendedAnimatedNodes);
+			
+			//経過時間を加算
+			time += elapsedTime;
+
+			//遷移完了判定
 			if (factor > FACTOR_MAX)
 			{
-				// 遷移が終了した場合
-				transitionState = TRANSITION_STATE::NONE;  // 遷移状態をリセット
-				time = 0;  // 時間をリセット
+				//遷移終了処理
+				transitionState = TRANSITION_STATE::NONE;
+				time = 0;
 			}
 			break;
 		}
-		// レンダリング処理（遷移中）
+		//ブレンド後のアニメーションを描画
 		model->render(graphics.Get_DC().Get(), transform, blendedAnimatedNodes);
 	}
 	else
 	{
-		// 遷移がない場合、通常のアニメーション再生
-		time += elapsedTime;  // 経過時間の更新
+		//通常アニメーションの更新
+		time += elapsedTime;
+
+		//アニメーションが終了した場合の処理
 		if (model->animations.at(ToInt(bossAnimation)).duration < time)
 		{
-			if (nowLoop)
-				time = 0;  // ループアニメーションの場合、時間をリセット
-			else time = model->animations.at(ToInt(bossAnimation)).duration;  // ループしない場合、アニメーションの終了時間に設定
+			if (isLoop)
+			{
+				time = 0;  //ループする場合は最初に戻す
+			}
+			else
+			{
+				// ループしない場合は最後のフレームで停止
+				time = model->animations.at(ToInt(bossAnimation)).duration;
+			}
 		}
-		model->animate(ToInt(bossAnimation), time, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], nowLoop);  // 現在のアニメーションを再生
-		model->render(graphics.Get_DC().Get(), transform, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)]);  // レンダリング
-		bossAnimation_old = bossAnimation;  // 古いアニメーションを更新
+
+		//アニメーションを適用
+		model->animate(ToInt(bossAnimation), time, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)], isLoop);
+
+		//モデルを描画
+		model->render(graphics.Get_DC().Get(), transform, animatedNodes[ToInt(ANIME_NODE::NOW_ANIMATION)]);
+		
+		//前回のアニメーションを更新
+		bossAnimation_old = bossAnimation;
 	}
 }
 
@@ -201,40 +239,47 @@ void Boss::RenderUI(float elapsedTime)
 
 void Boss::ShotBullet(ATTACK_TYPE type)
 {
+	//弾マネージャーのインスタンス取得
 	BulletManager& bulletManager = BulletManager::Instance();
 	
+	//弾の発射位置
 	DirectX::XMFLOAT3 shotPos{};
 	if (type == ATTACK_TYPE::SHOT_S)
 	{
+		//ターゲットの現在位置を記録
 		targetPointPos = targetPos;
-		//発射位置(タレット部分)
+		
+		//タレットボーンの位置を取得し、発射位置を決定
 		model->fech_by_bone(ToInt(bossAnimation), time, transform, turretNode, shotPos);
-		//目標
+		
+		//ターゲット方向へのベクトルを計算
 		DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(shotPos,
 			{ targetPointPos.x, targetPointPos.y + targetPointHeight, targetPointPos.z });
 
+		//直進弾を生成
 		BulletStraight* bullet = 
 			new BulletStraight(&BulletManager::Instance(), Bullet::BULLET_MASTER::ENEMY);
+		
+		//発射処理
 		bullet->Launch(dir, shotPos);
-	}
-	else if (type == ATTACK_TYPE::SHOT_H)
-	{
-
 	}
 }
 
 void Boss::CalcAttack_vs_Player(Capsule capsule_collider, float collider_height, AddDamageFunc damaged_func)
 {
+	//攻撃フラグが有効でなければ処理を終了
 	if (!attackParam.isAttack)
 		return;
 
+	//カメラインスタンスを取得
 	Camera &camera = Camera::Instance();
 
+	//ボスの攻撃判定とプレイヤーの当たり判定の衝突判定
 	if (Collision::CylinderVsCylinder(
 		bossBodyCollision.capsule.start, bossBodyCollision.attackRadius, bossBodyCollision.attackHeight,
 		capsule_collider.start, capsule_collider.radius, collider_height))
 	{
-		//攻撃対象に与えるダメージ量と無敵時間
+		//ダメージを与えられたか確認
 		if (damaged_func(attackParam.power, attackParam.invinsibleTime, WINCE_TYPE::SMALL))
 		{
 			//カメラシェイク
@@ -244,24 +289,26 @@ void Boss::CalcAttack_vs_Player(Capsule capsule_collider, float collider_height,
 			camera.SetHitStop(attackParam.hitStop);
 		}
 	}
-
 }
 
 float Boss::CalcMoveSpeed(DirectX::XMFLOAT3 target, float time)
 {
+	//現在位置から目標地点までの距離を計算
 	float direction = Math::calc_vector_AtoB_length(position, target);
+	
+	//指定された時間内に移動するための速度を返す
 	return direction / time;
 }
 
 bool Boss::ApplyDamage(int damage, float invincibleTime, WINCE_TYPE type)
 {
-	//ダメージが0の場合は健康状態を変更する必要がない
+	//ダメージが0の場合は処理不要
 	if (damage == 0)return false;
 
-	//死亡している場合は健康状態を変更しない
+	//既に死亡している場合は処理不要
 	if (health <= 0)return false;
 
-
+	//無敵時間中であれば処理を行わない
 	if (invincibleTimer > 0.0f)return false;
 
 	//無敵時間設定
@@ -269,16 +316,18 @@ bool Boss::ApplyDamage(int damage, float invincibleTime, WINCE_TYPE type)
 	//ダメージ処理
 	health -= damage;
 
-	//死亡通知
+	//HPが0以下になった場合は死亡処理
 	if (health <= 0)
 	{
 		OnDead();
 	}
-	else//ダメージ通知
+	else//生存中の場合のダメージ処理
 	{
+		//一定ライン以下になるたびに怯む
 		if (health < lineHealth)
 		{
-			lineHealth -= 300;
+			//ラインHPを次の段階へ移行
+			lineHealth -= LINE_HEALTH_DECREASE;
 			OnDamaged(type);
 		}
 	}
@@ -301,6 +350,7 @@ void Boss::OnDamaged(WINCE_TYPE type)
 	case WINCE_TYPE::NONE:
 		break;
 	case WINCE_TYPE::SMALL:
+		//怯みダメージ
 		TransitionDamageState();
 		break;
 	case WINCE_TYPE::BIG:
@@ -340,13 +390,13 @@ void Boss::SaveDataFile()
 	// JSONファイルにデータを保存
 	std::filesystem::path path = filePath;
 	path.replace_extension(".json");
-	std::ofstream ifs;
-	ifs.open(path);  // ファイルを開く
+	std::ofstream ofs;
+	ofs.open(path);  // ファイルを開く
 
 	// ファイルが正常に開けた場合、書き込みとデータを保存
-	if (ifs)
+	if (ofs)
 	{
-		cereal::JSONOutputArchive o_archive(ifs);
+		cereal::JSONOutputArchive o_archive(ofs);
 		o_archive(param);  
 	}
 }
@@ -517,7 +567,7 @@ void Boss::DebugPrimitiveUpdate()
 		bossBodyCollision.capsule.start,
 		bossBodyCollision.capsule.radius,
 		bossBodyCollision.height,
-		{ 0.0f,1.0f,0.0f,1.0f });
+		DEBUG_COLLIDER_COLOR);
 
 	//攻撃フラグがオンなら攻撃当たり判定用円柱を生成
 	if (attackParam.isAttack)
@@ -526,7 +576,6 @@ void Boss::DebugPrimitiveUpdate()
 			bossBodyCollision.capsule.start,
 			bossBodyCollision.attackRadius,
 			bossBodyCollision.attackHeight,
-			{ 1.0f,0.0f,0.0f,1.0f });
+			DEBUG_ATTACK_COLOR);
 	}
 }
-

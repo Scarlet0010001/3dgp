@@ -266,7 +266,8 @@ private:
 #if _DEBUG
 	bool isUpdate = true;  //更新処理を行うか
 	bool isRender = true;  //描画処理を行うか
-#endif	//==============================================================
+#endif	
+	//==============================================================
 	// 
 	// 定数
 	// 
@@ -281,7 +282,6 @@ private:
 	const float ACCELERATION_JUMP_SPEED = 25.0f;	//ジャンプ時の加速度
 	
 	//攻撃関連
-	
 	const float ATTACK_ACTION_LENGTH = 17;		//通常攻撃の射程
 	const float NORMAL_ATTACK_COOLTIME = 1;		//通常攻撃のクールタイム
 	const float ATTACK_RESPONDER_TIME = 2.0f;	//近距離以上の射程時の判定時間
@@ -292,8 +292,36 @@ private:
 
 	const float CHARGE_JUMP_TIME = 2.5f;		//ジャンプ攻撃のチャージ時間
 
+	//目標地点に到達したとみなす判定距離
+	const float TACKLE_HIT_RADIUS = 2.0f;
+	//ジャンプ時に目標地点への到達判定距離
+	const float JUMP_RADIUS = 3.0f;
+
+	const float JUMP_ANIM_START_WAIT = 0.1f;	//ジャンプアニメーション再生の猶予時間
+	const float JUMP_SPEED = 30.0f;				//ジャンプ初速
+	const float BACK_JUMP_SPEED = 20.0f;		//バックジャンプ時の速度
+	
+	const float JUMP_HEIGHT_THRESHOLD = 5.0f;	//高さ差がこの値を超えたらジャンプ開始
+	const float JUMP_APPROACH_RADIUS = 3.0f;	//目標地点への到達判定距離
+	const float JUMP_MOVE_TIME = 0.5f;			//目標地点までにかける時間
+
 	//ダメージを受けたときのスタン時間
 	const float DAMAGE_STUN_DURATION = 3.0f;
+
+	//ボスの初期座標
+	const DirectX::XMFLOAT3 INIT_POSITION = { 0.0f, 41.0f, 30.0f };
+	
+	const float BOSS_SCALE = 10.0f;				//ボスモデルのスケール倍率
+	const float BODY_RADIUS = 5.0f;				//ボスの当たり判定カプセルの半径
+	const float BODY_HEIGHT = 10.0f;			//ボスの当たり判定カプセルの高さ
+	const float ATTACK_RADIUS = 5.2f;			//攻撃用当たり判定の半径
+	const float STATE_DURATION = 2.0f;			//各ステートの基本継続時間
+	
+	const int INIT_LINE_HEALTH = 700;			//体力ゲージの初期しきい値ライン
+	const int LINE_HEALTH_DECREASE = 300;		//ラインHPが減少する値
+
+	const DirectX::XMFLOAT4 DEBUG_ATTACK_COLOR = { 1.0f,0.0f,0.0f,1.0f };	//デバッグ時の攻撃当たり判定の色
+	const DirectX::XMFLOAT4 DEBUG_COLLIDER_COLOR = { 0.0f,1.0f,0.0f,1.0f };	//デバッグ時の身体当たり判定の色
 
 public:
 	//被ダメージ時のコールバック関数
