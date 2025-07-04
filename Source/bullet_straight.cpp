@@ -45,7 +45,7 @@ void BulletStraight::Update(float elapsedTime)
     UpdateTransform();
 
     //モデル行列更新
-    transform = Math::calc_world_matrix(scale, angle, position, Math::COORDINATE_SYSTEM::RHS_YUP);
+    transform = Math::CalcWorldMatrix(scale, angle, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 }
 
 void BulletStraight::Render(float elapsedTime)

@@ -704,7 +704,7 @@ bool Collision::RingVsCapsule(
     if (center_ring_position.y - ring_height > capsule_end.y) return false;
 
     //ƒŠƒ“ƒO‚Ì“à‘¤‚ÆŠO‘¤‚Ì”»’è
-    float ring_capsule_length = Math::calc_vector_AtoB_length({ center_ring_position.x, center_ring_position.z }, { capsule_start.x, capsule_start.z });
+    float ring_capsule_length = Math::CalcVectorAtoBLength({ center_ring_position.x, center_ring_position.z }, { capsule_start.x, capsule_start.z });
     if (ring_capsule_length > ring_radius + ring_width) return false;
     if (ring_capsule_length < ring_radius - ring_width) return false;
 

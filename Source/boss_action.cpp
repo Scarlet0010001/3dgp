@@ -135,7 +135,7 @@ void Boss::UpdateIdleState(float elapsedTime)
 void Boss::UpdateWalkState(float elapsedTime)
 {
 	//プレイヤー方向に歩く
-	DirectX::XMFLOAT3 dirTargetVec = Math::calc_vector_AtoB_normalize(position, targetPos);  //プレイヤー位置への方向ベクトルを計算
+	DirectX::XMFLOAT3 dirTargetVec = Math::CalcVectorAtoBNormalize(position, targetPos);  //プレイヤー位置への方向ベクトルを計算
 	Move(dirTargetVec.x, dirTargetVec.z, charaParam.moveSpeed);  //プレイヤー方向に移動
 	Turn(elapsedTime, dirTargetVec, charaParam.turnSpeed, orientation);  //プレイヤー方向に向けて回転
 
@@ -170,7 +170,7 @@ void Boss::UpdateAttackTackleState(float elapsedTime)
 	DirectX::XMFLOAT3 pointPos = { targetPointPos.x ,0.0f, targetPointPos.z };
 	
 	//目標地点への方向ベクトルを計算
-	DirectX::XMFLOAT3 dirTargetVec = Math::calc_vector_AtoB_normalize(pos, pointPos);
+	DirectX::XMFLOAT3 dirTargetVec = Math::CalcVectorAtoBNormalize(pos, pointPos);
 	
 	//目標地点に向かって移動
 	Move(dirTargetVec.x, dirTargetVec.z, param.runSpeed);
@@ -260,7 +260,7 @@ void Boss::UpdateAttackJumpState(float elapsedTime)
 	else
 	{
 		//目標地点への方向ベクトルを計算
-		dirTargetVec = Math::calc_vector_AtoB_normalize(position, targetPointPos);  //目標地点への方向ベクトルを計算
+		dirTargetVec = Math::CalcVectorAtoBNormalize(position, targetPointPos);  //目標地点への方向ベクトルを計算
 	}
 
 	//移動処理
@@ -292,7 +292,7 @@ void Boss::UpdateAttackShotStraightState(float elapsedTime)
 	if (!isBackJump)
 	{
 		//プレイヤーからの逆方向に移動するための方向ベクトル計算
-		DirectX::XMFLOAT3 dir_target_vec = Math::calc_vector_AtoB_normalize(targetPos, position); 
+		DirectX::XMFLOAT3 dir_target_vec = Math::CalcVectorAtoBNormalize(targetPos, position); 
 		
 		//後退移動
 		Move(dir_target_vec.x, dir_target_vec.z, BACK_JUMP_SPEED);
@@ -349,7 +349,7 @@ void Boss::UpdateDeadState(float elapsedTime)
 void Boss::AttackRoutine(float elapsedTime)
 {
 	//プレイヤーまでの距離を計算
-	float length_to_target = Math::calc_vector_AtoB_length(position, targetPos);
+	float length_to_target = Math::CalcVectorAtoBLength(position, targetPos);
 
 	//プレイヤーが近ければ近距離攻撃を選択
 	if (length_to_target < ATTACK_ACTION_LENGTH)

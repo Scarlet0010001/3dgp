@@ -12,7 +12,6 @@ void PLAYER::TransitionIdleState()
 	playerAnimation = PlayerAnimation::PLAYER_IDLE;
 }
 
-
 void PLAYER::TransitionMoveState()
 {
 	//移動状態へ偏移
@@ -106,10 +105,10 @@ void PLAYER::TransitionShotState()
 	playerAnimation = PlayerAnimation::PLAYER_SHOT_IDLE;
 }
 
-void PLAYER::TransitionCombo_01_01_State()
+void PLAYER::TransitionCombo01State()
 {
 	//コンボ1状態へ偏移
-	pUpdate = &PLAYER::UpdateCombo_01_01_State;
+	pUpdate = &PLAYER::UpdateComboState;
 
 	//状態とアニメーションをATTACK_01へ偏移
 	state = STATE::RIGHT_ATTACK;
@@ -122,20 +121,23 @@ void PLAYER::TransitionCombo_01_01_State()
 	attackParam = param.combo_1;
 	//次のコンボを無効化
 	nextCombo = false;
+	//今のコンボ設定
+	nowCombo = COMBO::ATTACK01;
 
 	//斬撃音再生
 	audios[ToInt(PLAYER_SE::SE_SABER)]->play();
-	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(1.0f);
+	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(SOUND_VOLUME_SABER);
 }
 
-void PLAYER::TransitionCombo_01_02_State()
+void PLAYER::TransitionCombo02State()
 {
 	//コンボ2状態へ偏移
-	pUpdate = &PLAYER::UpdateCombo_01_02_State;
+	pUpdate = &PLAYER::UpdateComboState;
 
 	//状態とアニメーションをATTACK_02へ偏移
 	state = STATE::LEFT_ATTACK;
 	playerAnimation = PlayerAnimation::PLAYER_ATTACK_02;
+
 	// 軌跡をリセット
 	resetTrail = true;
 
@@ -143,16 +145,18 @@ void PLAYER::TransitionCombo_01_02_State()
 	attackParam = param.combo_2;
 	//次のコンボを無効化
 	nextCombo = false;
+	//今のコンボ設定
+	nowCombo = COMBO::ATTACK02;
 
 	//斬撃音再生
 	audios[ToInt(PLAYER_SE::SE_SABER)]->play();
-	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(1.0f);
+	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(SOUND_VOLUME_SABER);
 }
 
-void PLAYER::TransitionCombo_01_03_State()
+void PLAYER::TransitionCombo03State()
 {
 	//コンボ3状態へ偏移
-	pUpdate = &PLAYER::UpdateCombo_01_03_State;
+	pUpdate = &PLAYER::UpdateComboState;
 
 	//状態とアニメーションをATTACK_03へ偏移
 	state = STATE::RIGHT_ATTACK;
@@ -164,11 +168,12 @@ void PLAYER::TransitionCombo_01_03_State()
 	attackParam = param.combo_3;
 	//次のコンボを無効化
 	nextCombo = false;
+	//今のコンボ設定
+	nowCombo = COMBO::ATTACK03;
 
 	//斬撃音再生
 	audios[ToInt(PLAYER_SE::SE_SABER)]->play();
-	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(1.0f);
-
+	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(SOUND_VOLUME_SABER);
 }
 
 void PLAYER::TransitionDamageState()
@@ -213,7 +218,7 @@ void PLAYER::UpdateIdleState(float elapsedTime)
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
-		TransitionCombo_01_01_State();
+		TransitionCombo01State();
 	}
 	//射撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER)
@@ -254,7 +259,7 @@ void PLAYER::UpdateMoveState(float elapsedTime)
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
-		TransitionCombo_01_01_State();
+		TransitionCombo01State();
 	}
 	//射撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_RIGHT_TRIGGER)
@@ -380,7 +385,7 @@ void PLAYER::UpdateJumpState(float elapsedTime)
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
-		TransitionCombo_01_01_State();
+		TransitionCombo01State();
 	}
 
 	//速力更新
@@ -424,28 +429,26 @@ void PLAYER::UpdateShotState(float elapsedTime)
 	//移動処理（攻撃時の値を考慮）
 	InputMove(elapsedTime, param.floatingValue, 1);
 
-	//ジャンプ入力
+	//ジャンプ/回避/飛行入力
 	InputJump();
-	//回避入力
 	InputBoost();
-	//飛行入力
 	InputWing();
+
 	//攻撃入力
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
 	{
-		TransitionCombo_01_01_State();
+		TransitionCombo01State();
 	}
 
 	//速力更新
 	UpdateVelocity(elapsedTime, position);
 }
 
-
-void PLAYER::UpdateCombo_01_01_State(float elapsedTime)
+void PLAYER::UpdateComboState(float elapsedTime)
 {
 	//先行入力チェックと攻撃当たり判定のオンオフ
-	CheckPreInput(COMBO::ATTACK01);
-	
+	CheckPreInput(nowCombo);
+
 	//アニメーションが終了したら待機状態へ遷移
 	if (model->GetIsEndAnimation())
 	{
@@ -453,54 +456,8 @@ void PLAYER::UpdateCombo_01_01_State(float elapsedTime)
 		attackParam.isAttack = false;
 	}
 
-	//移動処理（攻撃中の移動速度を考慮）
+	//移動/回避処理（攻撃中の移動速度を考慮）
 	InputMove(elapsedTime, param.attackMoveSpeed, 1);
-
-	//回避入力
-	InputBoost();
-
-	//速力更新
-	UpdateVelocity(elapsedTime, position);
-}
-
-void PLAYER::UpdateCombo_01_02_State(float elapsedTime)
-{
-	//先行入力チェックと攻撃当たり判定のオンオフ
-	CheckPreInput(COMBO::ATTACK02);
-
-	//アニメーション終了時に待機状態へ遷移
-	if (model->GetIsEndAnimation())
-	{
-		attackParam.isAttack = false;
-		TransitionIdleState();
-	}
-
-	//移動入力
-	InputMove(elapsedTime, param.attackMoveSpeed, 1);
-
-	//回避入力
-	InputBoost();
-
-	//速力更新
-	UpdateVelocity(elapsedTime, position);
-}
-
-void PLAYER::UpdateCombo_01_03_State(float elapsedTime)
-{
-	//先行入力チェックと攻撃当たり判定のオンオフ
-	CheckPreInput(COMBO::ATTACK03);
-
-	//アニメーション終了時に待機状態へ遷移
-	if (model->GetIsEndAnimation())
-	{
-		TransitionIdleState();
-		attackParam.isAttack = false;
-
-	}
-	//移動入力
-	InputMove(elapsedTime, param.attackMoveSpeed, 1);
-
-	//回避入力
 	InputBoost();
 
 	//速力更新

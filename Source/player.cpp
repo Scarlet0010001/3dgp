@@ -88,19 +88,18 @@ void PLAYER::Initialize()
 	TransitionIdleState();
 
 	//コンボ01のフレーム初期化
-	attackFlameParam[ToInt(COMBO::ATTACK01)].startFlame = 0.023f;
-	attackFlameParam[ToInt(COMBO::ATTACK01)].endFlame = 0.15f;
-	attackFlameParam[ToInt(COMBO::ATTACK01)].preInputFlame = 0.173f;
-	
+	attackFlameParam[ToInt(COMBO::ATTACK01)].startFlame		= ATTACK01_START;
+	attackFlameParam[ToInt(COMBO::ATTACK01)].endFlame		= ATTACK01_END;
+	attackFlameParam[ToInt(COMBO::ATTACK01)].preInputFlame	= ATTACK01_PREINPUT;
 	//コンボ02のフレーム初期化
-	attackFlameParam[ToInt(COMBO::ATTACK02)].startFlame = 0.03f;
-	attackFlameParam[ToInt(COMBO::ATTACK02)].endFlame = 0.175f;
-	attackFlameParam[ToInt(COMBO::ATTACK02)].preInputFlame = 0.2f;
+	attackFlameParam[ToInt(COMBO::ATTACK02)].startFlame		= ATTACK02_START;
+	attackFlameParam[ToInt(COMBO::ATTACK02)].endFlame		= ATTACK02_END;
+	attackFlameParam[ToInt(COMBO::ATTACK02)].preInputFlame	= ATTACK02_PREINPUT;
 	
 	//コンボ03のフレーム初期化
-	attackFlameParam[ToInt(COMBO::ATTACK03)].startFlame = 0.325f;
-	attackFlameParam[ToInt(COMBO::ATTACK03)].endFlame = 0.65f;
-	attackFlameParam[ToInt(COMBO::ATTACK03)].preInputFlame = 1.0f;
+	attackFlameParam[ToInt(COMBO::ATTACK03)].startFlame		= ATTACK03_START;
+	attackFlameParam[ToInt(COMBO::ATTACK03)].endFlame		= ATTACK03_END;
+	attackFlameParam[ToInt(COMBO::ATTACK03)].preInputFlame	= ATTACK03_PREINPUT;
 
 	// 被ダメージ時の処理を設定
 	damagedFunction = [=](int damage, float invincible, WINCE_TYPE type)->bool {return ApplyDamage(damage, invincible, type); };
@@ -136,7 +135,7 @@ void PLAYER::Update(float elapsedTime)
 	}
 
 	//プレイヤーの正面情報を更新
-	forward = Math::get_posture_forward(orientation);
+	forward = Math::GetPostureForward(orientation);
 	
 	//-----------------無敵時間の更新-----------------//
 	UpdateInvicibleTimer(elapsedTime);
@@ -172,7 +171,7 @@ void PLAYER::Update(float elapsedTime)
 	if (camera->GetLockOn())
 	{
 		ui->SetLockonPosition(bossPosition);
-		ui->SetLockonDistance(Math::calc_vector_AtoB_length(position, bossPosition));
+		ui->SetLockonDistance(Math::CalcVectorAtoBLength(position, bossPosition));
 	}
 	ui->Update(elapsedTime);
 }
@@ -183,7 +182,7 @@ void PLAYER::Render_f(float elapsedTime)
 	Graphics& graphics = Graphics::Instance();
 
 	//自機モデルのトランスフォームを更新（ワールド行列を計算）
-	transform = Math::calc_world_matrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
+	transform = Math::CalcWorldMatrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 
 	//アニメーションの遷移チェック
 	if (playerAnimation_transition != playerAnimation)
@@ -628,12 +627,12 @@ void PLAYER::InputShot()
 	if (!camera->GetLockOn())
 	{
 		// プレイヤーの向いている方向を取得
-		dir = Math::get_posture_forward(transform);
+		dir = Math::GetPostureForward(transform);
 	}
 	else
 	{
 		// ロックオン対象（ボス）に向かう方向を計算
-		dir = Math::calc_vector_AtoB_normalize(pos, bossPosition);
+		dir = Math::CalcVectorAtoBNormalize(pos, bossPosition);
 	}
 
 	// 直線弾（BulletStraight）の生成
@@ -696,10 +695,10 @@ void PLAYER::CheckPreInput(COMBO combo)
 		switch (combo)
 		{
 		case PLAYER::COMBO::ATTACK01:
-			TransitionCombo_01_02_State();
+			TransitionCombo02State();
 			break;
 		case PLAYER::COMBO::ATTACK02:
-			TransitionCombo_01_03_State();
+			TransitionCombo03State();
 			break;
 		case PLAYER::COMBO::ATTACK03:
 			//最後のコンボだから偏移しない
@@ -713,7 +712,6 @@ void PLAYER::CheckPreInput(COMBO combo)
 	{
 		attackParam.isAttack = false;
 	}
-
 }
 
 void PLAYER::OnDead()
@@ -946,6 +944,7 @@ void PLAYER::SaveDataFile()
 		o_archive(param);  // paramのデータをシリアライズして保存
 	}
 }
+
 void PLAYER::DebugPrimitiveUpdate()
 {
 	//デバッグレンダラーのインスタンスを取得
@@ -967,11 +966,11 @@ void PLAYER::DebugPrimitiveUpdate()
 				DirectX::XMFLOAT3 Saber{ saber };
 
 				//方向ベクトルと距離を計算
-				DirectX::XMFLOAT3 direction = Math::calc_vector_AtoB_normalize(Arm, Saber);
-				float length = Math::calc_vector_AtoB_length(Arm, Saber);
+				DirectX::XMFLOAT3 direction = Math::CalcVectorAtoBNormalize(Arm, Saber);
+				float length = Math::CalcVectorAtoBLength(Arm, Saber);
 
 				//腕から見てサーベルまでの中間点（攻撃位置の中心）を返す
-				return Math::calc_designated_point(Arm, direction, length * 0.5f);
+				return Math::CalcDesignatedPoint(Arm, direction, length * 0.5f);
 		} };
 
 		//サーベルの衝突判定位置を計算
@@ -1002,7 +1001,7 @@ void PLAYER::DebugGUI()
 #ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-	imguiMenuBar("Character", "player", displayPlayerImgui);
+	ImguiMenuBar("Character", "player", displayPlayerImgui);
 
 	if (displayPlayerImgui)
 	{
@@ -1019,7 +1018,7 @@ void PLAYER::DebugGUI()
 				ImGui::DragFloat3("Scale", &scale.x);
 				//回転
 				DirectX::XMFLOAT3 forward;
-				DirectX::XMStoreFloat3(&forward, Math::get_posture_forward_vec(orientation));
+				DirectX::XMStoreFloat3(&forward, Math::GetPostureForwardVec(orientation));
 				ImGui::DragFloat3("forward", &forward.x);
 				ImGui::DragFloat4("ori", &orientation.x);
 				std::string state_name;

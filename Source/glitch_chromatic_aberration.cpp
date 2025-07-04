@@ -49,7 +49,7 @@ void Glitch_CA::DebugGUI()
 #ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-	imguiMenuBar("Glitch", "Chromatic Aberration", displayGlitch_CA_Imgui);
+	ImguiMenuBar("Glitch", "Chromatic Aberration", displayGlitch_CA_Imgui);
 
 	if (displayGlitch_CA_Imgui)
 	{

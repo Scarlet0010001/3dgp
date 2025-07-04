@@ -9,6 +9,15 @@
 #include "device.h"
 #include "effect_manager.h"
 
+
+#if _DEBUG
+const bool MOUSE_SHOW{ true };
+const bool IMGUI_SAVE{ true };
+#else
+const bool MOUSE_SHOW{ false };
+const bool IMGUI_SAVE{ false };
+#endif
+
 framework::framework(HWND hwnd) : hwnd(hwnd)
 {
 }
@@ -16,7 +25,7 @@ framework::framework(HWND hwnd) : hwnd(hwnd)
 bool framework::Initialize()
 {
 	Graphics::Instance().Initialize(hwnd);
-	Device::Instance().GetMouse().Set_do_show(false);
+	Device::Instance().GetMouse().Set_do_show(MOUSE_SHOW);
 	SceneManager::Instance().ChangeScene(new SceneTitle());
 
 	// エフェクトマネージャー初期化
@@ -49,14 +58,6 @@ void framework::Update(float elapsedTime/*Elapsed seconds from last frame*/)
 	SceneManager::Instance().Update(elapsedTime);
 	Graphics::Instance().DebugGui();
 
-	//デバッグモード切り替え
-	if (device.GetMouse().GetButton() & device.GetMouse().BTN_F2)
-	{
-		isDebug = !isDebug;
-		device.GetMouse().Set_do_show(isDebug);
-		//Graphics::Instance().SetisDisplayDebug(isDebug);
-	}
-
 #ifdef USE_IMGUI
 #endif
 }
@@ -67,8 +68,6 @@ void framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	//同時アクセスしないように排他制御する
 	Graphics& graphics = Graphics::Instance();
 	std::lock_guard<std::mutex> lock(graphics.GetMutex());
-
-	//HRESULT hr{ S_OK };
 
 	ID3D11RenderTargetView* null_render_target_views[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
 	graphics.Get_DC()->OMSetRenderTargets(_countof(null_render_target_views), null_render_target_views, 0);
@@ -144,6 +143,13 @@ int framework::run()
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX11_Init(graphics.GetDevice().Get(), graphics.Get_DC().Get());
 	ImGui::StyleColorsDark();
+
+	//ReleaseならImguiの設定ファイルを保存しない
+	if (!IMGUI_SAVE)
+	{
+		ImGui::GetIO().IniFilename = NULL;
+	}
+
 #endif
 
 	while (WM_QUIT != msg.message)

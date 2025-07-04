@@ -44,7 +44,7 @@ void RadialBlur::DebugGUI()
 #ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-	imguiMenuBar("Blur", "radial_blur", displayRadialBlurImgui);
+	ImguiMenuBar("Blur", "radial_blur", displayRadialBlurImgui);
 
 	if (displayRadialBlurImgui)
 	{

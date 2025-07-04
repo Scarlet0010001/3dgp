@@ -94,7 +94,7 @@ void PlayerHpGauge::DebugGUI()
 #ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-	imguiMenuBar("UI", "PlayerHP", displayImgui);
+	ImguiMenuBar("UI", "PlayerHP", displayImgui);
 
 	if (displayImgui)
 	{
@@ -142,7 +142,7 @@ void PlayerBoostGauge::DebugGUI()
 #ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-	imguiMenuBar("UI", "PlayerBoost", displayImgui);
+	ImguiMenuBar("UI", "PlayerBoost", displayImgui);
 
 	if (displayImgui)
 	{
@@ -189,7 +189,7 @@ void PlayerLockon::DebugGUI()
 #ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-	imguiMenuBar("UI", "Lockon", displayImgui);
+	ImguiMenuBar("UI", "Lockon", displayImgui);
 
 	if (displayImgui)
 	{

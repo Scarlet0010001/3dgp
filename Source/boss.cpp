@@ -138,7 +138,7 @@ void Boss::Render_f(float elapsedTime)
 	Graphics& graphics = Graphics::Instance();
 
 	//ボスモデルのトランスフォーム更新（スケール、姿勢、位置を基にワールド行列を計算）
-	transform = Math::calc_world_matrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
+	transform = Math::CalcWorldMatrix(scale, orientation, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 
 	//アニメーションの遷移チェック
 	if (bossAnimation_transition != bossAnimation)
@@ -154,7 +154,6 @@ void Boss::Render_f(float elapsedTime)
 		bossAnimation_transition = bossAnimation;
 		transitionState = TRANSITION_STATE::START;
 	}
-
 
 	//現在のアニメーションがループするか判定
 	bool isLoop = FindLoopAnimation(bossAnimation);
@@ -253,7 +252,7 @@ void Boss::ShotBullet(ATTACK_TYPE type)
 		model->fech_by_bone(ToInt(bossAnimation), time, transform, turretNode, shotPos);
 		
 		//ターゲット方向へのベクトルを計算
-		DirectX::XMFLOAT3 dir = Math::calc_vector_AtoB_normalize(shotPos,
+		DirectX::XMFLOAT3 dir = Math::CalcVectorAtoBNormalize(shotPos,
 			{ targetPointPos.x, targetPointPos.y + targetPointHeight, targetPointPos.z });
 
 		//直進弾を生成
@@ -294,7 +293,7 @@ void Boss::CalcAttack_vs_Player(Capsule capsule_collider, float collider_height,
 float Boss::CalcMoveSpeed(DirectX::XMFLOAT3 target, float time)
 {
 	//現在位置から目標地点までの距離を計算
-	float direction = Math::calc_vector_AtoB_length(position, target);
+	float direction = Math::CalcVectorAtoBLength(position, target);
 	
 	//指定された時間内に移動するための速度を返す
 	return direction / time;
@@ -414,7 +413,7 @@ bool Boss::FindLoopAnimation(BOSS_ANIMATION BA)
 void Boss::DebugDUI()
 {
 #if USE_IMGUI
-	imguiMenuBar("Character", "boss", displayImgui);
+	ImguiMenuBar("Character", "boss", displayImgui);
 	if (displayImgui)
 	{
 		if (ImGui::Begin("Boss", nullptr, ImGuiWindowFlags_None))

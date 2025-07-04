@@ -72,14 +72,12 @@ void SceneGame::Initialize()
    
     IBL_constant = std::make_unique<Constants<IBL_constants>>(Graphics::Instance().GetDevice().Get());
     create_ps_from_cso(graphics.GetDevice().Get(), "Shader/tone_map_ps.cso", toneMapPixelShader.GetAddressOf());
-
 }
 
 void SceneGame::Finalize()
 {
     //ステージ初期化
     StageManager::Instance().Clear();
-
 }
 
 void SceneGame::Update(float elapsedTime)
@@ -107,7 +105,7 @@ void SceneGame::Update(float elapsedTime)
         return;
     }
 
-    //**********カメラの更新**********//
+    //-----------------カメラの更新-----------------//
     camera->SetTrakkingTarget(player->GetGazingPoint());
     camera->SetPlayerOrientation(player->GetOrientation());
     camera->SetLockOnTarget(boss->GetPosition());
@@ -127,19 +125,19 @@ void SceneGame::Update(float elapsedTime)
         return;
     }
 
-    //**********プレイヤーの更新**********//
+    //-----------------プレイヤーの更新-----------------//
     player->Update(elapsedTime);
     player->SetBossPosition(boss->GetTargetPosition());
 
-    //**********ボスの更新**********//
+    //-----------------ボスの更新-----------------//
     boss->SetLocationOfAttackTarget(player->GetPosition());
     boss->SetAttackTargetHeight(player->GetHeight());
     boss->Update(elapsedTime);
 
-    //**********弾の更新**********//
+    //-----------------弾の更新-----------------//
     bulletManager.Update(elapsedTime);
 
-    //**********ステージの更新**********//
+    //-----------------ステージの更新-----------------//
     StageManager::Instance().Update(elapsedTime);
     
     //当たり判定
@@ -155,7 +153,7 @@ void SceneGame::Update(float elapsedTime)
         glitch_CA->glitch_CA_constant->DataSet(player->GetGlitch_CA());
     }
 
-    //**********エフェクトの更新**********//
+    //-----------------エフェクトの更新-----------------//
     EffectManager::Instance().Update(elapsedTime);
 
     //色収差タイマーが20フレーム以上にならないようにセット
@@ -321,7 +319,7 @@ void SceneGame::Render(float elapsedTime)
         glitch_CA->DebugGUI();
         LightManager::Instance().DebugGUI();
 
-        imguiMenuBar("Game", "game_menu", displayImgui);
+        ImguiMenuBar("Game", "game_menu", displayImgui);
         if (displayImgui)
         {
             if (ImGui::Button("back_title"))
@@ -332,7 +330,7 @@ void SceneGame::Render(float elapsedTime)
             };
         }
 
-        imguiMenuBar("Game", "IBL", IBLImgui);
+        ImguiMenuBar("Game", "IBL", IBLImgui);
         if (IBLImgui)
         {
             if (ImGui::Begin("IBL", nullptr, ImGuiWindowFlags_None))

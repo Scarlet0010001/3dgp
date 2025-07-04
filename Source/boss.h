@@ -284,7 +284,7 @@ private:
 	//攻撃関連
 	const float ATTACK_ACTION_LENGTH = 17;		//通常攻撃の射程
 	const float NORMAL_ATTACK_COOLTIME = 1;		//通常攻撃のクールタイム
-	const float ATTACK_RESPONDER_TIME = 2.0f;	//近距離以上の射程時の判定時間
+	const float ATTACK_RESPONDER_TIME = 0.5f;	//近距離以上の射程時の判定時間
 
 	//連射関連
 	const int RAPID_MAX = 10;					//最大連射回数

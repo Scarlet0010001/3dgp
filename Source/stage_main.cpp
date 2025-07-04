@@ -15,7 +15,7 @@ StageMain::StageMain()
     
     animeTimer = 0.0f;
     animatedNodes = model->nodes;
-	transform = Math::calc_world_matrix(scale, angle, position, Math::COORDINATE_SYSTEM::RHS_YUP);
+	transform = Math::CalcWorldMatrix(scale, angle, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 
 }
 
@@ -25,7 +25,7 @@ StageMain::~StageMain()
 
 void StageMain::Update(float elapsedTime)
 {
-    transform = Math::calc_world_matrix(scale, angle, position, Math::COORDINATE_SYSTEM::RHS_YUP);
+    transform = Math::CalcWorldMatrix(scale, angle, position, Math::COORDINATE_SYSTEM::RHS_YUP);
 
 }
 
@@ -43,7 +43,7 @@ void StageMain::Render(float elapsedTime)
 void StageMain::DebugDUI()
 {
 #if USE_IMGUI
-	imguiMenuBar("Stage", "stage_main", displayImgui);
+	ImguiMenuBar("Stage", "stage_main", displayImgui);
 	if (displayImgui)
 	{
 

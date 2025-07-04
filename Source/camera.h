@@ -144,9 +144,9 @@ public:
     //視点取得
     const DirectX::XMFLOAT3& GetEye()const { return eye; }
     //前方向取得
-    const DirectX::XMFLOAT3& GetForward()const { return Math::get_posture_forward(orientation); }
+    const DirectX::XMFLOAT3& GetForward()const { return Math::GetPostureForward(orientation); }
     //右方向取得
-    const DirectX::XMFLOAT3& GetRight()const { return Math::get_posture_right(orientation); }
+    const DirectX::XMFLOAT3& GetRight()const { return Math::GetPostureRight(orientation); }
     //クォータニオン取得
     const DirectX::XMFLOAT4& GetOrientation()const { return orientation; }
 

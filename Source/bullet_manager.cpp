@@ -254,7 +254,7 @@ void BulletManager::DebugGUI()
 #ifdef USE_IMGUI
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-    imguiMenuBar("Bullet", "PLAYER", displayPlayerImgui);
+    ImguiMenuBar("Bullet", "PLAYER", displayPlayerImgui);
 
     if (displayPlayerImgui)
     {
@@ -296,7 +296,7 @@ void BulletManager::DebugGUI()
         }
         ImGui::End();
     }
-    imguiMenuBar("Bullet", "ENEMY", displayBossImgui);
+    ImguiMenuBar("Bullet", "ENEMY", displayBossImgui);
     if (displayBossImgui)
     {
         if (ImGui::Begin("EnemyBullet", nullptr, ImGuiWindowFlags_None))

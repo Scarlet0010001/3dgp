@@ -194,9 +194,9 @@ private:
 	void TransitionLandingState();		//着地
 
 	void TransitionShotState();			//射撃
-	void TransitionCombo_01_01_State();	//近接コンボ１
-	void TransitionCombo_01_02_State();	//近接コンボ２
-	void TransitionCombo_01_03_State();	//近接コンボ３
+	void TransitionCombo01State();		//近接コンボ１
+	void TransitionCombo02State();		//近接コンボ２
+	void TransitionCombo03State();		//近接コンボ３
 
 	void TransitionDamageState();		//ダメージ
 	void TransitionDeadState();			//死亡
@@ -212,9 +212,7 @@ private:
 	void UpdateLandingState(float elapsedTime);			//着地
 
 	void UpdateShotState(float elapsedTime);			//射撃
-	void UpdateCombo_01_01_State(float elapsedTime);	//近接コンボ１
-	void UpdateCombo_01_02_State(float elapsedTime);	//近接コンボ２
-	void UpdateCombo_01_03_State(float elapsedTime);	//近接コンボ３
+	void UpdateComboState(float elapsedTime);			//近接コンボ
 
 	void UpdateDamageState(float elapsedTime);			//ダメージ
 	void UpdateDeadState(float elapsedTime);			//死亡
@@ -424,6 +422,25 @@ public:
 	
 private:
 	//--------------------定数--------------------------//
+	
+	//コンボ攻撃の時間定数
+	//START	　：攻撃フラグ開始フレーム
+	//END	　：攻撃フラグ終了フレーム
+	//PREINPUT：先行入力があれば偏移開始するフレーム
+
+	//コンボ01
+	const float ATTACK01_START = 0.023f;
+	const float ATTACK01_END = 0.15f;
+	const float ATTACK01_PREINPUT = 0.173f;
+	//コンボ02
+	const float ATTACK02_START = 0.03f;
+	const float ATTACK02_END = 0.175f;
+	const float ATTACK02_PREINPUT = 0.2f;
+	//コンボ03
+	const float ATTACK03_START = 0.325f;
+	const float ATTACK03_END = 0.65f;
+	const float ATTACK03_PREINPUT = 1.0f;
+
 	//着地ステートに偏移する速度
 	const float LANDING_SPEED = 30.0f;
 
@@ -453,6 +470,9 @@ private:
 	
 	//射撃音のボリューム
 	const float SOUND_VOLUME_LASER = 0.3f;
+
+	//サーベル音のボリューム
+	const float SOUND_VOLUME_SABER = 1.0f;
 
 	//被弾音のボリューム
 	const float SOUND_VOLUME_DAMAGE = 0.5f;

@@ -200,7 +200,6 @@
     <ClCompile Include="Source\boss_action.cpp" />
     <ClCompile Include="Source\Boss_UI.cpp" />
     <ClCompile Include="Source\bullet.cpp" />
-    <ClCompile Include="Source\bullet_homing.cpp" />
     <ClCompile Include="Source\bullet_manager.cpp" />
     <ClCompile Include="Source\bullet_straight.cpp" />
     <ClCompile Include="Source\camera.cpp" />
@@ -257,7 +256,6 @@
     <ClInclude Include="Source\boss.h" />
     <ClInclude Include="Source\Boss_UI.h" />
     <ClInclude Include="Source\bullet.h" />
-    <ClInclude Include="Source\bullet_homing.h" />
     <ClInclude Include="Source\bullet_manager.h" />
     <ClInclude Include="Source\bullet_straight.h" />
     <ClInclude Include="Source\camera.h" />

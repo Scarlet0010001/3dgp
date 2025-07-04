@@ -355,7 +355,7 @@ bool CollisionMesh::RayCast(DirectX::XMFLOAT3 ray_start,
 							//もう一度ここで距離を計算しなおすかワールドに戻す
 							//closest_distance = t;
 							//hit.distance = closest_distance;
-							hit.distance = Math::calc_vector_AtoB_length(ray_start, hit.position);
+							hit.distance = Math::CalcVectorAtoBLength(ray_start, hit.position);
 							hit.meshName = mesh.name;
 							hit.materialName = subset.material_name;
 							if (skip_if)

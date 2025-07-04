@@ -276,9 +276,6 @@
     <ClCompile Include="Source\glitch_chromatic_aberration.cpp">
       <Filter>Sources\Glitch</Filter>
     </ClCompile>
-    <ClCompile Include="Source\bullet_homing.cpp">
-      <Filter>Sources\Bullet</Filter>
-    </ClCompile>
     <ClCompile Include="Source\effect_manager.cpp">
       <Filter>Sources\Effect</Filter>
     </ClCompile>
@@ -478,9 +475,6 @@
     </ClInclude>
     <ClInclude Include="Source\glitch_chromatic_aberration.h">
       <Filter>Sources\Glitch</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\bullet_homing.h">
-      <Filter>Sources\Bullet</Filter>
     </ClInclude>
     <ClInclude Include="Source\effect_manager.h">
       <Filter>Sources\Effect</Filter>

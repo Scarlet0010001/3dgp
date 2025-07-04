@@ -74,7 +74,7 @@ void LightManager::Draw(ID3D11ShaderResourceView** rtv, int rtv_num)
 
 void LightManager::DebugGUI()
 {
-	imguiMenuBar("Lights", "Light", displayImgui);
+	ImguiMenuBar("Lights", "Light", displayImgui);
 	if (displayImgui)
 	{
 #if CAST_SHADOW

@@ -192,7 +192,7 @@ void Camera::UpdateWithTracking(float elapsedTime)
 
     // カメラ回転値を回転行列に変換
     // XMVECTORクラスへ変換
-    DirectX::XMFLOAT3 forward = Math::get_posture_forward(orientation);
+    DirectX::XMFLOAT3 forward = Math::GetPostureForward(orientation);
 
     // レイキャスト(ターゲットと壁)
     DirectX::XMFLOAT3 ray_target = trakkingTarget + DirectX::XMFLOAT3{ 0,-0.5,0 };//めり込まないよう少し下に下げる
@@ -221,10 +221,10 @@ void Camera::UpdateWithLockOn(float elapsedTime)
 // カメラの現在位置から、目標座標への方向を求める
     DirectX::XMFLOAT3 dir = lockOnTarget - eye;
     DirectX::XMVECTOR TargetVecNorm = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&dir));
-    DirectX::XMVECTOR Forward = Math::get_posture_forward_vec(orientation);
+    DirectX::XMVECTOR Forward = Math::GetPostureForwardVec(orientation);
     DirectX::XMVECTOR Up = { 0.0f,1.0f,0.0f };
     DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
-    DirectX::XMVECTOR Right = Math::get_posture_right_vec(orientation);
+    DirectX::XMVECTOR Right = Math::GetPostureRightVec(orientation);
 
     DirectX::XMFLOAT3 forward{};//forwardの値をfloat3に
     DirectX::XMFLOAT3 up{};//forwardの値をfloat3に
@@ -317,7 +317,7 @@ void Camera::UpdateWithWing(float elapsedTime)
 
     // カメラ回転値を回転行列に変換
     // XMVECTORクラスへ変換
-    DirectX::XMFLOAT3 forward = Math::get_posture_forward(playerOrientation);
+    DirectX::XMFLOAT3 forward = Math::GetPostureForward(playerOrientation);
 
     // レイキャスト(ターゲットと壁)
     DirectX::XMFLOAT3 ray_target = trakkingTarget + DirectX::XMFLOAT3{ 0,-0.5,0 };//めり込まないよう少し下に下げる
@@ -358,9 +358,9 @@ void Camera::ControlByGamePadStick(float elapsedTime)
     // XMVECTORクラスへ変換
     DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
 
-    DirectX::XMVECTOR forward = Math::get_posture_forward_vec(orientation);
+    DirectX::XMVECTOR forward = Math::GetPostureForwardVec(orientation);
     DirectX::XMVECTOR up = { 0,1,0 };//カメラのY軸は常に（0,1,0）とする
-    DirectX::XMVECTOR right = Math::get_posture_right_vec(orientation);
+    DirectX::XMVECTOR right = Math::GetPostureRightVec(orientation);
 
     //縦回転
     {
@@ -399,9 +399,9 @@ void Camera::ControlByGamePadStick(float elapsedTime)
 
     //向きすぎと判断する値
     const float overdirection = 0.4f;
-    if (Math::get_posture_up(orientation).y < overdirection)
+    if (Math::GetPostureUp(orientation).y < overdirection)
     {
-        if (Math::get_posture_forward(orientation).y < 0.0f)
+        if (Math::GetPostureForward(orientation).y < 0.0f)
         {
             float correction_rate = -5.0f;
             DirectX::XMVECTOR correct_angles_axis = DirectX::XMQuaternionRotationAxis(right, DirectX::XMConvertToRadians(correction_rate));
@@ -474,9 +474,9 @@ void Camera::ControlByMouse(float elapsedTime)
         // XMVECTORクラスへ変換
         DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
 
-        DirectX::XMVECTOR forward = Math::get_posture_forward_vec(orientation);
+        DirectX::XMVECTOR forward = Math::GetPostureForwardVec(orientation);
         DirectX::XMVECTOR up = { 0,1,0 };//カメラのY軸は常に（0,1,0）とする
-        DirectX::XMVECTOR right = Math::get_posture_right_vec(orientation);
+        DirectX::XMVECTOR right = Math::GetPostureRightVec(orientation);
 
         //縦回転
         {
@@ -515,9 +515,9 @@ void Camera::ControlByMouse(float elapsedTime)
 
         //向きすぎと判断する値
         const float overdirection = 0.4f;
-        if (Math::get_posture_up(orientation).y < overdirection)
+        if (Math::GetPostureUp(orientation).y < overdirection)
         {
-            if (Math::get_posture_forward(orientation).y < 0.0f)
+            if (Math::GetPostureForward(orientation).y < 0.0f)
             {
                 float correction_rate = -5.0f;
                 DirectX::XMVECTOR correct_angles_axis = DirectX::XMQuaternionRotationAxis(right, DirectX::XMConvertToRadians(correction_rate));
@@ -574,9 +574,9 @@ void Camera::CameraShakeUpdate(float elapsedTime)
 
         //揺らす処理
         {
-            DirectX::XMVECTOR forward = Math::get_posture_forward_vec(standardOrientation);
+            DirectX::XMVECTOR forward = Math::GetPostureForwardVec(standardOrientation);
             DirectX::XMVECTOR up = { 0,1,0 };
-            DirectX::XMVECTOR right = Math::get_posture_right_vec(standardOrientation);
+            DirectX::XMVECTOR right = Math::GetPostureRightVec(standardOrientation);
 
             //縦回転
             if (Y_shake > 0)
@@ -659,7 +659,7 @@ void Camera::CalcViewProjection(float elapsedTime)
 void Camera::DebugGui()
 {
 #ifdef USE_IMGUI
-    imguiMenuBar("Camera", "main_camera", displayCameraImgui);
+    ImguiMenuBar("Camera", "main_camera", displayCameraImgui);
 
     if (displayCameraImgui)
     {
@@ -707,9 +707,9 @@ void Camera::DebugGui()
 
             ImGui::DragFloat("range", &range, 0.2f);
             DirectX::XMFLOAT3 a = { DirectX::XMConvertToDegrees(angle.x),DirectX::XMConvertToDegrees(angle.y),DirectX::XMConvertToDegrees(angle.z) };
-            DirectX::XMFLOAT3 up = Math::get_posture_up(orientation);
-            DirectX::XMFLOAT3 forward = Math::get_posture_forward(orientation);
-            DirectX::XMFLOAT3 right = Math::get_posture_forward(orientation);
+            DirectX::XMFLOAT3 up = Math::GetPostureUp(orientation);
+            DirectX::XMFLOAT3 forward = Math::GetPostureForward(orientation);
+            DirectX::XMFLOAT3 right = Math::GetPostureForward(orientation);
             ImGui::DragFloat2("angle", &a.x, 0.1f);
             ImGui::DragFloat3("up", &up.x, 0.1f);
             ImGui::DragFloat3("forward", &forward.x, 0.1f);

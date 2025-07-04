@@ -110,8 +110,8 @@ void Character::Turn(float elapsedTime, DirectX::XMFLOAT3 move_vec, float speed,
 	
 
 	//現在の姿勢から上方向・前方向ベクトルを取得
-	DirectX::XMVECTOR up = Math::get_posture_up_vec(orien);
-	DirectX::XMVECTOR forward = Math::get_posture_forward_vec(orien);
+	DirectX::XMVECTOR up = Math::GetPostureUpVec(orien);
+	DirectX::XMVECTOR forward = Math::GetPostureForwardVec(orien);
 
 	//正規化
 	up = DirectX::XMVector3Normalize(up);
@@ -275,7 +275,7 @@ void Character::UpdateVerticalMove(float elapsedTime, DirectX::XMFLOAT3& positio
 		DirectX::XMVECTOR OrientationVec = DirectX::XMLoadFloat4(&orientation);
 
 		//上ベクトル
-		DirectX::XMVECTOR up = Math::get_posture_up_vec(orientation);
+		DirectX::XMVECTOR up = Math::GetPostureUpVec(orientation);
 		//法線のベクトル
 		DirectX::XMVECTOR Normal = DirectX::XMLoadFloat3(&slopeNormal);
 		Normal = DirectX::XMVector3Normalize(Normal);

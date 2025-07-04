@@ -70,17 +70,18 @@ void Mouse::UpdateCursor(HWND hwnd)
 	GetCursorPos(&point);           // スクリーン座標を取得する
 	ScreenToClient(hwnd, &point);   // クライアント座標に変換する
 	oldCursorPosition = cursorPosition;
-	cursorPosition.x = (float)point.x - 15.0f;
-	cursorPosition.y = (float)point.y - 15.0f;
-	//cursorPosition.x = (float)point.x;
-	//cursorPosition.y = (float)point.y;
+	//cursorPosition.x = (float)point.x - 15.0f;
+	//cursorPosition.y = (float)point.y - 15.0f;
+	cursorPosition.x = (float)point.x;
+	cursorPosition.y = (float)point.y;
 
 	//　カーソルの範囲
 	cursorPosition.x = std::clamp(cursorPosition.x, 0.0f, static_cast<float>(SCREEN_WIDTH));
 	cursorPosition.y = std::clamp(cursorPosition.y, 0.0f, static_cast<float>(SCREEN_HEIGHT));
 	
 	if(isFixedCursor)
-		SetCursorPos((SCREEN_WIDTH / 2) + 24.0f, (SCREEN_HEIGHT / 2) + 53.0f);
+		SetCursorPos((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2));
+		//SetCursorPos((SCREEN_WIDTH / 2) + 24.0f, (SCREEN_HEIGHT / 2) + 53.0f);
 
 	// マウスの操作
 	switch (state)

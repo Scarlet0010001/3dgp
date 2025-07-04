@@ -104,7 +104,7 @@ namespace Math
     //--------------------------------------------------------------
     // 戻り値：ワールド行列
     //--------------------------------------------------------------
-    inline auto calc_world_matrix(const DirectX::XMFLOAT3& scale,
+    inline auto CalcWorldMatrix(const DirectX::XMFLOAT3& scale,
         const DirectX::XMFLOAT3& rotate, const DirectX::XMFLOAT3& trans, COORDINATE_SYSTEM coordinate_system = RHS_YUP)
     {
         DirectX::XMMATRIX C{ DirectX::XMLoadFloat4x4(&conversion_coordinate_system(coordinate_system, 1.0f)) };
@@ -120,7 +120,7 @@ namespace Math
     //--------------------------------------------------------------
     // 戻り値：親子関係を考慮したワールド行列
     //--------------------------------------------------------------
-    inline auto calc_world_matrix(const DirectX::XMFLOAT3& parent_scale,
+    inline auto CalcWorldMatrix(const DirectX::XMFLOAT3& parent_scale,
         const DirectX::XMFLOAT3& parent_rotate, const DirectX::XMFLOAT3& parent_trans,
         const DirectX::XMFLOAT3& child_scale, const DirectX::XMFLOAT3& child_rotate,
         const DirectX::XMFLOAT3& child_trans, COORDINATE_SYSTEM coordinate_system = RHS_YUP)
@@ -142,7 +142,7 @@ namespace Math
         return world;
     }
 
-    inline auto calc_world_matrix(const DirectX::XMFLOAT4X4 parent_world_matrix,
+    inline auto CalcWorldMatrix(const DirectX::XMFLOAT4X4 parent_world_matrix,
         const DirectX::XMFLOAT3& child_scale, const DirectX::XMFLOAT3& child_rotate,
         const DirectX::XMFLOAT3& child_trans, COORDINATE_SYSTEM coordinate_system = RHS_YUP)
     {
@@ -165,7 +165,7 @@ namespace Math
     //--------------------------------------------------------------
     // 戻り値：ワールド行列
     //--------------------------------------------------------------
-    inline auto calc_world_matrix(const DirectX::XMFLOAT3& scale,
+    inline auto CalcWorldMatrix(const DirectX::XMFLOAT3& scale,
         const DirectX::XMFLOAT4& orien, const DirectX::XMFLOAT3& trans,
         COORDINATE_SYSTEM coordinate_system = RHS_YUP)
     {
@@ -183,7 +183,7 @@ namespace Math
     //--------------------------------------------------------------
     // 戻り値：親子関係を考慮したワールド行列
     //--------------------------------------------------------------
-    inline auto calc_world_matrix(const DirectX::XMFLOAT3& parent_scale,
+    inline auto CalcWorldMatrix(const DirectX::XMFLOAT3& parent_scale,
         const DirectX::XMFLOAT4& parent_orien, const DirectX::XMFLOAT3& parent_trans,
         const DirectX::XMFLOAT3& child_scale, const DirectX::XMFLOAT4& child_orien,
         const DirectX::XMFLOAT3& child_trans, COORDINATE_SYSTEM coordinate_system = RHS_YUP)
@@ -210,7 +210,7 @@ namespace Math
    //--------------------------------------------------------------
    // 戻り値：親子関係を考慮したワールド行列
    //--------------------------------------------------------------
-    inline auto calc_world_matrix(const DirectX::XMFLOAT4X4 parent_world_matrix,
+    inline auto CalcWorldMatrix(const DirectX::XMFLOAT4X4 parent_world_matrix,
         const DirectX::XMFLOAT3& child_scale, const DirectX::XMFLOAT4& child_orien,
         const DirectX::XMFLOAT3& child_trans, COORDINATE_SYSTEM coordinate_system = RHS_YUP)
     {
@@ -229,7 +229,7 @@ namespace Math
     //--------------------------------------------------------------
     //  親子関係を考慮したpositionを算出
     //--------------------------------------------------------------
-    inline auto calc_world_position(const DirectX::XMFLOAT3& parent_pos, const DirectX::XMFLOAT3& child_pos)
+    inline auto CalcWorldPosition(const DirectX::XMFLOAT3& parent_pos, const DirectX::XMFLOAT3& child_pos)
     {
         using namespace DirectX;
         XMMATRIX P_T{ DirectX::XMMatrixTranslation(parent_pos.x, parent_pos.y, parent_pos.z) };
@@ -305,7 +305,7 @@ namespace Math
     //-------------------------------------------------------
     //  戻り値：aからbに向かうベクトル
     //-------------------------------------------------------
-    inline const DirectX::XMVECTOR& calc_vector_AtoB_vec(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
+    inline const DirectX::XMVECTOR& CalcVectorAtoBVec(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
     {
         using namespace DirectX;
         XMVECTOR a_vec = DirectX::XMLoadFloat3(&a);
@@ -313,7 +313,7 @@ namespace Math
         XMVECTOR vec = b_vec - a_vec;
         return vec;
     }
-    inline const DirectX::XMFLOAT3& calc_vector_AtoB(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
+    inline const DirectX::XMFLOAT3& CalcVectorAtoB(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
     {
         using namespace DirectX;
         XMVECTOR a_vec = DirectX::XMLoadFloat3(&a);
@@ -328,7 +328,7 @@ namespace Math
     //-------------------------------------------------------
     //  戻り値：aからbに向かうベクトル
     //-------------------------------------------------------
-    inline const DirectX::XMVECTOR& calc_vector_AtoB(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b)
+    inline const DirectX::XMVECTOR& CalcVectorAtoB(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b)
     {
         using namespace DirectX;
         XMVECTOR a_vec = DirectX::XMLoadFloat2(&a);
@@ -341,15 +341,15 @@ namespace Math
     //--------------------------------------------------------------
     //  戻り値：aからbに向かう正規化されたベクトル
     //--------------------------------------------------------------
-    inline const DirectX::XMVECTOR& calc_vector_AtoB_normalize_vec(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
+    inline const DirectX::XMVECTOR& CalcVectorAtoBNormalizeVec(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
     {
-        return DirectX::XMVector3Normalize(calc_vector_AtoB_vec(a, b));
+        return DirectX::XMVector3Normalize(CalcVectorAtoBVec(a, b));
     }
 
-    inline const DirectX::XMFLOAT3& calc_vector_AtoB_normalize(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
+    inline const DirectX::XMFLOAT3& CalcVectorAtoBNormalize(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
     {
         DirectX::XMFLOAT3 v;
-        DirectX::XMStoreFloat3(&v, DirectX::XMVector3Normalize(calc_vector_AtoB_vec(a, b)));
+        DirectX::XMStoreFloat3(&v, DirectX::XMVector3Normalize(CalcVectorAtoBVec(a, b)));
         return v;
     }
     //--------------------------------------------------------------
@@ -357,19 +357,19 @@ namespace Math
     //--------------------------------------------------------------
     //  戻り値：aからbに向かう正規化されたベクトル
     //--------------------------------------------------------------
-    inline const DirectX::XMVECTOR& calc_vector_AtoB_normalize(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b)
+    inline const DirectX::XMVECTOR& CalcVectorAtoBNormalize(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b)
     {
-        return DirectX::XMVector2Normalize(calc_vector_AtoB(a, b));
+        return DirectX::XMVector2Normalize(CalcVectorAtoB(a, b));
     }
     //--------------------------------------------------------------
     //  二点からベクトルを算出し、その長さを計算する(2乗)
     //--------------------------------------------------------------
     //  戻り値：aからbに向かうベクトルの長さ
     //--------------------------------------------------------------
-    inline float calc_vector_AtoB_length_sq(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
+    inline float CalcVectorAtoBLengthSq(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
     {
         using namespace DirectX;
-        XMVECTOR length_sq_vec = XMVector3LengthSq(calc_vector_AtoB_vec(a, b));
+        XMVECTOR length_sq_vec = XMVector3LengthSq(CalcVectorAtoBVec(a, b));
         float length_sq;
         XMStoreFloat(&length_sq, length_sq_vec);
         return length_sq;
@@ -379,10 +379,10 @@ namespace Math
     //--------------------------------------------------------------
     //  戻り値：aからbに向かうベクトルの長さ
     //--------------------------------------------------------------
-    inline float calc_vector_AtoB_length_sq(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b)
+    inline float CalcVectorAtoBLengthSq(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b)
     {
         using namespace DirectX;
-        XMVECTOR length_sq_vec = XMVector2LengthSq(calc_vector_AtoB(a, b));
+        XMVECTOR length_sq_vec = XMVector2LengthSq(CalcVectorAtoB(a, b));
         float length_sq;
         XMStoreFloat(&length_sq, length_sq_vec);
         return length_sq;
@@ -392,10 +392,10 @@ namespace Math
     //--------------------------------------------------------------
     //  戻り値：aからbに向かうベクトルの長さ
     //--------------------------------------------------------------
-    inline float calc_vector_AtoB_length(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
+    inline float CalcVectorAtoBLength(const DirectX::XMFLOAT3& a, const DirectX::XMFLOAT3& b)
     {
         using namespace DirectX;
-        XMVECTOR length_vec = XMVector3Length(calc_vector_AtoB_vec(a, b));
+        XMVECTOR length_vec = XMVector3Length(CalcVectorAtoBVec(a, b));
         float length;
         XMStoreFloat(&length, length_vec);
         return length;
@@ -405,10 +405,10 @@ namespace Math
     //--------------------------------------------------------------
     //  戻り値：aからbに向かうベクトルの長さ
     //--------------------------------------------------------------
-    inline float calc_vector_AtoB_length(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b)
+    inline float CalcVectorAtoBLength(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b)
     {
         using namespace DirectX;
-        XMVECTOR length_vec = XMVector2Length(calc_vector_AtoB(a, b));
+        XMVECTOR length_vec = XMVector2Length(CalcVectorAtoB(a, b));
         float length;
         XMStoreFloat(&length, length_vec);
         return length;
@@ -418,7 +418,7 @@ namespace Math
     //--------------------------------------------------------------
     //  戻り値：startからdirection方向にlength分進んだ地点
     //--------------------------------------------------------------
-    inline const DirectX::XMFLOAT3& calc_designated_point(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& direction, float length)
+    inline const DirectX::XMFLOAT3& CalcDesignatedPoint(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& direction, float length)
     {
         return { start.x + direction.x * length, start.y + direction.y * length, start.z + direction.z * length };
     }
@@ -427,7 +427,7 @@ namespace Math
     //--------------------------------------------------------------
     //  戻り値：startからdirection方向にlength分進んだ地点
     //--------------------------------------------------------------
-    inline const DirectX::XMFLOAT2& calc_designated_point(const DirectX::XMFLOAT2& start,
+    inline const DirectX::XMFLOAT2& CalcDesignatedPoint(const DirectX::XMFLOAT2& start,
         const DirectX::XMFLOAT2& direction, float length)
     {
         return { start.x + direction.x * length, start.y + direction.y * length };
@@ -437,7 +437,7 @@ namespace Math
     //--------------------------------------------------------------
     //  戻り値：線分 start end と点p0の最近点
     //--------------------------------------------------------------
-    inline const DirectX::XMFLOAT3& calc_closest_point(const DirectX::XMFLOAT3& start,
+    inline const DirectX::XMFLOAT3& CalcClosestPoint(const DirectX::XMFLOAT3& start,
         const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& p0)
     {
         using namespace DirectX;
@@ -448,7 +448,7 @@ namespace Math
         XMStoreFloat(&projection_length, projection_length_vec);
         XMFLOAT3 v0_norm;
         XMStoreFloat3(&v0_norm, XMVector3Normalize(v0_vec));
-        return calc_designated_point(start, v0_norm, projection_length);
+        return CalcDesignatedPoint(start, v0_norm, projection_length);
     }
 
     //--------------------------------------------------------------
@@ -498,7 +498,7 @@ namespace Math
     //--------------------------------------------------------------
     //  逆行列
     //--------------------------------------------------------------
-    inline DirectX::XMFLOAT4X4 get_inv_mat(DirectX::XMFLOAT4X4 m)
+    inline DirectX::XMFLOAT4X4 GetInvMat(DirectX::XMFLOAT4X4 m)
     {
         auto M = DirectX::XMLoadFloat4x4(&m);
 
@@ -598,7 +598,7 @@ namespace Math
     //--------------------------------------------------------------
     //  戻り値：回転後の姿勢
     //--------------------------------------------------------------
-    inline DirectX::XMFLOAT4 rot_quaternion(DirectX::XMFLOAT4 Orientation_, DirectX::XMFLOAT3 Axis_, float Radian_)
+    inline DirectX::XMFLOAT4 RotQuaternion(DirectX::XMFLOAT4 Orientation_, DirectX::XMFLOAT3 Axis_, float Radian_)
     {
 
         if (fabs(Radian_) > 1e-8f)
@@ -624,7 +624,7 @@ namespace Math
    //--------------------------------------------------------------
    //  戻り値：回転後の姿勢
    //--------------------------------------------------------------
-    inline DirectX::XMFLOAT4 rot_quaternion(DirectX::XMFLOAT4 Orientation_, DirectX::XMFLOAT3 Axis_, float Radian_,float elapsed_time,float rate = 10)
+    inline DirectX::XMFLOAT4 RotQuaternion(DirectX::XMFLOAT4 Orientation_, DirectX::XMFLOAT3 Axis_, float Radian_,float elapsed_time,float rate = 10)
     {
         if (fabs(Radian_) > 1e-8f)
         {
@@ -650,7 +650,7 @@ namespace Math
    //--------------------------------------------------------------
    //  戻り値：指定方向への回転後の姿勢
    //--------------------------------------------------------------
-    inline DirectX::XMFLOAT4 rot_quaternion_dir(DirectX::XMFLOAT4 Orientation_, DirectX::XMFLOAT3 OriAxis_, DirectX::XMFLOAT3 DirVec_)
+    inline DirectX::XMFLOAT4 RotQuaternionDir(DirectX::XMFLOAT4 Orientation_, DirectX::XMFLOAT3 OriAxis_, DirectX::XMFLOAT3 DirVec_)
     {
         //法線のベクトル
         DirectX::XMVECTOR ori_axis = DirectX::XMLoadFloat3(&OriAxis_);
@@ -686,7 +686,7 @@ namespace Math
    //--------------------------------------------------------------
    //  クォータニオンから回転行列に変換
    //--------------------------------------------------------------
-    inline void transform_quaternion_to_rotatemat(DirectX::XMFLOAT4X4& m,
+    inline void TransformQuaternionToRotatemat(DirectX::XMFLOAT4X4& m,
         DirectX::XMFLOAT4 q)
     {
         m._11 = 1.0f - 2.0f * q.y * q.y - 2.0f * q.z * q.z;
@@ -710,7 +710,7 @@ namespace Math
    //  引数：変換後のクォータニオン、変換元の回転行列
    //
    //--------------------------------------------------------------
-    inline bool transform_rotatemat_to_quaternion(DirectX::XMFLOAT4& q,
+    inline bool TransformRotatematToQuaternion(DirectX::XMFLOAT4& q,
         DirectX::XMFLOAT4X4 m)
     {
         // 最大成分を検索
@@ -764,7 +764,7 @@ namespace Math
     //  ベクトル取得
     //--------------------------------------------------------------
     //右ベクトル取得
-    inline DirectX::XMVECTOR get_posture_right_vec(DirectX::XMFLOAT4 orientation)
+    inline DirectX::XMVECTOR GetPostureRightVec(DirectX::XMFLOAT4 orientation)
     {
         DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
         DirectX::XMVECTOR right;
@@ -778,7 +778,7 @@ namespace Math
     }
 
     //上ベクトル取得
-    inline DirectX::XMVECTOR get_posture_up_vec(DirectX::XMFLOAT4 orientation)
+    inline DirectX::XMVECTOR GetPostureUpVec(DirectX::XMFLOAT4 orientation)
     {
         DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
         DirectX::XMVECTOR up;
@@ -792,7 +792,7 @@ namespace Math
     }
 
     //前ベクトル取得
-    inline DirectX::XMVECTOR get_posture_forward_vec(DirectX::XMFLOAT4 orientation)
+    inline DirectX::XMVECTOR GetPostureForwardVec(DirectX::XMFLOAT4 orientation)
     {
         DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
         DirectX::XMVECTOR forward;
@@ -805,7 +805,7 @@ namespace Math
     }
 
     //右ベクトル取得(クォータニオン)
-    inline DirectX::XMFLOAT3 get_posture_right(DirectX::XMFLOAT4 orientation)
+    inline DirectX::XMFLOAT3 GetPostureRight(DirectX::XMFLOAT4 orientation)
     {
         DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
         DirectX::XMVECTOR right;
@@ -821,7 +821,7 @@ namespace Math
     }
 
     //右ベクトル取得(回転行列)
-    inline DirectX::XMFLOAT3 get_posture_right(DirectX::XMFLOAT4X4 transform)
+    inline DirectX::XMFLOAT3 GetPostureRight(DirectX::XMFLOAT4X4 transform)
     {
         DirectX::XMFLOAT4X4 w = transform;
 
@@ -839,7 +839,7 @@ namespace Math
     }
 
     //上ベクトル取得
-    inline DirectX::XMFLOAT3 get_posture_up(DirectX::XMFLOAT4 orientation)
+    inline DirectX::XMFLOAT3 GetPostureUp(DirectX::XMFLOAT4 orientation)
     {
         DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
         DirectX::XMVECTOR up;
@@ -855,7 +855,7 @@ namespace Math
     }
 
     //上ベクトル取得(回転行列)
-    inline DirectX::XMFLOAT3 get_posture_up(DirectX::XMFLOAT4X4 transform)
+    inline DirectX::XMFLOAT3 GetPostureUp(DirectX::XMFLOAT4X4 transform)
     {
         DirectX::XMFLOAT4X4 w = transform;
 
@@ -873,7 +873,7 @@ namespace Math
     }
 
     //前ベクトル取得
-    inline DirectX::XMFLOAT3 get_posture_forward(DirectX::XMFLOAT4 orientation)
+    inline DirectX::XMFLOAT3 GetPostureForward(DirectX::XMFLOAT4 orientation)
     {
         DirectX::XMVECTOR orientationVec = DirectX::XMLoadFloat4(&orientation);
         DirectX::XMVECTOR forward;
@@ -888,7 +888,7 @@ namespace Math
     }
 
     //前ベクトル取得(回転行列)
-    inline DirectX::XMFLOAT3 get_posture_forward(DirectX::XMFLOAT4X4 transform)
+    inline DirectX::XMFLOAT3 GetPostureForward(DirectX::XMFLOAT4X4 transform)
     {
         DirectX::XMFLOAT4X4 w = transform;
 
@@ -1086,7 +1086,7 @@ inline std::string StrBit16(const int n)
 
  //imgui Menu
 
-inline void imguiMenuBar(std::string menu_label, std::string menu_item_label, bool& selected)
+inline void ImguiMenuBar(std::string menu_label, std::string menu_item_label, bool& selected)
 {
 #ifdef USE_IMGUI
     if (ImGui::BeginMainMenuBar())
