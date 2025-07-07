@@ -40,23 +40,42 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB10[1], immediateIndexed
 dcl_sampler s2, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
 dcl_input_ps linear v1.xy
 dcl_output o0.xyzw
 dcl_temps 2
-add r0.x, -cb10[0].x, cb10[0].y
-div r0.x, l(1.000000, 1.000000, 1.000000, 1.000000), r0.x
-sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v1.xyxx, t0.xyzw, s2
-dp3 r0.y, r1.xyzx, l(0.299000, 0.587000, 0.114000, 0.000000)
-add r0.y, r0.y, -cb10[0].x
-mul_sat r0.x, r0.x, r0.y
-mad r0.y, r0.x, l(-2.000000), l(3.000000)
-mul r0.x, r0.x, r0.x
-mul r0.x, r0.x, r0.y
-mul o0.xyz, r1.xyzx, r0.xxxx
-mov o0.w, r1.w
+//
+// Initial variable locations:
+//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
+//   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 12 "C:\Users\2220411\Desktop\課題\自作ライブラリ\描画とゲープロmark2\描画とゲープロ\HLSL\luminance_extraction_ps.hlsl"
+sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v1.xyxx, t0.xyzw, s2  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z; r0.w <- color.w
+
+#line 13
+mov r0.w, r0.w  // r0.w <- alpha
+
+#line 19
+dp3 r1.x, r0.xyzx, l(0.299000, 0.587000, 0.114000, 0.000000)
+mov r1.y, -cb10[0].x
+add r1.z, r1.y, cb10[0].y
+add r1.x, r1.y, r1.x
+div r1.y, l(1.000000, 1.000000, 1.000000, 1.000000), r1.z
+mul r1.x, r1.y, r1.x
+max r1.x, r1.x, l(0.000000)
+min r1.x, r1.x, l(1.000000)
+mul r1.y, r1.x, l(-2.000000)
+add r1.y, r1.y, l(3.000000)
+mul r1.x, r1.x, r1.x
+mul r1.x, r1.x, r1.y
+mul r0.xyz, r0.xyzx, r1.xxxx
+
+#line 21
+mov o0.xyz, r0.xyzx
+mov o0.w, r0.w
 ret 
-// Approximately 12 instruction slots used
+// Approximately 18 instruction slots used

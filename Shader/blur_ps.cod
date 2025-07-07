@@ -60,7 +60,7 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB8[2], immediateIndexed
 dcl_constantbuffer CB10[1], immediateIndexed
 dcl_sampler s2, mode_default
@@ -70,56 +70,299 @@ dcl_resource_texture2d (float,float,float,float) t1
 dcl_input_ps linear v1.xy
 dcl_output o0.xyzw
 dcl_temps 5
-resinfo_indexable(texture2d)(float,float,float,float) r0.xy, l(0), t1.xyzw
-div r1.xyzw, l(-3.000000, -3.000000, -2.000000, -1.000000), r0.xyyy
-add r0.xz, r1.xxwx, v1.xxyx
-sample_indexable(texture2d)(float,float,float,float) r0.xzw, r0.xzxx, t1.xwyz, s3
-add r2.xyzw, r1.xyxz, v1.xyxy
-sample_indexable(texture2d)(float,float,float,float) r3.xyz, r2.xyxx, t1.xyzw, s3
-sample_indexable(texture2d)(float,float,float,float) r2.xyz, r2.zwzz, t1.xyzw, s3
-mul r2.w, cb10[0].z, cb10[0].z
-add r3.w, r2.w, r2.w
-mul r2.w, r2.w, l(6.283185)
-div r4.xyzw, l(-18.000000, -13.000000, -10.000000, -9.000000), r3.wwww
-mul r4.xyzw, r4.xyzw, l(1.442695, 1.442695, 1.442695, 1.442695)
-exp r4.xyzw, r4.xyzw
-div r4.xyzw, r4.xyzw, r2.wwww
-mul r2.xyz, r2.xyzx, r4.yyyy
-mad r2.xyz, r3.xyzx, r4.xxxx, r2.xyzx
-mad r0.xzw, r0.xxzw, r4.zzzz, r2.xxyz
-mov r1.y, l(0)
-add r2.xy, r1.xyxx, v1.xyxx
-sample_indexable(texture2d)(float,float,float,float) r2.xyz, r2.xyxx, t1.xyzw, s3
-mad r0.xzw, r2.xxyz, r4.wwww, r0.xxzw
-div r1.z, l(1.000000, 1.000000, 1.000000, 1.000000), r0.y
-div r2.xy, l(2.000000, 3.000000, 0.000000, 0.000000), r0.yyyy
-add r1.yz, r1.xxzx, v1.xxyx
-sample_indexable(texture2d)(float,float,float,float) r3.xyz, r1.yzyy, t1.xyzw, s3
-mad r0.xyz, r3.xyzx, r4.zzzz, r0.xzwx
-mov r1.w, r2.x
-add r1.yz, r1.xxwx, v1.xxyx
-mov r2.z, r1.x
-add r1.xw, r2.zzzy, v1.xxxy
-sample_indexable(texture2d)(float,float,float,float) r2.xyz, r1.xwxx, t1.xyzw, s3
-sample_indexable(texture2d)(float,float,float,float) r1.xyz, r1.yzyy, t1.xyzw, s3
-mad r0.xyz, r1.xyzx, r4.yyyy, r0.xyzx
-mad r0.xyz, r2.xyzx, r4.xxxx, r0.xyzx
-add r0.w, r4.y, r4.x
-add r0.w, r4.z, r0.w
-add r0.w, r4.w, r0.w
-add r0.w, r4.z, r0.w
-add r0.w, r4.y, r0.w
-add r0.w, r4.x, r0.w
-div r0.xyz, r0.xyzx, r0.wwww
-sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v1.xyxx, t0.xyzw, s2
-mad r0.xyz, r0.xyzx, cb10[0].wwww, r1.xyzx
-mov o0.w, r1.w
-mul r0.xyz, -r0.xyzx, cb8[1].zzzz
+//
+// Initial variable locations:
+//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
+//   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 17 "C:\Users\2220411\Desktop\課題\自作ライブラリ\描画とゲープロmark2\描画とゲープロ\HLSL\blur_ps.hlsl"
+mov r0.x, l(0)  // r0.x <- mip_level
+
+#line 18
+resinfo_indexable(texture2d)(float,float,float,float) r0.xy, r0.x, t1.xyzw
+ftoi r0.x, r0.x  // r0.x <- width
+ftoi r0.y, r0.y  // r0.y <- height
+
+#line 21
+sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v1.xyxx, t0.xyzw, s2  // r1.x <- color.x; r1.y <- color.y; r1.z <- color.z; r1.w <- color.w
+
+#line 22
+mov r1.w, r1.w  // r1.w <- alpha
+
+#line 25
+itof r2.xyz, l(0, 0, 0, 0)  // r2.x <- blur_color.x; r2.y <- blur_color.y; r2.z <- blur_color.z
+
+#line 26
+itof r0.z, l(0)  // r0.z <- gaussian_kernel_total
+
+#line 33
+mov r0.w, l(-3)  // r0.w <- x
+
+#line 36
+mov r2.w, l(-3)  // r2.w <- y
+
+#line 39
+imul null, r3.x, r0.w, r0.w
+imul null, r3.y, r2.w, r2.w
+iadd r3.x, r3.y, r3.x
+ineg r3.x, r3.x
+itof r3.x, r3.x
+mul r3.y, cb10[0].z, l(2.000000)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y
+mul r3.x, r3.x, l(1.442695)
+exp r3.x, r3.x
+mul r3.y, cb10[0].z, l(6.283185)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y  // r3.x <- gaussian_kernel
+
+#line 42
+itof r3.y, r0.w
+mul r3.y, r3.y, l(1.000000)
+itof r3.z, r0.x
+div r4.x, r3.y, r3.z
+itof r2.w, r2.w
+mul r2.w, r2.w, l(1.000000)
+itof r3.y, r0.y
+div r4.y, r2.w, r3.y
+add r3.yz, r4.xxyx, v1.xxyx
+sample_indexable(texture2d)(float,float,float,float) r3.yzw, r3.yzyy, t1.wxyz, s3
+mul r3.yzw, r3.xxxx, r3.yyzw
+add r2.xyz, r2.xyzx, r3.yzwy
+
+#line 45
+add r0.z, r0.z, r3.x
+
+#line 39
+imul null, r2.w, r0.w, r0.w
+imul null, r3.x, l(-2), l(-2)
+iadd r2.w, r2.w, r3.x
+ineg r2.w, r2.w
+itof r2.w, r2.w
+mul r3.x, cb10[0].z, l(2.000000)
+mul r3.x, r3.x, cb10[0].z
+div r2.w, r2.w, r3.x
+mul r2.w, r2.w, l(1.442695)
+exp r2.w, r2.w
+mul r3.x, cb10[0].z, l(6.283185)
+mul r3.x, r3.x, cb10[0].z
+div r2.w, r2.w, r3.x  // r2.w <- gaussian_kernel
+
+#line 42
+itof r3.x, r0.w
+mul r3.x, r3.x, l(1.000000)
+itof r3.y, r0.x
+div r3.x, r3.x, r3.y
+itof r3.z, l(-2)
+mul r3.z, r3.z, l(1.000000)
+itof r3.w, r0.y
+div r3.y, r3.z, r3.w
+add r3.xy, r3.xyxx, v1.xyxx
+sample_indexable(texture2d)(float,float,float,float) r3.xyz, r3.xyxx, t1.xyzw, s3
+mul r3.xyz, r2.wwww, r3.xyzx
+add r2.xyz, r2.xyzx, r3.xyzx
+
+#line 45
+add r0.z, r0.z, r2.w
+
+#line 39
+imul null, r2.w, r0.w, r0.w
+imul null, r3.x, l(-1), l(-1)
+iadd r2.w, r2.w, r3.x
+ineg r2.w, r2.w
+itof r2.w, r2.w
+mul r3.x, cb10[0].z, l(2.000000)
+mul r3.x, r3.x, cb10[0].z
+div r2.w, r2.w, r3.x
+mul r2.w, r2.w, l(1.442695)
+exp r2.w, r2.w
+mul r3.x, cb10[0].z, l(6.283185)
+mul r3.x, r3.x, cb10[0].z
+div r2.w, r2.w, r3.x  // r2.w <- gaussian_kernel
+
+#line 42
+itof r3.x, r0.w
+mul r3.x, r3.x, l(1.000000)
+itof r3.y, r0.x
+div r3.x, r3.x, r3.y
+itof r3.z, l(-1)
+mul r3.z, r3.z, l(1.000000)
+itof r3.w, r0.y
+div r3.y, r3.z, r3.w
+add r3.xy, r3.xyxx, v1.xyxx
+sample_indexable(texture2d)(float,float,float,float) r3.xyz, r3.xyxx, t1.xyzw, s3
+mul r3.xyz, r2.wwww, r3.xyzx
+add r2.xyz, r2.xyzx, r3.xyzx
+
+#line 45
+add r0.z, r0.z, r2.w
+
+#line 46
+iadd r2.w, l(1), l(-1)  // r2.w <- y
+
+#line 39
+imul null, r3.x, r0.w, r0.w
+imul null, r3.y, r2.w, r2.w
+iadd r3.x, r3.y, r3.x
+ineg r3.x, r3.x
+itof r3.x, r3.x
+mul r3.y, cb10[0].z, l(2.000000)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y
+mul r3.x, r3.x, l(1.442695)
+exp r3.x, r3.x
+mul r3.y, cb10[0].z, l(6.283185)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y  // r3.x <- gaussian_kernel
+
+#line 42
+itof r3.y, r0.w
+mul r3.y, r3.y, l(1.000000)
+itof r3.z, r0.x
+div r4.x, r3.y, r3.z
+itof r3.y, r2.w
+mul r3.y, r3.y, l(1.000000)
+itof r3.z, r0.y
+div r4.y, r3.y, r3.z
+add r3.yz, r4.xxyx, v1.xxyx
+sample_indexable(texture2d)(float,float,float,float) r3.yzw, r3.yzyy, t1.wxyz, s3
+mul r3.yzw, r3.xxxx, r3.yyzw
+add r2.xyz, r2.xyzx, r3.yzwy
+
+#line 45
+add r0.z, r0.z, r3.x
+
+#line 46
+iadd r2.w, r2.w, l(1)
+
+#line 39
+imul null, r3.x, r0.w, r0.w
+imul null, r3.y, r2.w, r2.w
+iadd r3.x, r3.y, r3.x
+ineg r3.x, r3.x
+itof r3.x, r3.x
+mul r3.y, cb10[0].z, l(2.000000)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y
+mul r3.x, r3.x, l(1.442695)
+exp r3.x, r3.x
+mul r3.y, cb10[0].z, l(6.283185)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y  // r3.x <- gaussian_kernel
+
+#line 42
+itof r3.y, r0.w
+mul r3.y, r3.y, l(1.000000)
+itof r3.z, r0.x
+div r4.x, r3.y, r3.z
+itof r3.y, r2.w
+mul r3.y, r3.y, l(1.000000)
+itof r3.z, r0.y
+div r4.y, r3.y, r3.z
+add r3.yz, r4.xxyx, v1.xxyx
+sample_indexable(texture2d)(float,float,float,float) r3.yzw, r3.yzyy, t1.wxyz, s3
+mul r3.yzw, r3.xxxx, r3.yyzw
+add r2.xyz, r2.xyzx, r3.yzwy
+
+#line 45
+add r0.z, r0.z, r3.x
+
+#line 46
+iadd r2.w, r2.w, l(1)
+
+#line 39
+imul null, r3.x, r0.w, r0.w
+imul null, r3.y, r2.w, r2.w
+iadd r3.x, r3.y, r3.x
+ineg r3.x, r3.x
+itof r3.x, r3.x
+mul r3.y, cb10[0].z, l(2.000000)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y
+mul r3.x, r3.x, l(1.442695)
+exp r3.x, r3.x
+mul r3.y, cb10[0].z, l(6.283185)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y  // r3.x <- gaussian_kernel
+
+#line 42
+itof r3.y, r0.w
+mul r3.y, r3.y, l(1.000000)
+itof r3.z, r0.x
+div r4.x, r3.y, r3.z
+itof r3.y, r2.w
+mul r3.y, r3.y, l(1.000000)
+itof r3.z, r0.y
+div r4.y, r3.y, r3.z
+add r3.yz, r4.xxyx, v1.xxyx
+sample_indexable(texture2d)(float,float,float,float) r3.yzw, r3.yzyy, t1.wxyz, s3
+mul r3.yzw, r3.xxxx, r3.yyzw
+add r2.xyz, r2.xyzx, r3.yzwy
+
+#line 45
+add r0.z, r0.z, r3.x
+
+#line 46
+iadd r2.w, r2.w, l(1)
+
+#line 39
+imul null, r3.x, r0.w, r0.w
+imul null, r3.y, r2.w, r2.w
+iadd r3.x, r3.y, r3.x
+ineg r3.x, r3.x
+itof r3.x, r3.x
+mul r3.y, cb10[0].z, l(2.000000)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y
+mul r3.x, r3.x, l(1.442695)
+exp r3.x, r3.x
+mul r3.y, cb10[0].z, l(6.283185)
+mul r3.y, r3.y, cb10[0].z
+div r3.x, r3.x, r3.y  // r3.x <- gaussian_kernel
+
+#line 42
+itof r0.w, r0.w
+mul r0.w, r0.w, l(1.000000)
+itof r0.x, r0.x
+div r4.x, r0.w, r0.x
+itof r0.x, r2.w
+mul r0.x, r0.x, l(1.000000)
+itof r0.y, r0.y
+div r4.y, r0.x, r0.y
+add r0.xy, r4.xyxx, v1.xyxx
+sample_indexable(texture2d)(float,float,float,float) r0.xyw, r0.xyxx, t1.xywz, s3
+mul r0.xyw, r3.xxxx, r0.xyxw
+add r0.xyw, r0.xyxw, r2.xyxz  // r0.x <- blur_color.x; r0.y <- blur_color.y; r0.w <- blur_color.z
+
+#line 45
+add r0.z, r0.z, r3.x
+
+#line 48
+div r0.xyz, r0.xywx, r0.zzzz  // r0.z <- blur_color.z
+
+#line 51
+mul r0.xyz, r0.xyzx, cb10[0].wwww
+add r0.xyz, r0.xyzx, r1.xyzx  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z
+
+#line 58
+itof r1.xyz, l(1, 1, 1, 0)
+mov r0.xyz, -r0.xyzx
+mul r0.xyz, r0.xyzx, cb8[1].zzzz
 mul r0.xyz, r0.xyzx, l(1.442695, 1.442695, 1.442695, 0.000000)
 exp r0.xyz, r0.xyzx
-add r0.xyz, -r0.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
+mov r0.xyz, -r0.xyzx
+add r0.xyz, r0.xyzx, r1.xyzx  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z
+
+#line 63
 log r0.xyz, r0.xyzx
 mul r0.xyz, r0.xyzx, l(0.454545, 0.454545, 0.454545, 0.000000)
-exp o0.xyz, r0.xyzx
+exp r0.xyz, r0.xyzx  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z
+
+#line 66
+mov o0.xyz, r0.xyzx
+mov o0.w, r1.w
+
+#line 33
 ret 
-// Approximately 52 instruction slots used
+// Approximately 212 instruction slots used
