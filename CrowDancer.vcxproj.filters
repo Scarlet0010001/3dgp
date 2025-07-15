@@ -267,10 +267,10 @@
     <ClCompile Include="Source\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Source\gauge_UI.cpp">
+    <ClCompile Include="Source\gauge_ui.cpp">
       <Filter>Sources\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\player_UI.cpp">
+    <ClCompile Include="Source\player_ui.cpp">
       <Filter>Sources\Character\Player</Filter>
     </ClCompile>
     <ClCompile Include="Source\glitch_chromatic_aberration.cpp">
@@ -282,7 +282,7 @@
     <ClCompile Include="Source\effect.cpp">
       <Filter>Sources\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Boss_UI.cpp">
+    <ClCompile Include="Source\Boss_ui.cpp">
       <Filter>Sources\Character\Boss</Filter>
     </ClCompile>
     <ClCompile Include="Source\primitive_renderer.cpp">
@@ -464,13 +464,13 @@
     <ClInclude Include="Source\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI.h">
+    <ClInclude Include="Source\ui.h">
       <Filter>Sources\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\gauge_UI.h">
+    <ClInclude Include="Source\gauge_ui.h">
       <Filter>Sources\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\player_UI.h">
+    <ClInclude Include="Source\player_ui.h">
       <Filter>Sources\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="Source\glitch_chromatic_aberration.h">
@@ -482,7 +482,7 @@
     <ClInclude Include="Source\effect.h">
       <Filter>Sources\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Boss_UI.h">
+    <ClInclude Include="Source\Boss_ui.h">
       <Filter>Sources\Character\Boss</Filter>
     </ClInclude>
     <ClInclude Include="Source\primitive_renderer.h">

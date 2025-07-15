@@ -198,7 +198,7 @@
     <ClCompile Include="Source\audio.cpp" />
     <ClCompile Include="Source\boss.cpp" />
     <ClCompile Include="Source\boss_action.cpp" />
-    <ClCompile Include="Source\Boss_UI.cpp" />
+    <ClCompile Include="Source\Boss_ui.cpp" />
     <ClCompile Include="Source\bullet.cpp" />
     <ClCompile Include="Source\bullet_manager.cpp" />
     <ClCompile Include="Source\bullet_straight.cpp" />
@@ -214,7 +214,7 @@
     <ClCompile Include="Source\framework.cpp" />
     <ClCompile Include="Source\fullscreen_quad.cpp" />
     <ClCompile Include="Source\game_pad.cpp" />
-    <ClCompile Include="Source\gauge_UI.cpp" />
+    <ClCompile Include="Source\gauge_ui.cpp" />
     <ClCompile Include="Source\geometric_primitive.cpp" />
     <ClCompile Include="Source\glitch_chromatic_aberration.cpp" />
     <ClCompile Include="Source\gltf_model.cpp" />
@@ -234,7 +234,7 @@
     <ClCompile Include="Source\noise.cpp" />
     <ClCompile Include="Source\player.cpp" />
     <ClCompile Include="Source\player_action.cpp" />
-    <ClCompile Include="Source\player_UI.cpp" />
+    <ClCompile Include="Source\player_ui.cpp" />
     <ClCompile Include="Source\primitive_renderer.cpp" />
     <ClCompile Include="Source\radial_blur.cpp" />
     <ClCompile Include="Source\scene_game.cpp" />
@@ -254,7 +254,7 @@
   <ItemGroup>
     <ClInclude Include="Source\audio.h" />
     <ClInclude Include="Source\boss.h" />
-    <ClInclude Include="Source\Boss_UI.h" />
+    <ClInclude Include="Source\Boss_ui.h" />
     <ClInclude Include="Source\bullet.h" />
     <ClInclude Include="Source\bullet_manager.h" />
     <ClInclude Include="Source\bullet_straight.h" />
@@ -272,7 +272,7 @@
     <ClInclude Include="Source\framework.h" />
     <ClInclude Include="Source\fullscreen_quad.h" />
     <ClInclude Include="Source\game_pad.h" />
-    <ClInclude Include="Source\gauge_UI.h" />
+    <ClInclude Include="Source\gauge_ui.h" />
     <ClInclude Include="Source\geometric_primitive.h" />
     <ClInclude Include="Source\glitch_chromatic_aberration.h" />
     <ClInclude Include="Source\gltf_model.h" />
@@ -297,7 +297,7 @@
     <ClInclude Include="Source\operators.h" />
     <ClInclude Include="Source\par_shapes.h" />
     <ClInclude Include="Source\player.h" />
-    <ClInclude Include="Source\player_UI.h" />
+    <ClInclude Include="Source\player_ui.h" />
     <ClInclude Include="Source\primitive.h" />
     <ClInclude Include="Source\primitive_renderer.h" />
     <ClInclude Include="Source\radial_blur.h" />
@@ -316,7 +316,7 @@
     <ClInclude Include="Source\stage_manager.h" />
     <ClInclude Include="Source\static_mesh.h" />
     <ClInclude Include="Source\texture.h" />
-    <ClInclude Include="Source\UI.h" />
+    <ClInclude Include="Source\ui.h" />
     <ClInclude Include="Source\user.h" />
   </ItemGroup>
   <ItemGroup>

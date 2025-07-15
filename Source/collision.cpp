@@ -23,8 +23,6 @@ bool Collision::HitCheckRect(const DirectX::XMFLOAT2& center_a, const DirectX::X
 bool Collision::SphereVsSphere(const DirectX::XMFLOAT3& center_a, float radius_a, const DirectX::XMFLOAT3& center_b, float radius_b, DirectX::XMFLOAT3* out_center_b)
 {
     using namespace DirectX;
-    //debug_figure->create_sphere(center_a, radius_a, { 0,0,1,1 });
-    //debug_figure->create_sphere(center_b, radius_b, { 1,0,0,1 });
 
     // B → A の単位ベクトルを算出
     XMVECTOR position_a_vec = XMLoadFloat3(&center_a);
@@ -54,8 +52,6 @@ bool Collision::CylinderVsCylinder(const DirectX::XMFLOAT3& position_a, float ra
 
 {
     using namespace DirectX;
-    //debug_figure->create_cylinder(position_a, radius_a, height_a, { 0,0,1,1 });
-    //debug_figure->create_cylinder(position_b, radius_b, height_b, { 1,0,0,1 });
 
     // Aの足元がBの頭より上なら当たってない
     if (position_a.y > position_b.y + height_b) { return false; }
@@ -136,8 +132,6 @@ bool Collision::SphereVsCylinder(const DirectX::XMFLOAT3& sphere_position, float
 bool Collision::CuboidVsCuboid(const DirectX::XMFLOAT3& center_a, const DirectX::XMFLOAT3& radius_a, const DirectX::XMFLOAT3& center_b, const DirectX::XMFLOAT3& radius_b, DirectX::XMFLOAT3* velocity_b)
 {
     using namespace DirectX;
-    //debug_figure->create_cuboid(center_a, radius_a, { 0,0,1,1 });
-    //debug_figure->create_cuboid(center_b, radius_b, { 1,0,0,1 });
 
     // 各軸のposition,radiusを算出
     /*cuboid a*/
@@ -173,7 +167,6 @@ bool Collision::CuboidVsCuboid(const DirectX::XMFLOAT3& center_a, const DirectX:
     XMFLOAT2 arrival_radius_b_xy = { arrival_radius.x, arrival_radius.y };
     XMFLOAT2 arrival_radius_b_xz = { arrival_radius.x, arrival_radius.z };
     XMFLOAT2 arrival_radius_b_yz = { arrival_radius.y, arrival_radius.z };
-    //debug_figure->create_cuboid(arrival_position, arrival_radius, { 0,1,0,1 });
 
     //----交差判定----//
     /*cuboid a vs cuboid b*/
@@ -196,7 +189,6 @@ bool Collision::FrustumVsCuboid(DirectX::XMFLOAT4X4 camara_view, DirectX::XMFLOA
     //----- 直方体のパラメーター -----//
     XMFLOAT3 cuboid_radius = { (cuboid_max_pos.x - cuboid_min_pos.x) / 2, (cuboid_max_pos.y - cuboid_min_pos.y) / 2, (cuboid_max_pos.z - cuboid_min_pos.z) / 2 };
     XMFLOAT3 cuboid_center = { cuboid_max_pos.x - cuboid_radius.x, cuboid_max_pos.y - cuboid_radius.y, cuboid_max_pos.z - cuboid_radius.z };
-    //debug_figure->create_cuboid(cuboid_center, cuboid_radius, { 1,1,0,1 });
     
     //----- 視錐台のパラメーター -----//
     // ビュープロジェクション行列を取得する
@@ -352,7 +344,6 @@ bool Collision::ForefrontFrustumVsCuboid(DirectX::XMFLOAT4X4 camara_view, float 
     //----- 直方体のパラメーター -----//
     XMFLOAT3 cuboid_radius = { (cuboid_max_pos.x - cuboid_min_pos.x) / 2, (cuboid_max_pos.y - cuboid_min_pos.y) / 2, (cuboid_max_pos.z - cuboid_min_pos.z) / 2 };
     XMFLOAT3 cuboid_center = { cuboid_max_pos.x - cuboid_radius.x, cuboid_max_pos.y - cuboid_radius.y, cuboid_max_pos.z - cuboid_radius.z };
-    //debug_figure->create_cuboid(cuboid_center, cuboid_radius, { 1,1,0,1 });
 
     //----- 視錐台のパラメーター -----//
     // ビュープロジェクション行列を取得する
@@ -507,8 +498,6 @@ bool Collision::ForefrontFrustumVsCuboid(DirectX::XMFLOAT4X4 camara_view, float 
 bool Collision::SphereVsCapsule(const DirectX::XMFLOAT3& sphere_center, float sphere_radius, const DirectX::XMFLOAT3& capsule_start, const DirectX::XMFLOAT3& capsule_end, float capsule_radius)
 {
     using namespace DirectX;
-    //debug_figure->create_sphere(sphere_center, sphere_radius, { 0,0,1,1 });
-    //debug_figure->create_capsule(capsule_start, capsule_end, capsule_radius, { 1,0,0,1 });
     XMFLOAT3 cp_to_sp;
     cp_to_sp.x = sphere_center.x - capsule_start.x;
     cp_to_sp.y = sphere_center.y - capsule_start.y;
@@ -561,8 +550,6 @@ bool Collision::SphereVsCapsule(const DirectX::XMFLOAT3& sphere_center, float sp
 bool Collision::CapsuleVsCapsule(const DirectX::XMFLOAT3& start_a, const DirectX::XMFLOAT3& end_a, float radius_a, const DirectX::XMFLOAT3& start_b, const DirectX::XMFLOAT3& end_b, float radius_b)
 {
     using namespace DirectX;
-    //debug_figure->create_capsule(start_a, end_a, radius_a, { 0,0,1,1 });
-    //debug_figure->create_capsule(start_b, end_b, radius_b, { 1,0,0,1 });
     // カプセルc0の始点から終点へのベクトル(d0)
     XMFLOAT3 d0;
     d0.x = end_a.x - start_a.x;
@@ -680,7 +667,6 @@ bool Collision::RayVsModel(const DirectX::XMFLOAT3& start,
     bool hit = false;
     if (model->collisionMesh->RayCast(start, end,
         model_world_mat, result
-        //,Math::calc_vector_AtoB_length(start, end))
         ))
     {
         hit = true;
@@ -695,10 +681,6 @@ bool Collision::RingVsCapsule(
     const DirectX::XMFLOAT3& capsule_start,
     const DirectX::XMFLOAT3& capsule_end, float capsule_radius)
 {
-    //debug_figure->create_cylinder(center_ring_position, ring_radius + ring_width, ring_height, { 0,0,1,1 });
-    //debug_figure->create_cylinder(center_ring_position, ring_radius - ring_width, ring_height, { 0,0,0.7f,1 });
-    //debug_figure->create_capsule(capsule_start, capsule_end, capsule_radius, { 1,0,0,1 });
-
     //上下の判定
     if (center_ring_position.y + ring_height < capsule_start.y) return false;
     if (center_ring_position.y - ring_height > capsule_end.y) return false;
