@@ -6,20 +6,20 @@
 #include <wrl.h>
 #include <sstream>
 
-#include "sprite.h"
-#include "sprite_batch.h"
-#include "geometric_primitive.h"
-#include "static_mesh.h"
-#include "skinned_mesh.h"
-#include "framebuffer.h"
-#include "fullscreen_quad.h"
-#include "misc.h"
-#include "high_resolution_timer.h"
+#include "Sprite/sprite.h"
+#include "Sprite/sprite_batch.h"
+#include "Model/geometric_primitive.h"
+#include "Model/static_mesh.h"
+#include "Model/skinned_mesh.h"
+#include "Graphics/framebuffer.h"
+#include "Graphics/fullscreen_quad.h"
+#include "Framework/misc.h"
+#include "Framework/high_resolution_timer.h"
 
-#include "device.h"
+#include "Input/device.h"
 
 //gltf
-#include "gltf_model.h"
+#include "Model/gltf_model.h"
 
 #ifdef USE_IMGUI
 #include "imgui/imgui.h"

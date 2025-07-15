@@ -1,13 +1,13 @@
 ﻿#include "framework.h"
 #include "interval.h"
-#include "shader.h"
-#include "texture.h"
-#include "user.h"
-#include "Graphics.h"
-#include "scene_manager.h"
-#include "scene_title.h"
-#include "device.h"
-#include "effect_manager.h"
+#include "Shader/shader.h"
+#include "Sprite/texture.h"
+#include "User/user.h"
+#include "Graphics/graphics.h"
+#include "Scene/scene_manager.h"
+#include "Scene/scene_title.h"
+#include "Input/device.h"
+#include "Effect/effect_manager.h"
 
 
 #if _DEBUG

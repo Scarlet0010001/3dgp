@@ -1,6 +1,6 @@
-#include "gauge_UI.h"
-#include "Operators.h"
-#include "user.h"
+#include "gauge_ui.h"
+#include "User/operators.h"
+#include "User/user.h"
 
 GaugeUI::GaugeUI(const wchar_t* back_filename, const wchar_t* body_filename, const wchar_t* frame_filename)
 {

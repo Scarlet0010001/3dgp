@@ -1,5 +1,4 @@
 #include "scene_loading.h"
-//#include "scene_game.h"
 #include "scene_manager.h"
 
 #include<thread>

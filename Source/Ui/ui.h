@@ -1,6 +1,6 @@
 #pragma once
-#include "sprite_batch.h"
-#include "graphics.h"
+#include "Sprite/sprite_batch.h"
+#include "Graphics/graphics.h"
 class UI
 {
 public:

@@ -1,7 +1,7 @@
 #include "collision.h"
-#include "Graphics.h"
-#include "user.h"
-#include "operators.h"
+#include "Graphics/graphics.h"
+#include "User/user.h"
+#include "User/operators.h"
 
 bool Collision::HitCheckCircle(const DirectX::XMFLOAT2& pos1, float r1, const DirectX::XMFLOAT2& pos2, float r2)
 {

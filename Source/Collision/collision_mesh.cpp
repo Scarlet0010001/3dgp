@@ -10,7 +10,7 @@
 #include "tinygltf-release/tiny_gltf.h"
 #include <fbxsdk.h>
 
-#include "user.h"
+#include "User/user.h"
 
 inline DirectX::XMFLOAT4X4 to_xmfloat4x4(const FbxAMatrix& fbxamatrix)
 {

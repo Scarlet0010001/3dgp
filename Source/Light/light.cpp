@@ -1,5 +1,5 @@
 #include "light.h"
-#include "user.h"
+#include "User/user.h"
 
 //--------------------------コンストラクタ----------------------//
 Light::Light()

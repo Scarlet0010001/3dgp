@@ -1,6 +1,6 @@
 #include "character.h"
-#include "stage_manager.h"
-#include "user.h"
+#include "Stage/stage_manager.h"
+#include "User/user.h"
 
 void Character::AddImpulse(const DirectX::XMFLOAT3& impulse)
 {

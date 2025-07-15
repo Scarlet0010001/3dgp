@@ -1,27 +1,27 @@
 #include "player.h"
-#include "bullet_straight.h"
-#include "bullet_manager.h"
-#include "shader.h"
-#include"user.h"
-#include "texture.h"
-#include "operators.h"
-#include "collision.h"
-#include "Graphics.h"
+#include "Bullet/bullet_straight.h"
+#include "Bullet/bullet_manager.h"
+#include "Shader/shader.h"
+#include "User/user.h"
+#include "Sprite/texture.h"
+#include "User/operators.h"
+#include "Collision/collision.h"
+#include "Graphics/graphics.h"
 #include "magic_enum/include/magic_enum.hpp"
 
-#include "effect_manager.h"
+#include "Effect/effect_manager.h"
 
 #include <filesystem>
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-PLAYER::PLAYER()
+Player::Player()
 {
 	//インスタンス取得
 	Graphics& graphics = Graphics::Instance();
 	//キャラクターモデルを読み込む
 	model = std::make_unique<gltf_model>(graphics.GetDevice().Get(),
-		"Resources/Character/PLAYER/glb/white_crow.glb", true);
+		"Resources/Character/Player/glb/white_crow.glb", true);
 	
 	//エフェクト作成（斬撃エフェクト）
 	slashEffect = std::make_unique<Effect>("Resources/Effect/Slash/slash.efkefc");
@@ -61,7 +61,7 @@ PLAYER::PLAYER()
 
 }
 
-void PLAYER::Initialize()
+void Player::Initialize()
 {
 	//パラメーターロード
 	LoadDataFile();
@@ -105,11 +105,11 @@ void PLAYER::Initialize()
 	damagedFunction = [=](int damage, float invincible, WINCE_TYPE type)->bool {return ApplyDamage(damage, invincible, type); };
 }
 
-PLAYER::~PLAYER()
+Player::~Player()
 {
 }
 
-void PLAYER::Update(float elapsedTime)
+void Player::Update(float elapsedTime)
 {
 	//インスタンス取得
 	Graphics& graphics = Graphics::Instance();
@@ -176,7 +176,7 @@ void PLAYER::Update(float elapsedTime)
 	ui->Update(elapsedTime);
 }
 
-void PLAYER::Render_f(float elapsedTime)
+void Player::Render_f(float elapsedTime)
 {
 	//グラフィックスインスタンスを取得
 	Graphics& graphics = Graphics::Instance();
@@ -280,14 +280,14 @@ void PLAYER::Render_f(float elapsedTime)
 	}
 }
 
-void PLAYER::RenderUI(float elapsed_time)
+void Player::RenderUI(float elapsed_time)
 {
 	//プレイヤーのUI
 	ui->Render();
 	
 }
 
-void PLAYER::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_height)
+void Player::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_height)
 {
 	//身体の押し出し判定
 	Collision::CylinderVsCylinder(
@@ -296,7 +296,7 @@ void PLAYER::CalcCollision_vs_Enemy(Capsule capsule_collider, float collider_hei
 
 }
 
-void PLAYER::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height, AddDamageFunc damaged_func)
+void Player::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height, AddDamageFunc damaged_func)
 {
 	//攻撃フラグがオフなら終わる
 	if (!attackParam.isAttack) return;
@@ -325,7 +325,7 @@ void PLAYER::CalcAttack_vs_Enemy(Capsule capsule_collider, float collider_height
 	}
 }
 
-bool PLAYER::FindLoopAnimation(PlayerAnimation PA)
+bool Player::FindLoopAnimation(PlayerAnimation PA)
 {
 	//ループさせたいアニメーションじゃなかったらfalse
 	if (PA == PlayerAnimation::PLAYER_ATTACK_01
@@ -343,7 +343,7 @@ bool PLAYER::FindLoopAnimation(PlayerAnimation PA)
 	return true;
 }
 
-void PLAYER::Move(float vx, float vz, float speed)
+void Player::Move(float vx, float vz, float speed)
 {
 	//移動方向ベクトルを設定
 	moveVec_x = vx;
@@ -361,7 +361,7 @@ void PLAYER::Move(float vx, float vz, float speed)
 	}
 }
 
-void PLAYER::Move(float vx, float vy, float vz, float speed)
+void Player::Move(float vx, float vy, float vz, float speed)
 {
 	//移動方向ベクトルを設定
 	moveVec_x = vx;
@@ -380,7 +380,7 @@ void PLAYER::Move(float vx, float vy, float vz, float speed)
 	}
 }
 
-void PLAYER::BoostUpdate(float elapsedTime)
+void Player::BoostUpdate(float elapsedTime)
 {
 	//ブーストステートじゃないかつ地面に接していたらブーストゲージを回復する
 	if (isGround && STATE::BOOST != state)
@@ -402,7 +402,7 @@ void PLAYER::BoostUpdate(float elapsedTime)
 	}
 }
 
-bool PLAYER::InputMove(float elapsedTime)
+bool Player::InputMove(float elapsedTime)
 {
 	//進行ベクトル取得
 	const DirectX::XMFLOAT3 moveVec = GetMoveVec(camera);
@@ -414,7 +414,7 @@ bool PLAYER::InputMove(float elapsedTime)
 	return moveVec.x != 0.0f || moveVec.y != 0.0f || moveVec.z != 0.0f;
 }
 
-bool PLAYER::InputMove(float elapsedTime, float restrictionMove, float restrictionTurn)
+bool Player::InputMove(float elapsedTime, float restrictionMove, float restrictionTurn)
 {
 	//進行ベクトル取得
 	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
@@ -426,7 +426,7 @@ bool PLAYER::InputMove(float elapsedTime, float restrictionMove, float restricti
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
 
-bool PLAYER::InputMoveWing(float elapsedTime)
+bool Player::InputMoveWing(float elapsedTime)
 {
 	//進行ベクトル取得
 	const DirectX::XMFLOAT3 move_vec = GetMoveVec(camera);
@@ -438,7 +438,7 @@ bool PLAYER::InputMoveWing(float elapsedTime)
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z != 0.0f;
 }
 
-const DirectX::XMFLOAT3 PLAYER::GetMoveVec(Camera* camera, bool wing) const
+const DirectX::XMFLOAT3 Player::GetMoveVec(Camera* camera, bool wing) const
 {
 	//入力情報を取得
 	float ax = gamePad->GetAxis_LX();
@@ -493,7 +493,7 @@ const DirectX::XMFLOAT3 PLAYER::GetMoveVec(Camera* camera, bool wing) const
 	return vec;
 }
 
-void PLAYER::ShaderUpdate(float elapsedTime)
+void Player::ShaderUpdate(float elapsedTime)
 {
 	//ラジアルブラータイマーがオフの場合
 	if (player_RadialBlurConstant.blurStrength <= 0 
@@ -556,7 +556,7 @@ void PLAYER::ShaderUpdate(float elapsedTime)
 	}
 }
 
-void PLAYER::InputJump()
+void Player::InputJump()
 {
 	//スペースを押したらジャンプ
 	if (gamePad->GetButtonDown() & GamePad::BTN_A)
@@ -577,7 +577,7 @@ void PLAYER::InputJump()
 	}
 }
 
-void PLAYER::InputBoost()
+void Player::InputBoost()
 {
 	//ブースト量が25%以下だと出来ない
 	if (param.boostTimer < BOOST_MIN_THRESHOLD)return;
@@ -589,7 +589,7 @@ void PLAYER::InputBoost()
 	}
 }
 
-void PLAYER::InputWing()
+void Player::InputWing()
 {
 	//Xボタン押すと飛行モードになる
 	if (gamePad->GetButtonDown() & GamePad::BTN_B)
@@ -598,7 +598,7 @@ void PLAYER::InputWing()
 	}
 }
 
-void PLAYER::InputShot()
+void Player::InputShot()
 {
 	// 弾管理クラスのインスタンス取得
 	BulletManager& bulletManager = BulletManager::Instance();
@@ -647,7 +647,7 @@ void PLAYER::InputShot()
 	audios[ToInt(PLAYER_SE::SE_LASER)]->volume(SOUND_VOLUME_LASER);
 }
 
-void PLAYER::OnLanding()
+void Player::OnLanding()
 {
 	// ジャンプ回数をリセット（地面に着地したと判断）
 	jumpCount = 0;
@@ -675,7 +675,7 @@ void PLAYER::OnLanding()
 	}
 }
 
-void PLAYER::CheckPreInput(COMBO combo)
+void Player::CheckPreInput(COMBO combo)
 {
 	//先行入力のチェック
 	if (gamePad->GetButtonDown() & gamePad->BTN_X)
@@ -694,13 +694,13 @@ void PLAYER::CheckPreInput(COMBO combo)
 	{
 		switch (combo)
 		{
-		case PLAYER::COMBO::ATTACK01:
+		case Player::COMBO::ATTACK01:
 			TransitionCombo02State();
 			break;
-		case PLAYER::COMBO::ATTACK02:
+		case Player::COMBO::ATTACK02:
 			TransitionCombo03State();
 			break;
-		case PLAYER::COMBO::ATTACK03:
+		case Player::COMBO::ATTACK03:
 			//最後のコンボだから偏移しない
 			break;
 		}
@@ -714,13 +714,13 @@ void PLAYER::CheckPreInput(COMBO combo)
 	}
 }
 
-void PLAYER::OnDead()
+void Player::OnDead()
 {
 	//死亡状態へ偏移
 	TransitionDeadState();
 }
 
-void PLAYER::OnDamaged(WINCE_TYPE type)
+void Player::OnDamaged(WINCE_TYPE type)
 {
 	//typeによって偏移する状態を変える
 	switch (type)
@@ -739,7 +739,7 @@ void PLAYER::OnDamaged(WINCE_TYPE type)
 
 }
 
-bool PLAYER::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
+bool Player::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 {
 	//ダメージが0の場合は健康状態を変更する必要がない
 	if (damage == 0)return false;
@@ -774,7 +774,7 @@ bool PLAYER::ApplyDamage(int damage, float invincible_time, WINCE_TYPE type)
 
 }
 
-void PLAYER::TrailUpdate()
+void Player::TrailUpdate()
 {
 	//攻撃状態でない、またはトレイルリセットフラグが立っている場合
 	if ((state != STATE::LEFT_ATTACK
@@ -887,7 +887,7 @@ void PLAYER::TrailUpdate()
 	}
 }
 
-void PLAYER::UpdateVerticalVelocity(float elapsed_frame)
+void Player::UpdateVerticalVelocity(float elapsed_frame)
 {
 	//プレイヤーのアニメーションが飛行開始でない場合は通常の重力を適用
 	if (playerAnimation != PlayerAnimation::PLAYER_WING_START)
@@ -903,7 +903,7 @@ void PLAYER::UpdateVerticalVelocity(float elapsed_frame)
 	}
 }
 
-void PLAYER::LoadDataFile()
+void Player::LoadDataFile()
 {
 	// Jsonファイルから値を取得
 	std::filesystem::path path = filePath;
@@ -925,7 +925,7 @@ void PLAYER::LoadDataFile()
 	}
 }
 
-void PLAYER::SaveDataFile()
+void Player::SaveDataFile()
 {
 	// ベースクラスの初期化パラメーター情報を更新
 	param.charaInitParam = charaParam;
@@ -945,7 +945,7 @@ void PLAYER::SaveDataFile()
 	}
 }
 
-void PLAYER::DebugPrimitiveUpdate()
+void Player::DebugPrimitiveUpdate()
 {
 	//デバッグレンダラーのインスタンスを取得
 	DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
@@ -996,7 +996,7 @@ void PLAYER::DebugPrimitiveUpdate()
 		DEBUG_COLLIDER_COLOR);  // 自キャラの当たり判定を緑色で表示
 }
 
-void PLAYER::DebugGUI()
+void Player::DebugGUI()
 {
 #ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
@@ -1006,7 +1006,7 @@ void PLAYER::DebugGUI()
 	if (displayPlayerImgui)
 	{
 
-		if (ImGui::Begin("PLAYER", nullptr, ImGuiWindowFlags_None))
+		if (ImGui::Begin("Player", nullptr, ImGuiWindowFlags_None))
 		{
 			//カメラ
 			//トランスフォーム

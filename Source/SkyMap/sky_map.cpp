@@ -1,9 +1,9 @@
 #include "sky_map.h"
-#include "texture.h"
-#include "shader.h"
-#include "graphics.h"
+#include "Sprite/texture.h"
+#include "Shader/shader.h"
+#include "Graphics/graphics.h"
 
-#include "misc.h"
+#include "Framework/misc.h"
 
 SkyMap::SkyMap(ID3D11Device* device, const wchar_t* filename, bool generate_mips)
 {

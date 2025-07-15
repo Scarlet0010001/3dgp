@@ -123,126 +123,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\camera.cpp">
-      <Filter>Sources\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\character.cpp">
-      <Filter>Sources\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\player.cpp">
-      <Filter>Sources\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\player_action.cpp">
-      <Filter>Sources\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\collision.cpp">
-      <Filter>Sources\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\collision_mesh.cpp">
-      <Filter>Sources\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\debug_renderer.cpp">
-      <Filter>Sources\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\framework.cpp">
-      <Filter>Sources\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\main.cpp">
-      <Filter>Sources\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\framebuffer.cpp">
-      <Filter>Sources\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\fullscreen_quad.cpp">
-      <Filter>Sources\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\graphics.cpp">
-      <Filter>Sources\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\device.cpp">
-      <Filter>Sources\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\game_pad.cpp">
-      <Filter>Sources\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\mouse.cpp">
-      <Filter>Sources\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\light.cpp">
-      <Filter>Sources\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\light_manager.cpp">
-      <Filter>Sources\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\geometric_primitive.cpp">
-      <Filter>Sources\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\skinned_mesh.cpp">
-      <Filter>Sources\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\static_mesh.cpp">
-      <Filter>Sources\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\scene_game.cpp">
-      <Filter>Sources\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\scene_loading.cpp">
-      <Filter>Sources\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\scene_manager.cpp">
-      <Filter>Sources\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\scene_title.cpp">
-      <Filter>Sources\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\shader.cpp">
-      <Filter>Sources\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\sky_map.cpp">
-      <Filter>Sources\Skymap</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\sprite.cpp">
-      <Filter>Sources\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\sprite_batch.cpp">
-      <Filter>Sources\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\texture.cpp">
-      <Filter>Sources\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\stage_main.cpp">
-      <Filter>Sources\Stage</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\stage_manager.cpp">
-      <Filter>Sources\Stage</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\audio.cpp">
-      <Filter>Sources\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\gltf_model.cpp">
-      <Filter>Sources\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\radial_blur.cpp">
-      <Filter>Sources\Radial_Blur</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\bullet.cpp">
-      <Filter>Sources\Bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\bullet_manager.cpp">
-      <Filter>Sources\Bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\bullet_straight.cpp">
-      <Filter>Sources\Bullet</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\boss.cpp">
-      <Filter>Sources\Character\Boss</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\boss_action.cpp">
-      <Filter>Sources\Character\Boss</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\noise.cpp">
-      <Filter>Sources\User</Filter>
-    </ClCompile>
     <ClCompile Include="Source\imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -267,26 +147,146 @@
     <ClCompile Include="Source\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Source\gauge_ui.cpp">
-      <Filter>Sources\UI</Filter>
+    <ClCompile Include="Source\Audio\audio.cpp">
+      <Filter>Sources\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Source\player_ui.cpp">
-      <Filter>Sources\Character\Player</Filter>
+    <ClCompile Include="Source\Bullet\bullet.cpp">
+      <Filter>Sources\Bullet</Filter>
     </ClCompile>
-    <ClCompile Include="Source\glitch_chromatic_aberration.cpp">
-      <Filter>Sources\Glitch</Filter>
+    <ClCompile Include="Source\Bullet\bullet_manager.cpp">
+      <Filter>Sources\Bullet</Filter>
     </ClCompile>
-    <ClCompile Include="Source\effect_manager.cpp">
-      <Filter>Sources\Effect</Filter>
+    <ClCompile Include="Source\Bullet\bullet_straight.cpp">
+      <Filter>Sources\Bullet</Filter>
     </ClCompile>
-    <ClCompile Include="Source\effect.cpp">
-      <Filter>Sources\Effect</Filter>
+    <ClCompile Include="Source\Camera\camera.cpp">
+      <Filter>Sources\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Boss_ui.cpp">
+    <ClCompile Include="Source\Character\Boss\boss.cpp">
       <Filter>Sources\Character\Boss</Filter>
     </ClCompile>
-    <ClCompile Include="Source\primitive_renderer.cpp">
+    <ClCompile Include="Source\Character\Boss\boss_action.cpp">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\Boss\boss_ui.cpp">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\Player\player.cpp">
+      <Filter>Sources\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\Player\player_action.cpp">
+      <Filter>Sources\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\Player\player_ui.cpp">
+      <Filter>Sources\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\character.cpp">
+      <Filter>Sources\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Collision\collision.cpp">
+      <Filter>Sources\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Collision\collision_mesh.cpp">
+      <Filter>Sources\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Debug\debug_renderer.cpp">
+      <Filter>Sources\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Effect\effect.cpp">
+      <Filter>Sources\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Effect\effect_manager.cpp">
+      <Filter>Sources\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Framework\framework.cpp">
+      <Filter>Sources\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Framework\main.cpp">
+      <Filter>Sources\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Glitch\glitch_chromatic_aberration.cpp">
+      <Filter>Sources\Glitch</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\framebuffer.cpp">
       <Filter>Sources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\fullscreen_quad.cpp">
+      <Filter>Sources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\graphics.cpp">
+      <Filter>Sources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\primitive_renderer.cpp">
+      <Filter>Sources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Input\device.cpp">
+      <Filter>Sources\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Input\game_pad.cpp">
+      <Filter>Sources\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Input\mouse.cpp">
+      <Filter>Sources\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Light\light.cpp">
+      <Filter>Sources\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Light\light_manager.cpp">
+      <Filter>Sources\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Model\geometric_primitive.cpp">
+      <Filter>Sources\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Model\gltf_model.cpp">
+      <Filter>Sources\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Model\skinned_mesh.cpp">
+      <Filter>Sources\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Model\static_mesh.cpp">
+      <Filter>Sources\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RadialBlur\radial_blur.cpp">
+      <Filter>Sources\Radial_Blur</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\scene_game.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\scene_loading.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\scene_manager.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\scene_title.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\shader.cpp">
+      <Filter>Sources\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SkyMap\sky_map.cpp">
+      <Filter>Sources\Skymap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sprite\sprite.cpp">
+      <Filter>Sources\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sprite\sprite_batch.cpp">
+      <Filter>Sources\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sprite\texture.cpp">
+      <Filter>Sources\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Stage\stage_main.cpp">
+      <Filter>Sources\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Stage\stage_manager.cpp">
+      <Filter>Sources\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ui\gauge_ui.cpp">
+      <Filter>Sources\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\User\noise.cpp">
+      <Filter>Sources\User</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -295,150 +295,6 @@
     </ClInclude>
     <ClInclude Include="Source\interval.h">
       <Filter>Sources</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\character.h">
-      <Filter>Sources\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\damage_func.h">
-      <Filter>Sources\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\player.h">
-      <Filter>Sources\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\camera.h">
-      <Filter>Sources\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\collision.h">
-      <Filter>Sources\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\collision_mesh.h">
-      <Filter>Sources\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\hit_result.h">
-      <Filter>Sources\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\primitive.h">
-      <Filter>Sources\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\constant.h">
-      <Filter>Sources\Constant</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\debug_renderer.h">
-      <Filter>Sources\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\framework.h">
-      <Filter>Sources\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\high_resolution_timer.h">
-      <Filter>Sources\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\misc.h">
-      <Filter>Sources\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\framebuffer.h">
-      <Filter>Sources\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\fullscreen_quad.h">
-      <Filter>Sources\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\graphics.h">
-      <Filter>Sources\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\device.h">
-      <Filter>Sources\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\game_pad.h">
-      <Filter>Sources\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\mouse.h">
-      <Filter>Sources\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\light.h">
-      <Filter>Sources\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\light_manager.h">
-      <Filter>Sources\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\geometric_primitive.h">
-      <Filter>Sources\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\skinned_mesh.h">
-      <Filter>Sources\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\static_mesh.h">
-      <Filter>Sources\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\scene.h">
-      <Filter>Sources\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\scene_game.h">
-      <Filter>Sources\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\scene_loading.h">
-      <Filter>Sources\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\scene_manager.h">
-      <Filter>Sources\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\scene_title.h">
-      <Filter>Sources\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\shader.h">
-      <Filter>Sources\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\sky_map.h">
-      <Filter>Sources\Skymap</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\sprite.h">
-      <Filter>Sources\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\sprite_batch.h">
-      <Filter>Sources\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\texture.h">
-      <Filter>Sources\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\stage.h">
-      <Filter>Sources\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\stage_main.h">
-      <Filter>Sources\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\stage_manager.h">
-      <Filter>Sources\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\audio.h">
-      <Filter>Sources\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\par_shapes.h">
-      <Filter>Sources\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\gltf_model.h">
-      <Filter>Sources\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\radial_blur.h">
-      <Filter>Sources\Radial_Blur</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\bullet.h">
-      <Filter>Sources\Bullet</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\bullet_manager.h">
-      <Filter>Sources\Bullet</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\bullet_straight.h">
-      <Filter>Sources\Bullet</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\boss.h">
-      <Filter>Sources\Character\Boss</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\user.h">
-      <Filter>Sources\User</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\operators.h">
-      <Filter>Sources\User</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\noise.h">
-      <Filter>Sources\User</Filter>
     </ClInclude>
     <ClInclude Include="Source\imgui\imconfig.h">
       <Filter>imgui</Filter>
@@ -464,29 +320,173 @@
     <ClInclude Include="Source\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ui.h">
-      <Filter>Sources\UI</Filter>
+    <ClInclude Include="Source\Audio\audio.h">
+      <Filter>Sources\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Source\gauge_ui.h">
-      <Filter>Sources\UI</Filter>
+    <ClInclude Include="Source\Bullet\bullet.h">
+      <Filter>Sources\Bullet</Filter>
     </ClInclude>
-    <ClInclude Include="Source\player_ui.h">
-      <Filter>Sources\Character\Player</Filter>
+    <ClInclude Include="Source\Bullet\bullet_manager.h">
+      <Filter>Sources\Bullet</Filter>
     </ClInclude>
-    <ClInclude Include="Source\glitch_chromatic_aberration.h">
-      <Filter>Sources\Glitch</Filter>
+    <ClInclude Include="Source\Bullet\bullet_straight.h">
+      <Filter>Sources\Bullet</Filter>
     </ClInclude>
-    <ClInclude Include="Source\effect_manager.h">
-      <Filter>Sources\Effect</Filter>
+    <ClInclude Include="Source\Camera\camera.h">
+      <Filter>Sources\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Source\effect.h">
-      <Filter>Sources\Effect</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Boss_ui.h">
+    <ClInclude Include="Source\Character\Boss\boss.h">
       <Filter>Sources\Character\Boss</Filter>
     </ClInclude>
-    <ClInclude Include="Source\primitive_renderer.h">
+    <ClInclude Include="Source\Character\Boss\boss_ui.h">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Character\Player\player.h">
+      <Filter>Sources\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Character\Player\player_ui.h">
+      <Filter>Sources\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Character\character.h">
+      <Filter>Sources\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Character\damage_func.h">
+      <Filter>Sources\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Collision\collision.h">
+      <Filter>Sources\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Collision\collision_mesh.h">
+      <Filter>Sources\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Collision\hit_result.h">
+      <Filter>Sources\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Collision\par_shapes.h">
+      <Filter>Sources\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Collision\primitive.h">
+      <Filter>Sources\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Constant\constant.h">
+      <Filter>Sources\Constant</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Debug\debug_renderer.h">
+      <Filter>Sources\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Effect\effect.h">
+      <Filter>Sources\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Effect\effect_manager.h">
+      <Filter>Sources\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Framework\framework.h">
+      <Filter>Sources\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Framework\high_resolution_timer.h">
+      <Filter>Sources\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Framework\misc.h">
+      <Filter>Sources\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Glitch\glitch_chromatic_aberration.h">
+      <Filter>Sources\Glitch</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\framebuffer.h">
       <Filter>Sources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\fullscreen_quad.h">
+      <Filter>Sources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\graphics.h">
+      <Filter>Sources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\primitive_renderer.h">
+      <Filter>Sources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Input\device.h">
+      <Filter>Sources\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Input\game_pad.h">
+      <Filter>Sources\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Input\mouse.h">
+      <Filter>Sources\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Light\light.h">
+      <Filter>Sources\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Light\light_manager.h">
+      <Filter>Sources\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Model\geometric_primitive.h">
+      <Filter>Sources\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Model\gltf_model.h">
+      <Filter>Sources\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Model\skinned_mesh.h">
+      <Filter>Sources\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Model\static_mesh.h">
+      <Filter>Sources\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RadialBlur\radial_blur.h">
+      <Filter>Sources\Radial_Blur</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\scene.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\scene_game.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\scene_loading.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\scene_manager.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\scene_title.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\shader.h">
+      <Filter>Sources\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SkyMap\sky_map.h">
+      <Filter>Sources\Skymap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sprite\sprite.h">
+      <Filter>Sources\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sprite\sprite_batch.h">
+      <Filter>Sources\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sprite\texture.h">
+      <Filter>Sources\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Stage\stage.h">
+      <Filter>Sources\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Stage\stage_main.h">
+      <Filter>Sources\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Stage\stage_manager.h">
+      <Filter>Sources\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Ui\gauge_ui.h">
+      <Filter>Sources\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Ui\ui.h">
+      <Filter>Sources\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\User\noise.h">
+      <Filter>Sources\User</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\User\operators.h">
+      <Filter>Sources\User</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\User\user.h">
+      <Filter>Sources\User</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

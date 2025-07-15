@@ -1,6 +1,6 @@
-#include "player_UI.h"
-#include "camera.h"
-#include "user.h"
+#include "Character/Player/player_ui.h"
+#include "Camera/camera.h"
+#include "User/user.h"
 
 PlayerHpGauge::PlayerHpGauge() :
 	GaugeUI(L"Resources/Sprite/UI/Gauge/HPframeGauge.png",

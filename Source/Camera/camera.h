@@ -1,9 +1,9 @@
 #pragma once
 #include <d3d11.h>
 #include <DirectXMath.h>
-#include "constant.h"
-#include "user.h"
-#include "noise.h"
+#include "Constant/constant.h"
+#include "User/user.h"
+#include "User/noise.h"
 #include <cereal/cereal.hpp>
 
 class Camera

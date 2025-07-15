@@ -1,7 +1,7 @@
 #include "bullet_manager.h"
-#include "collision.h"
-#include "camera.h"
-#include "user.h"
+#include "Collision/collision.h"
+#include "Camera/camera.h"
+#include "User/user.h"
 
 #include <filesystem>
 #include <fstream>
@@ -113,7 +113,7 @@ void BulletManager::Clear()
     bullets.clear();
 }
 
-void BulletManager::CollisionBullet(PLAYER* player, Boss*boss)
+void BulletManager::CollisionBullet(Player* player, Boss*boss)
 {
     //インスタンス取得
     Camera& camera = Camera::Instance();
@@ -254,7 +254,7 @@ void BulletManager::DebugGUI()
 #ifdef USE_IMGUI
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-    ImguiMenuBar("Bullet", "PLAYER", displayPlayerImgui);
+    ImguiMenuBar("Bullet", "Player", displayPlayerImgui);
 
     if (displayPlayerImgui)
     {

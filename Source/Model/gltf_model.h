@@ -1,16 +1,12 @@
 #pragma once
 #define NOMINMAX
-//#include <d3d11.h>
 #include <wrl.h>
-//#include <directxmath.h>
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #include "tinygltf-release/tiny_gltf.h"
 #include <unordered_map>
-//#include <sstream>
-//#include <filesystem>
-#include "collision_mesh.h"
+#include "Collision/collision_mesh.h"
 
 
 class gltf_model

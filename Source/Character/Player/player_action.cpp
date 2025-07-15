@@ -1,21 +1,21 @@
-#include "player.h"
-#include "operators.h"
-#include "bullet_straight.h"
+#include "Character/Player/player.h"
+#include "User/operators.h"
+#include "Bullet/bullet_straight.h"
 
-void PLAYER::TransitionIdleState()
+void Player::TransitionIdleState()
 {
 	//待機状態へ偏移
-	pUpdate = &PLAYER::UpdateIdleState;
+	pUpdate = &Player::UpdateIdleState;
 
 	//状態とアニメーションをIDLEへ偏移
 	state = STATE::IDLE;
 	playerAnimation = PlayerAnimation::PLAYER_IDLE;
 }
 
-void PLAYER::TransitionMoveState()
+void Player::TransitionMoveState()
 {
 	//移動状態へ偏移
-	pUpdate = &PLAYER::UpdateMoveState;
+	pUpdate = &Player::UpdateMoveState;
 
 	//状態をMOVEへ偏移
 	state = STATE::MOVE;
@@ -24,10 +24,10 @@ void PLAYER::TransitionMoveState()
 	charaParam.acceleration = accelerationState[ToInt(ACCELERATION_STATE::MOVE)];
 }
 
-void PLAYER::TransitionWingState()
+void Player::TransitionWingState()
 {
 	//飛行状態へ偏移
-	pUpdate = &PLAYER::UpdateWingState;
+	pUpdate = &Player::UpdateWingState;
 
 	//状態とアニメーションをWINGへ偏移
 	state = STATE::WING;
@@ -40,10 +40,10 @@ void PLAYER::TransitionWingState()
 	isBoost = false;
 }
 
-void PLAYER::TransitionBoostState()
+void Player::TransitionBoostState()
 {
 	//ブースト状態へ偏移
-	pUpdate = &PLAYER::UpdateBoostState;
+	pUpdate = &Player::UpdateBoostState;
 
 	//状態とアニメーションをBOOSTへ偏移
 	state = STATE::BOOST;
@@ -67,10 +67,10 @@ void PLAYER::TransitionBoostState()
 	param.avoidanceTimer = 0;
 }
 
-void PLAYER::TransitionJumpState()
+void Player::TransitionJumpState()
 {
 	//ジャンプ状態へ偏移
-	pUpdate = &PLAYER::UpdateJumpState;
+	pUpdate = &Player::UpdateJumpState;
 
 	//地面にいるかどうかでアニメーションを変更
 	if(isGround)
@@ -85,30 +85,30 @@ void PLAYER::TransitionJumpState()
 	charaParam.acceleration = accelerationState[ToInt(ACCELERATION_STATE::MOVE)];
 }
 
-void PLAYER::TransitionLandingState()
+void Player::TransitionLandingState()
 {
 	//着地状態へ偏移
-	pUpdate = &PLAYER::UpdateLandingState;
+	pUpdate = &Player::UpdateLandingState;
 
 	//状態とアニメーションをJUMP_ENDへ偏移
 	state = STATE::JUMP;
 	playerAnimation = PlayerAnimation::PLAYER_JUMP_END;
 }
 
-void PLAYER::TransitionShotState()
+void Player::TransitionShotState()
 {
 	//射撃状態へ偏移
-	pUpdate = &PLAYER::UpdateShotState;
+	pUpdate = &Player::UpdateShotState;
 
 	//状態とアニメーションをSHOTへ偏移
 	state = STATE::SHOT;
 	playerAnimation = PlayerAnimation::PLAYER_SHOT_IDLE;
 }
 
-void PLAYER::TransitionCombo01State()
+void Player::TransitionCombo01State()
 {
 	//コンボ1状態へ偏移
-	pUpdate = &PLAYER::UpdateComboState;
+	pUpdate = &Player::UpdateComboState;
 
 	//状態とアニメーションをATTACK_01へ偏移
 	state = STATE::RIGHT_ATTACK;
@@ -129,10 +129,10 @@ void PLAYER::TransitionCombo01State()
 	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(SOUND_VOLUME_SABER);
 }
 
-void PLAYER::TransitionCombo02State()
+void Player::TransitionCombo02State()
 {
 	//コンボ2状態へ偏移
-	pUpdate = &PLAYER::UpdateComboState;
+	pUpdate = &Player::UpdateComboState;
 
 	//状態とアニメーションをATTACK_02へ偏移
 	state = STATE::LEFT_ATTACK;
@@ -153,10 +153,10 @@ void PLAYER::TransitionCombo02State()
 	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(SOUND_VOLUME_SABER);
 }
 
-void PLAYER::TransitionCombo03State()
+void Player::TransitionCombo03State()
 {
 	//コンボ3状態へ偏移
-	pUpdate = &PLAYER::UpdateComboState;
+	pUpdate = &Player::UpdateComboState;
 
 	//状態とアニメーションをATTACK_03へ偏移
 	state = STATE::RIGHT_ATTACK;
@@ -176,10 +176,10 @@ void PLAYER::TransitionCombo03State()
 	audios[ToInt(PLAYER_SE::SE_SABER)]->volume(SOUND_VOLUME_SABER);
 }
 
-void PLAYER::TransitionDamageState()
+void Player::TransitionDamageState()
 {
 	//ダメージ状態へ偏移
-	pUpdate = &PLAYER::UpdateDamageState;
+	pUpdate = &Player::UpdateDamageState;
 
 	//状態とアニメーションをDAMAGEへ偏移
 	state = STATE::DAMAGE;
@@ -190,10 +190,10 @@ void PLAYER::TransitionDamageState()
 	glitch_CATimer = 0.03f;
 }
 
-void PLAYER::TransitionDeadState()
+void Player::TransitionDeadState()
 {
 	//死亡状態へ偏移
-	pUpdate = &PLAYER::UpdateDeadState;
+	pUpdate = &Player::UpdateDeadState;
 
 	//状態とアニメーションをDEADへ偏移
 	state = STATE::DEAD;
@@ -201,7 +201,7 @@ void PLAYER::TransitionDeadState()
 
 }
 
-void PLAYER::UpdateIdleState(float elapsedTime)
+void Player::UpdateIdleState(float elapsedTime)
 {
 	//動いていたら移動状態へ偏移
 	if (InputMove(elapsedTime))
@@ -231,7 +231,7 @@ void PLAYER::UpdateIdleState(float elapsedTime)
 
 }
 
-void PLAYER::UpdateMoveState(float elapsedTime)
+void Player::UpdateMoveState(float elapsedTime)
 {
 	//スティック入力
 	float ax = gamePad->GetAxis_LX();
@@ -271,7 +271,7 @@ void PLAYER::UpdateMoveState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void PLAYER::UpdateWingState(float elapsedTime)
+void Player::UpdateWingState(float elapsedTime)
 {
 	//飛行開始アニメーションの終了判定
 	if (playerAnimation == PlayerAnimation::PLAYER_WING_START)
@@ -316,7 +316,7 @@ void PLAYER::UpdateWingState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void PLAYER::UpdateBoostState(float elapsedTime)
+void Player::UpdateBoostState(float elapsedTime)
 {	
 	//進行方向のベクトル取得
 	float ax = gamePad->GetAxis_LX();
@@ -356,7 +356,7 @@ void PLAYER::UpdateBoostState(float elapsedTime)
 	//回避時間の更新
 	param.avoidanceTimer += elapsedTime;
 }
-void PLAYER::UpdateJumpState(float elapsedTime)
+void Player::UpdateJumpState(float elapsedTime)
 {
 	//ジャンプ開始アニメーションの終了判定
 	if (playerAnimation == PlayerAnimation::PLAYER_JUMP_START)
@@ -392,7 +392,7 @@ void PLAYER::UpdateJumpState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void PLAYER::UpdateLandingState(float elapsedTime)
+void Player::UpdateLandingState(float elapsedTime)
 {
 	//着地アニメーションが終了したら待機状態へ遷移
 	if (model->GetIsEndAnimation())
@@ -401,7 +401,7 @@ void PLAYER::UpdateLandingState(float elapsedTime)
 	}
 }
 
-void PLAYER::UpdateShotState(float elapsedTime)
+void Player::UpdateShotState(float elapsedTime)
 {
 	//コントローラーのスティック入力を取得
 	float ax = gamePad->GetAxis_LX();
@@ -444,7 +444,7 @@ void PLAYER::UpdateShotState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void PLAYER::UpdateComboState(float elapsedTime)
+void Player::UpdateComboState(float elapsedTime)
 {
 	//先行入力チェックと攻撃当たり判定のオンオフ
 	CheckPreInput(nowCombo);
@@ -464,7 +464,7 @@ void PLAYER::UpdateComboState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void PLAYER::UpdateDamageState(float elapsedTime)
+void Player::UpdateDamageState(float elapsedTime)
 {
 	static float damageTimer = 0.0f;
 
@@ -483,7 +483,7 @@ void PLAYER::UpdateDamageState(float elapsedTime)
 	UpdateVelocity(elapsedTime, position);
 }
 
-void PLAYER::UpdateDeadState(float elapsedTime)
+void Player::UpdateDeadState(float elapsedTime)
 {
 	// アニメーション終了時に死亡フラグを設定
 	if (model->GetIsEndAnimation())

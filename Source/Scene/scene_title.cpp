@@ -1,7 +1,7 @@
 #include "scene_title.h"
 #include "scene_loading.h"
 #include "scene_game.h"
-#include "device.h"
+#include "Input/device.h"
 #include "scene_manager.h"
 #include "imgui/imgui.h"
 

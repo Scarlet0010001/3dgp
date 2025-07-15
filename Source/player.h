@@ -2,7 +2,7 @@
 #include "Input/device.h"
 #include "Camera/camera.h"
 #include "Character/character.h"
-#include "player_ui.h"
+#include "Character/Player/player_ui.h"
 #include "RadialBlur/radial_blur.h"
 #include "Glitch/glitch_chromatic_aberration.h"
 

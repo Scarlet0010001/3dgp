@@ -1,9 +1,9 @@
 #pragma once
 #include <functional>
-#include "primitive.h"
+#include "Collision/primitive.h"
 #include <cereal/cereal.hpp>
-#include "camera.h"
-#include "game_pad.h"
+#include "Camera/camera.h"
+#include "Input/game_pad.h"
 struct AttackParam
 {
 	bool isAttack;//UŒ‚’†‚©‚Ç‚¤‚©

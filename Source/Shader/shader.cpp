@@ -2,8 +2,6 @@
 #include <d3d11.h>
 #include <vector>
 
-#include "shader.h"
-
 using namespace std;
 
 void Shader::Active(ID3D11DeviceContext* immediate_context)

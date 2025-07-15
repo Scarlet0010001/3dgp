@@ -1,7 +1,6 @@
 #pragma once
 #include "scene.h"
-#include "sprite_batch.h"
-//#include <memory>
+#include "Sprite/sprite_batch.h"
 
 class SceneLoading :
     public Scene

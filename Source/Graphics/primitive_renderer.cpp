@@ -1,6 +1,6 @@
 #include "primitive_renderer.h"
-#include "misc.h"
-#include "shader.h"
+#include "Framework/misc.h"
+#include "Shader/shader.h"
 
 // コンストラクタ
 PrimitiveRenderer::PrimitiveRenderer(ID3D11Device* device)

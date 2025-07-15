@@ -1,5 +1,5 @@
-#include "effect_manager.h"
-#include "graphics.h"
+#include "Effect/effect_manager.h"
+#include "Graphics/graphics.h"
 // ‰Šú‰»
 void EffectManager::Initialize()
 {

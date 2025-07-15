@@ -1,11 +1,11 @@
 ﻿#include "static_mesh.h"
-#include "shader.h"
-#include "texture.h"
+#include "Shader/shader.h"
+#include "Sprite/texture.h"
+#include "Framework/misc.h"
 #include <fstream>
 #include <filesystem>
 #include <vector>
 #include <string>
-#include "misc.h"
 
 using namespace DirectX;
 

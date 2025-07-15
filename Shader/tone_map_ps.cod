@@ -47,20 +47,64 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB8[8], immediateIndexed
 dcl_sampler s0, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
 dcl_input_ps linear v1.xy
 dcl_output o0.xyzw
 dcl_temps 3
-sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v1.xyxx, t0.xyzw, s0
-mad r1.xyz, r0.xyzx, l(2.510000, 2.510000, 2.510000, 0.000000), l(0.030000, 0.030000, 0.030000, 0.000000)
-mul r1.xyz, r0.xyzx, r1.xyzx
-mad r2.xyz, r0.xyzx, l(2.430000, 2.430000, 2.430000, 0.000000), l(0.590000, 0.590000, 0.590000, 0.000000)
-mad r0.xyz, r0.xyzx, r2.xyzx, l(0.140000, 0.140000, 0.140000, 0.000000)
-mov o0.w, r0.w
-div_sat r0.xyz, r1.xyzx, r0.xyzx
+//
+// Initial variable locations:
+//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
+//   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 86 "C:\Users\2220411\Desktop\課題\自作ライブラリ\描画とゲープロmark2\描画とゲープロ\HLSL\tone_map_ps.hlsl"
+sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v1.xyxx, t0.xyzw, s0  // r0.x <- sampled_color.x; r0.y <- sampled_color.y; r0.z <- sampled_color.z; r0.w <- sampled_color.w
+
+#line 87
+mov r0.xyz, r0.xyzx  // r0.x <- fragment_color.x; r0.y <- fragment_color.y; r0.z <- fragment_color.z
+
+#line 88
+mov r0.w, r0.w  // r0.w <- alpha
+
+#line 96
+nop 
+mov r0.xyz, r0.xyzx
+
+#line 76
+mov r1.x, l(2.510000)  // r1.x <- a
+
+#line 77
+mov r1.y, l(0.030000)  // r1.y <- b
+
+#line 78
+mov r1.z, l(2.430000)  // r1.z <- c
+
+#line 79
+mov r1.w, l(0.590000)  // r1.w <- d
+
+#line 80
+mov r2.x, l(0.140000)  // r2.x <- e
+
+#line 81
+mul r2.yzw, r0.xxyz, r1.xxxx
+add r2.yzw, r1.yyyy, r2.yyzw
+mul r2.yzw, r0.xxyz, r2.yyzw
+mul r1.xyz, r0.xyzx, r1.zzzz
+add r1.xyz, r1.wwww, r1.xyzx
+mul r0.xyz, r0.xyzx, r1.xyzx
+add r0.xyz, r2.xxxx, r0.xyzx
+div r0.xyz, r2.yzwy, r0.xyzx
+max r0.xyz, r0.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)
+min r0.xyz, r0.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)  // r0.x <- <ACESFilm return value>.x; r0.y <- <ACESFilm return value>.y; r0.z <- <ACESFilm return value>.z
+
+#line 96
+mov r0.xyz, r0.xyzx  // r0.x <- fragment_color.x; r0.y <- fragment_color.y; r0.z <- fragment_color.z
+
+#line 104
 mul o0.xyz, r0.xyzx, cb8[7].xyzx
+mov o0.w, r0.w
 ret 
-// Approximately 9 instruction slots used
+// Approximately 24 instruction slots used

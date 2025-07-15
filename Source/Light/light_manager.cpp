@@ -1,6 +1,6 @@
 #include "light_manager.h"
-#include "shader.h"
-#include "user.h"
+#include "Shader/shader.h"
+#include "User/user.h"
 
 void LightManager::Initialize()
 {

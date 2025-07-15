@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
 #include "bullet.h"
-#include "player.h"
-#include "Boss.h"
+#include "Character/Player/player.h"
+#include "Character/Boss/boss.h"
 
-#include "effect.h"
+#include "Effect/effect.h"
 
 #include <set>
 #include <cereal/cereal.hpp>
@@ -111,7 +111,7 @@ public:
     }
 
     //íeä€Ç∆íeä€Ç∆ÇÃè’ìÀèàóù
-    void CollisionBullet(PLAYER* player, Boss* boss);
+    void CollisionBullet(Player* player, Boss* boss);
 
 private:
 

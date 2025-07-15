@@ -6,13 +6,13 @@
 #include <wrl.h>
 #include <sstream>
 #include <mutex>
-#include "misc.h"
-#include "debug_renderer.h"
+#include "Framework/misc.h"
+#include "Debug/debug_renderer.h"
 #include "primitive_renderer.h"
-#include "shader.h"
-#include "constant.h"
-#include "gltf_model.h"
-#include "user.h"
+#include "Shader/shader.h"
+#include "Constant/constant.h"
+#include "Model/gltf_model.h"
+#include "User/user.h"
 
 
 #if _DEBUG

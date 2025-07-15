@@ -1,7 +1,7 @@
 #pragma once
 #include "scene.h"
-#include "sprite_batch.h"
-#include "audio.h"
+#include "Sprite/sprite_batch.h"
+#include "Audio/audio.h"
 
 class SceneTitle :
     public Scene

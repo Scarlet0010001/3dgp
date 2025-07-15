@@ -1,9 +1,9 @@
 #pragma once
 #include <DirectXMath.h>
-#include "graphics.h"
-#include "sprite.h"
-#include "constant.h"
-#include "fullscreen_quad.h"
+#include "Graphics/graphics.h"
+#include "Sprite/sprite.h"
+#include "Constant/constant.h"
+#include "Graphics/fullscreen_quad.h"
 
 //GlitchChromaticAberration
 //色収差グリッチ

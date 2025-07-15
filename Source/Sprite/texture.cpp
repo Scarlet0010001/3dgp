@@ -1,6 +1,6 @@
 #include "texture.h"
 #include <WICTextureLoader.h>
-#include "misc.h"
+#include "Framework/misc.h"
 #include <filesystem> // C++17以降でfilesystemが標準機能として利用可能
 
 using namespace DirectX;

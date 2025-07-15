@@ -1,7 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 #include "damage_func.h"
-#include "gltf_model.h"
+#include "Model/gltf_model.h"
 
 class Character
 {

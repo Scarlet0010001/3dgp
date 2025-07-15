@@ -1,6 +1,6 @@
-#include "effect.h"
-#include "Graphics.h"
-#include "effect_manager.h"
+#include "Effect/effect.h"
+#include "Graphics/graphics.h"
+#include "Effect/effect_manager.h"
 
 // コンストラクタ
 Effect::Effect(const char* filename)

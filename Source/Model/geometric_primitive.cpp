@@ -1,7 +1,7 @@
 #include "geometric_primitive.h"
-#include "shader.h"
+#include "Shader/shader.h"
+#include "Framework/misc.h"
 #include <vector>
-#include "misc.h"
 
 geometric_primitive::geometric_primitive(ID3D11Device* device)
 {

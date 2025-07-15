@@ -1,7 +1,7 @@
 #include "debug_renderer.h"
-#include "shader.h"
-#include "misc.h"
-#include "user.h"
+#include "Shader/shader.h"
+#include "Framework/misc.h"
+#include "User/user.h"
 
 DebugRenderer::DebugRenderer(ID3D11Device* device)
 {

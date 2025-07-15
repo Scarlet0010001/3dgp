@@ -1,9 +1,9 @@
-#include "framework.h"
+#include "Framework/framework.h"
 #include "camera.h"
-#include "graphics.h"
-#include "stage_manager.h"
-#include "operators.h"
-#include "debug_renderer.h"
+#include "Graphics/graphics.h"
+#include "Stage/stage_manager.h"
+#include "User/operators.h"
+#include "Debug/debug_renderer.h"
 #include <SimpleMath.h>
 
 Camera::Camera()

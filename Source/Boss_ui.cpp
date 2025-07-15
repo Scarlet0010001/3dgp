@@ -1,5 +1,5 @@
 #include "Boss_ui.h"
-#include "User/user.h"
+#include "user.h"
 
 BossHpGauge::BossHpGauge():
 	GaugeUI(L"Resources/Sprite/UI/Gauge/HPframeGauge.png",

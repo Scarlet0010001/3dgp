@@ -1,5 +1,5 @@
 #pragma once
-#include "graphics.h"
+#include "Graphics/graphics.h"
 //シーン基底クラス
 class Scene
 {

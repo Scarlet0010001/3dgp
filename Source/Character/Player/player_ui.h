@@ -1,5 +1,5 @@
 #pragma once
-#include "gauge_UI.h"
+#include "Ui/gauge_ui.h"
 
 class PlayerHpGauge : public GaugeUI
 {

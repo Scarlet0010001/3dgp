@@ -5,7 +5,7 @@
 
 #include "Audio/audio.h"
 #include "Effect/effect.h"
-#include "boss_ui.h"
+#include "Character/Boss/boss_ui.h"
 
 #include "Collision/primitive.h"
 #include <cereal/cereal.hpp>

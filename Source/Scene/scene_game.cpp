@@ -1,16 +1,16 @@
 #include "scene_game.h"
 
-#include "device.h"
+#include "Input/device.h"
 
 #include "scene_manager.h"
 #include "scene_title.h"
 #include "scene_loading.h"
 
-#include "bullet_manager.h"
-#include "effect_manager.h"
+#include "Bullet/bullet_manager.h"
+#include "Effect/effect_manager.h"
 
-#include "stage_manager.h"
-#include "stage_main.h"
+#include "Stage/stage_manager.h"
+#include "Stage/stage_main.h"
 
 
 SceneGame::SceneGame()
@@ -31,7 +31,7 @@ void SceneGame::Initialize()
     {
         camera = &Camera::Instance();
         camera->Initialize();
-        player = std::make_unique<PLAYER>();
+        player = std::make_unique<Player>();
         boss = std::make_unique<Boss>();
 
         StageManager& stageManager = StageManager::Instance();

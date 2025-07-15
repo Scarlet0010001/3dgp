@@ -1,6 +1,6 @@
-#include "misc.h"
-#include "shader.h"
-#include "texture.h"
+#include "Framework/misc.h"
+#include "Shader/shader.h"
+#include "Sprite/texture.h"
 #include "skinned_mesh.h"
 #include <sstream>
 #include <functional>

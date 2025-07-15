@@ -1,6 +1,6 @@
 #pragma once
 #include "bullet.h"
-#include "effect.h"
+#include "Effect/effect.h"
 
 class BulletStraight :
     public Bullet

@@ -1,5 +1,5 @@
-#include "Graphics.h"
-#include "framework.h"
+#include "graphics.h"
+#include "Framework/framework.h"
 
 Graphics::~Graphics()
 {

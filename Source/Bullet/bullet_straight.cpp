@@ -1,6 +1,6 @@
 #include "bullet_straight.h"
 #include "bullet_manager.h"
-#include "user.h"
+#include "User/user.h"
 
 BulletStraight::BulletStraight(BulletManager* manager, BULLET_MASTER MasterType)
     :Bullet(manager)

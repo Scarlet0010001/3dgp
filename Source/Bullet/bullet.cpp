@@ -1,7 +1,7 @@
 #include "bullet.h"
 #include "bullet_manager.h"
-#include "debug_renderer.h"
-#include "user.h"
+#include "Debug/debug_renderer.h"
+#include "User/user.h"
 
 Bullet::Bullet(BulletManager* manager) :manager(manager)
 {

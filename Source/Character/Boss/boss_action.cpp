@@ -1,5 +1,5 @@
 #include "boss.h"
-#include "noise.h"
+#include "User/noise.h"
 
 /*--------------------ó‘Ô‘JˆÚ------------------------*/
 void Boss::TransitionIdleState()

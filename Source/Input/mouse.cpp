@@ -1,6 +1,6 @@
-#include "user.h"
+#include "User/user.h"
 #include "mouse.h"
-#include "graphics.h"
+#include "Graphics/graphics.h"
 
 static const int KeyMap[] =
 {

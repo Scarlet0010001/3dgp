@@ -1,7 +1,7 @@
 #pragma once
-#include "graphics.h"
-#include "camera.h"
-#include "collision.h"
+#include "Graphics/graphics.h"
+#include "Camera/camera.h"
+#include "Collision/collision.h"
 class Camera;
 
 class Stage

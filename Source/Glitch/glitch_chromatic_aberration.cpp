@@ -1,6 +1,6 @@
 #include "glitch_chromatic_aberration.h"
-#include "user.h"
-#include "texture.h"
+#include "User/user.h"
+#include "Sprite/texture.h"
 
 Glitch_CA::Glitch_CA(ID3D11Device* device)
 {

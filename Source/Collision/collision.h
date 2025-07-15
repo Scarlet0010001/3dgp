@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gltf_model.h"
+#include "Model/gltf_model.h"
 #include "hit_result.h"
 
 class Collision

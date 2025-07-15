@@ -1,6 +1,6 @@
 #include "sprite.h"
 #include "texture.h"
-#include "misc.h"
+#include "Framework/misc.h"
 #include <sstream>
 #include <WICTextureLoader.h>
 #include <wrl.h>

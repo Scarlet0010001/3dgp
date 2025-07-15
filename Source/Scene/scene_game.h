@@ -1,16 +1,16 @@
 #pragma once
 #include "scene.h"
-#include "camera.h"
-#include "player.h"
-#include "boss.h"
+#include "Camera/camera.h"
+#include "Character/Player/player.h"
+#include "Character/Boss/boss.h"
 
-#include "light_manager.h"
-#include "framebuffer.h"
+#include "Light/light_manager.h"
+#include "Graphics/framebuffer.h"
 
-#include "audio.h"
-#include "sky_map.h"
-#include "radial_blur.h"
-#include "glitch_chromatic_aberration.h"
+#include "Audio/audio.h"
+#include "SkyMap/sky_map.h"
+#include "RadialBlur/radial_blur.h"
+#include "Glitch/glitch_chromatic_aberration.h"
 
 
 class SceneGame :
@@ -37,7 +37,7 @@ private:
     //カメラ
     Camera* camera = nullptr;
     //プレイヤー
-    std::unique_ptr<PLAYER> player = nullptr;
+    std::unique_ptr<Player> player = nullptr;
     //ボス
     std::unique_ptr<Boss> boss = nullptr;
     //キャラ初期位置

@@ -1,13 +1,13 @@
 #include "gltf_model.h"
 #define TINYGLTF_IMPLEMENTATION
 #include "tinygltf-release/tiny_gltf.h"
-#include "misc.h"
-#include "user.h"
+#include "Framework/misc.h"
+#include "User/user.h"
+#include "Shader/shader.h"
+#include "Sprite/texture.h"
 #include <stack>
 #include <functional>
 #include <filesystem>
-#include "shader.h"
-#include "texture.h"
 
 // 画像データを読み込まないtinygltf用の画像ローダー関数
 bool null_load_image_data(tinygltf::Image*, const int, std::string*, std::string*,

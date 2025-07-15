@@ -1,8 +1,8 @@
 #pragma once
 #define CAST_SHADOW 1
-#include "graphics.h"
+#include "Graphics/graphics.h"
 #include "light.h"
-#include "fullscreen_quad.h"
+#include "Graphics/fullscreen_quad.h"
 #include <map>
 
 class LightManager
