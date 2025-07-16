@@ -55,15 +55,15 @@ void Player::TransitionBoostState()
 
 	//ブースト効果音
 	audios[ToInt(PLAYER_SE::SE_BOOST)]->play();
-	audios[ToInt(PLAYER_SE::SE_BOOST)]->volume(0.5f);
+	audios[ToInt(PLAYER_SE::SE_BOOST)]->volume(SOUND_VOLUME_BOOST);
 
 	//ラジアルブラー設定
-	player_RadialBlurConstant.blurStrength = 1.0f;
-	player_RadialBlurConstant.blurRadius = 1.0f;
-	radialTimer = player_RadialBlurConstant.blurTimer = 0.5f;
+	player_RadialBlurConstant.blurStrength = BOOST_BLUR_STRENGTH;
+	player_RadialBlurConstant.blurRadius = BOOST_BLUR_RADIUS;
+	radialTimer = player_RadialBlurConstant.blurTimer = BOOST_BLUR_DURATION;
 
 	//ブーストタイマーを減少、回避タイマーをリセット
-	param.boostTimer -= 2.5f;
+	param.boostTimer -= BOOST_TIMER_DECREASE;
 	param.avoidanceTimer = 0;
 }
 

@@ -44,7 +44,6 @@ Boss::Boss()
 
 	//初期化処理
 	Initialize();
-
 }
 
 void Boss::Initialize()
@@ -176,7 +175,6 @@ void Boss::Render_f(float elapsedTime)
 			transitionState = TRANSITION_STATE::TRANSITION;
 			time = 0.0f;	//時間のリセット
 			factor = 0.0f;  //遷移係数の初期化
-			break;
 
 		case TRANSITION_STATE::TRANSITION:
 			//アニメーション遷移のブレンド率を計算

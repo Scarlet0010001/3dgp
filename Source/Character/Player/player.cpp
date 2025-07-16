@@ -58,7 +58,6 @@ Player::Player()
 
 	// 初期化処理を実行
 	Initialize();
-
 }
 
 void Player::Initialize()
@@ -103,10 +102,6 @@ void Player::Initialize()
 
 	// 被ダメージ時の処理を設定
 	damagedFunction = [=](int damage, float invincible, WINCE_TYPE type)->bool {return ApplyDamage(damage, invincible, type); };
-}
-
-Player::~Player()
-{
 }
 
 void Player::Update(float elapsedTime)
@@ -223,7 +218,6 @@ void Player::Render_f(float elapsedTime)
 			transitionState = TRANSITION_STATE::TRANSITION;
 			time = 0.0f;	//時間のリセット
 			factor = 0.0f;	//遷移係数の初期化
-			break;
 
 		case TRANSITION_STATE::TRANSITION:
 			//アニメーション遷移のブレンド率を計算

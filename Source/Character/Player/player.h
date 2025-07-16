@@ -22,7 +22,7 @@ class Player final :
 public:
 	//コンストラクタとデストラクタ
     Player();
-    ~Player()override;
+	~Player()override {}
 
 	//初期化処理
 	void Initialize();
@@ -462,6 +462,13 @@ private:
 
 	const float CHARGE_SPEED = 3.0f;			//ブーストの回復速度
 	const float BOOST_MIN_THRESHOLD = 2.5f;		//ブーストのしきい値
+	const float BOOST_TIMER_DECREASE = 2.5f;	// ブーストタイマー消費量
+	
+	// ブースト時のラジアルブラー設定
+	const float BOOST_BLUR_STRENGTH = 1.0f;
+	const float BOOST_BLUR_RADIUS = 1.0f;
+	const float BOOST_BLUR_DURATION = 0.5f;
+
 
 	const float GLITCH_MAX_DURATION = 0.03f;	//グリッチ効果の最大持続時間
 	const float GLITCH_SHIFT_AMOUNT = 0.015f;	//RGBシフトの移動量
@@ -470,6 +477,9 @@ private:
 	
 	//射撃音のボリューム
 	const float SOUND_VOLUME_LASER = 0.3f;
+
+	//ブースト音のボリューム
+	const float SOUND_VOLUME_BOOST = 0.5f;
 
 	//サーベル音のボリューム
 	const float SOUND_VOLUME_SABER = 1.0f;
