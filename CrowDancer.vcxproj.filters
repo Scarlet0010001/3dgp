@@ -162,24 +162,6 @@
     <ClCompile Include="Source\Camera\camera.cpp">
       <Filter>Sources\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Character\Boss\boss.cpp">
-      <Filter>Sources\Character\Boss</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Character\Boss\boss_action.cpp">
-      <Filter>Sources\Character\Boss</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Character\Boss\boss_ui.cpp">
-      <Filter>Sources\Character\Boss</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Character\Player\player.cpp">
-      <Filter>Sources\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Character\Player\player_action.cpp">
-      <Filter>Sources\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Character\Player\player_ui.cpp">
-      <Filter>Sources\Character\Player</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Character\character.cpp">
       <Filter>Sources\Character</Filter>
     </ClCompile>
@@ -288,6 +270,24 @@
     <ClCompile Include="Source\User\noise.cpp">
       <Filter>Sources\User</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Character\Boss\boss.cpp">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\Boss\boss_action.cpp">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\Boss\boss_ui.cpp">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\Player\player.cpp">
+      <Filter>Sources\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\Player\player_action.cpp">
+      <Filter>Sources\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character\Player\player_ui.cpp">
+      <Filter>Sources\Character\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\inline.h">
@@ -334,18 +334,6 @@
     </ClInclude>
     <ClInclude Include="Source\Camera\camera.h">
       <Filter>Sources\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Character\Boss\boss.h">
-      <Filter>Sources\Character\Boss</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Character\Boss\boss_ui.h">
-      <Filter>Sources\Character\Boss</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Character\Player\player.h">
-      <Filter>Sources\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Character\Player\player_ui.h">
-      <Filter>Sources\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="Source\Character\character.h">
       <Filter>Sources\Character</Filter>
@@ -487,6 +475,18 @@
     </ClInclude>
     <ClInclude Include="Source\User\user.h">
       <Filter>Sources\User</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Character\Boss\boss.h">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Character\Boss\boss_ui.h">
+      <Filter>Sources\Character\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Character\Player\player.h">
+      <Filter>Sources\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Character\Player\player_ui.h">
+      <Filter>Sources\Character\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
